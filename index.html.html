@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#002614">
+<title>Prestação de Conta · Grupo Piveta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --verde-900:#002614;
+  --verde-800:#00381E;
+  --verde-700:#005629;
+  --verde-600:#0A6B37;
+  --oro-500:#C9A063;
+  --oro-300:#E6CB99;
+  --papel:#F4F2EC;
+  --papel-2:#EAE7DE;
+  --tinta:#14180F;
+  --linea:rgba(0,86,41,.16);
+  --rojo:#A33327;
+  --sombra:0 1px 2px rgba(0,38,20,.08), 0 8px 24px rgba(0,38,20,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--verde-900);
+  font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color:var(--tinta);
+  font-size:16px;
+  line-height:1.4;
+}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:520px;margin:0 auto;min-height:100vh;background:var(--papel);position:relative}
+
+/* ---------- Cabecera ---------- */
+header{
+  background:var(--verde-700);
+  color:#fff;
+  padding:18px 18px 16px;
+  position:relative;
+  overflow:hidden;
+}
+header::after{
+  content:"";position:absolute;inset:auto 0 0 0;height:3px;
+  background:linear-gradient(90deg,var(--oro-500) 0 33%,transparent 33% 100%);
+}
+.marca{display:flex;align-items:center;gap:11px}
+.marca svg{flex:0 0 auto}
+.marca .txt{line-height:1}
+.marca .g{
+  font-size:10px;letter-spacing:.34em;font-weight:600;
+  color:var(--oro-300);display:block;margin-bottom:3px;
+}
+.marca .p{
+  font-size:21px;font-weight:800;letter-spacing:.16em;
+  font-stretch:112%;display:block;
+}
+.eyebrow{
+  margin-top:16px;font-size:10.5px;letter-spacing:.2em;font-weight:600;
+  color:rgba(255,255,255,.62);text-transform:uppercase;
+}
+h1{
+  margin:3px 0 0;font-size:20px;font-weight:700;font-stretch:108%;
+  letter-spacing:-.01em;color:#fff;
+}
+
+/* ---------- Selector de colaborador ---------- */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:16px 0 0;
+  border:1px solid rgba(230,203,153,.36);border-radius:9px;overflow:hidden}
+.seg button{
+  appearance:none;border:0;background:transparent;color:rgba(255,255,255,.72);
+  font-family:inherit;font-size:11.5px;font-weight:600;letter-spacing:.06em;
+  padding:11px 4px;cursor:pointer;border-right:1px solid rgba(230,203,153,.24);
+  transition:background .16s,color .16s;
+}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--oro-500);color:var(--verde-900)}
+
+/* ---------- Barra de período ---------- */
+.periodo{
+  display:flex;align-items:center;gap:8px;padding:11px 18px;
+  background:var(--verde-800);border-top:1px solid rgba(230,203,153,.16);
+}
+.periodo label{font-size:10px;letter-spacing:.18em;font-weight:600;
+  color:rgba(230,203,153,.72);text-transform:uppercase;margin-right:2px}
+.periodo select{
+  appearance:none;background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(230,203,153,.28);
+  border-radius:7px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;
+  font-weight:500;cursor:pointer;
+}
+.periodo select option{color:#000}
+
+/* ---------- Totalizador (cinta) ---------- */
+.tape{background:var(--papel);padding:0 0 2px}
+.tape-top{
+  padding:20px 18px 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+}
+.tape-top .lbl{font-size:10px;letter-spacing:.2em;font-weight:600;color:rgba(20,24,15,.5);text-transform:uppercase}
+.total-num{
+  font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
+  font-size:40px;font-weight:600;line-height:.95;color:var(--verde-700);
+  letter-spacing:-.03em;margin-top:5px;
+}
+.total-num .cur{font-size:14px;font-weight:500;color:rgba(0,86,41,.55);margin-right:7px;letter-spacing:0}
+.contador{text-align:right;flex:0 0 auto}
+.contador .n{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:var(--tinta);line-height:1}
+.contador .u{font-size:9.5px;letter-spacing:.16em;color:rgba(20,24,15,.5);text-transform:uppercase;font-weight:600}
+
+.zigzag{height:9px;background:
+  linear-gradient(-45deg,transparent 74%,var(--papel-2) 75%) 0 0/9px 9px repeat-x,
+  linear-gradient(45deg,transparent 74%,var(--papel-2) 75%) 0 0/9px 9px repeat-x;
+  background-color:var(--papel);}
+
+/* ---------- Bloque dictado ---------- */
+.dictado{background:var(--papel-2);padding:18px}
+.mic{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:11px;
+  background:var(--verde-700);color:#fff;border:0;border-radius:12px;
+  padding:17px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.02em;
+  cursor:pointer;box-shadow:var(--sombra);transition:transform .12s,background .2s;
+}
+.mic:active{transform:scale(.985)}
+.mic[data-on="1"]{background:var(--rojo);animation:pulso 1.25s ease-in-out infinite}
+@keyframes pulso{0%,100%{box-shadow:0 0 0 0 rgba(163,51,39,.42)}50%{box-shadow:0 0 0 13px rgba(163,51,39,0)}}
+.mic svg{flex:0 0 auto}
+.hint{margin:11px 2px 0;font-size:12px;line-height:1.5;color:rgba(20,24,15,.6)}
+.hint b{color:var(--verde-700);font-weight:600}
+.transcript{
+  margin-top:11px;background:#fff;border:1px solid var(--linea);border-left:3px solid var(--oro-500);
+  border-radius:8px;padding:11px 13px;font-size:13.5px;color:rgba(20,24,15,.85);display:none;
+}
+.transcript.show{display:block}
+.transcript .tl{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(20,24,15,.45);
+  font-weight:600;margin-bottom:4px;display:block}
+.transcript .acts{margin-top:9px;display:flex;gap:7px;flex-wrap:wrap}
+.mini{
+  background:transparent;border:1px solid var(--linea);border-radius:20px;padding:5px 11px;
+  font-family:inherit;font-size:11.5px;font-weight:600;color:var(--verde-700);cursor:pointer;
+}
+.mini:active{background:var(--papel-2)}
+
+/* ---------- Formulario ---------- */
+form{padding:18px;background:var(--papel)}
+fieldset{border:0;margin:0 0 17px;padding:0}
+legend,.flabel{
+  font-size:10px;letter-spacing:.19em;font-weight:600;text-transform:uppercase;
+  color:rgba(20,24,15,.52);padding:0;margin-bottom:8px;display:block;
+}
+.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.chip{
+  background:#fff;border:1px solid var(--linea);border-radius:9px;padding:11px 4px;
+  font-family:inherit;font-size:12px;font-weight:600;color:rgba(20,24,15,.72);cursor:pointer;
+  transition:all .15s;
+}
+.chip[aria-pressed="true"]{background:var(--verde-700);border-color:var(--verde-700);color:#fff}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:15px}
+.f{display:flex;flex-direction:column}
+input[type=text],input[type=date],input[type=number],textarea{
+  width:100%;background:#fff;border:1px solid var(--linea);border-radius:9px;
+  padding:12px 13px;font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--tinta);
+  font-variant-numeric:tabular-nums;
+}
+textarea{font-family:'Archivo',sans-serif;font-size:14.5px;resize:vertical;min-height:64px;line-height:1.45}
+input:focus,textarea:focus{outline:2px solid var(--oro-500);outline-offset:1px;border-color:transparent}
+.with-mic{position:relative}
+.with-mic input,.with-mic textarea{padding-right:44px}
+.fmic{
+  position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:7px;
+  background:var(--papel-2);border:1px solid var(--linea);display:flex;align-items:center;
+  justify-content:center;cursor:pointer;padding:0;
+}
+.fmic[data-on="1"]{background:var(--rojo);border-color:var(--rojo)}
+.fmic[data-on="1"] svg path{fill:#fff}
+.valor-wrap{position:relative}
+.valor-wrap .gs{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);font-family:'IBM Plex Mono',monospace;
+  font-size:13px;color:rgba(20,24,15,.4);pointer-events:none;
+}
+.valor-wrap input{padding-left:38px;font-size:18px;font-weight:600}
+.acciones{display:grid;grid-template-columns:1fr;gap:9px;margin-top:4px}
+.btn-add{
+  background:var(--verde-700);color:#fff;border:0;border-radius:11px;padding:16px;
+  font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.02em;cursor:pointer;
+  box-shadow:var(--sombra);
+}
+.btn-add:disabled{background:var(--papel-2);color:rgba(20,24,15,.35);box-shadow:none;cursor:not-allowed}
+.btn-ghost{
+  background:transparent;border:1px solid var(--linea);border-radius:11px;padding:13px;
+  font-family:inherit;font-size:13.5px;font-weight:600;color:rgba(20,24,15,.6);cursor:pointer;
+}
+
+/* ---------- Listado (cinta de recibo) ---------- */
+.lista-sec{background:var(--verde-900);padding:22px 18px 30px}
+.lista-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:13px}
+.lista-head h2{margin:0;font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  font-weight:600;color:var(--oro-300)}
+.lista-head span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.45)}
+.recibo{background:var(--papel);border-radius:3px;position:relative;padding:2px 0 0;overflow:hidden}
+.recibo::before{content:"";display:block;height:9px;background:
+  linear-gradient(-45deg,var(--papel) 74%,transparent 75%) 0 0/9px 9px repeat-x,
+  linear-gradient(45deg,var(--papel) 74%,transparent 75%) 0 0/9px 9px repeat-x;}
+.item{padding:12px 15px;border-bottom:1px dashed rgba(0,86,41,.22);display:grid;
+  grid-template-columns:22px 1fr auto;gap:11px;align-items:start}
+.item:last-child{border-bottom:0}
+.item .idx{font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(20,24,15,.38);padding-top:2px}
+.item .cat{font-size:13.5px;font-weight:700;color:var(--verde-700);line-height:1.25}
+.item .meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(20,24,15,.55);margin-top:2px}
+.item .obs{font-size:12px;color:rgba(20,24,15,.62);margin-top:3px;line-height:1.35}
+.item .val{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;
+  text-align:right;white-space:nowrap;padding-top:1px}
+.item .del{background:none;border:0;color:var(--rojo);font-size:11px;font-weight:600;
+  font-family:inherit;cursor:pointer;padding:3px 0 0;display:block;margin-left:auto}
+.vacio{padding:34px 20px;text-align:center;color:rgba(20,24,15,.42);font-size:13.5px;line-height:1.55}
+.recibo-total{background:var(--verde-800);color:#fff;padding:14px 15px;display:flex;
+  justify-content:space-between;align-items:center}
+.recibo-total .l{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;
+  color:var(--oro-300)}
+.recibo-total .v{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600}
+.export{
+  width:100%;margin-top:18px;background:var(--oro-500);color:var(--verde-900);border:0;
+  border-radius:12px;padding:17px;font-family:inherit;font-size:15px;font-weight:800;
+  letter-spacing:.03em;cursor:pointer;
+}
+.export:disabled{opacity:.34;cursor:not-allowed}
+.pie{margin-top:15px;font-size:11px;line-height:1.6;color:rgba(255,255,255,.4);text-align:center}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translate(-50%,90px);background:var(--tinta);
+  color:#fff;padding:13px 20px;border-radius:10px;font-size:13.5px;font-weight:600;
+  transition:transform .28s cubic-bezier(.2,.8,.3,1);z-index:60;max-width:88%;text-align:center;
+}
+.toast.show{transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="marca">
+      <svg width="38" height="38" viewBox="0 0 48 48" aria-hidden="true">
+        <rect width="48" height="48" rx="6" fill="#004320"/>
+        <g fill="none" stroke="#C9A063" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 15c0-3 2-5 5-5 3 0 5 2 6 5"/>
+          <path d="M38 15c0-3-2-5-5-5-3 0-5 2-6 5"/>
+          <path d="M13 16c0 8 3 13 11 13s11-5 11-13"/>
+          <path d="M18 20.5h.01M30 20.5h.01" stroke-width="3"/>
+          <path d="M20 26.5c1.4 1.2 6.6 1.2 8 0"/>
+        </g>
+      </svg>
+      <span class="txt">
+        <span class="g">GRUPO</span>
+        <span class="p">PIVETA</span>
+      </span>
+    </div>
+    <p class="eyebrow">Cartão Coorporativo</p>
+    <h1>Prestação de Conta</h1>
+    <div class="seg" role="group" aria-label="Colaborador">
+      <button type="button" data-p="LAURO ZIMMER" aria-pressed="true">LAURO</button>
+      <button type="button" data-p="RENATO MOURA" aria-pressed="false">RENATO</button>
+      <button type="button" data-p="GUTTO BROETTO" aria-pressed="false">GUTTO</button>
+    </div>
+  </header>
+
+  <div class="periodo">
+    <label for="mes">Período</label>
+    <select id="mes"></select>
+    <select id="ano"></select>
+  </div>
+
+  <section class="tape">
+    <div class="tape-top">
+      <div>
+        <span class="lbl">Total del período</span>
+        <div class="total-num"><span class="cur">G$</span><span id="totalTxt">0</span></div>
+      </div>
+      <div class="contador">
+        <div class="n" id="cantTxt">0</div>
+        <div class="u">facturas</div>
+      </div>
+    </div>
+    <div class="zigzag"></div>
+  </section>
+
+  <section class="dictado">
+    <button class="mic" id="micFrase" type="button" data-on="0">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="micLbl">Dictar factura completa</span>
+    </button>
+    <p class="hint">Decí todo de corrido: <b>"Gasoil, factura 4521, hoy, 350 mil, en Copetrol"</b> — el sistema separa cada dato solo.</p>
+    <div class="transcript" id="tr">
+      <span class="tl">Escuché</span>
+      <span id="trTxt"></span>
+      <div class="acts">
+        <button class="mini" type="button" id="trObs">Usar como Observação</button>
+        <button class="mini" type="button" id="trClear">Descartar</button>
+      </div>
+    </div>
+  </section>
+
+  <form id="form" autocomplete="off">
+    <fieldset>
+      <legend>Despesa</legend>
+      <div class="chips" id="chips"></div>
+    </fieldset>
+
+    <div class="row">
+      <div class="f">
+        <span class="flabel">Número da NF</span>
+        <div class="with-mic">
+          <input type="text" id="nf" inputmode="numeric" placeholder="0000">
+          <button class="fmic" type="button" data-campo="nf" data-on="0" aria-label="Dictar NF">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0h2a8 8 0 0 1-7 7.9V22h-2v-3.1A8 8 0 0 1 4 11h2z" fill="#005629"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="f">
+        <span class="flabel">Data</span>
+        <input type="date" id="fecha">
+      </div>
+    </div>
+
+    <div class="f" style="margin-bottom:15px">
+      <span class="flabel">Valor</span>
+      <div class="valor-wrap">
+        <span class="gs">G$</span>
+        <input type="text" id="valor" inputmode="numeric" placeholder="0">
+      </div>
+    </div>
+
+    <div class="f" style="margin-bottom:15px">
+      <span class="flabel">Local · comercio</span>
+      <div class="with-mic">
+        <input type="text" id="local" list="locales" placeholder="Supermercado, estación…">
+        <button class="fmic" type="button" data-campo="local" data-on="0" aria-label="Dictar local">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0h2a8 8 0 0 1-7 7.9V22h-2v-3.1A8 8 0 0 1 4 11h2z" fill="#005629"/></svg>
+        </button>
+      </div>
+      <datalist id="locales"></datalist>
+    </div>
+
+    <div class="f" style="margin-bottom:17px">
+      <span class="flabel">Observação · detalle</span>
+      <div class="with-mic">
+        <textarea id="obs" placeholder="Detalle de la compra"></textarea>
+        <button class="fmic" type="button" data-campo="obs" data-on="0" aria-label="Dictar observación">
+          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0h2a8 8 0 0 1-7 7.9V22h-2v-3.1A8 8 0 0 1 4 11h2z" fill="#005629"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="acciones">
+      <button class="btn-add" type="submit" id="btnAdd">Agregar a la planilla</button>
+      <button class="btn-ghost" type="button" id="btnClear">Limpiar campos</button>
+    </div>
+  </form>
+
+  <section class="lista-sec">
+    <div class="lista-head">
+      <h2>Facturas cargadas</h2>
+      <span id="periodoTxt"></span>
+    </div>
+    <div class="recibo">
+      <div id="lista"></div>
+      <div class="recibo-total">
+        <span class="l">Total G$</span>
+        <span class="v" id="totalPie">0</span>
+      </div>
+    </div>
+    <button class="export" id="btnExport" type="button">Exportar JSON para la PC</button>
+    <p class="pie">Empresa: Bahia Rica · Moeda: PYG<br>Todos los datos quedan guardados en este celular.</p>
+  </section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   ALMACENAMIENTO
+   Usa localStorage cuando está disponible (celular / GitHub Pages).
+   Si el entorno lo bloquea, cae a memoria para no romper nada.
+   ============================================================ */
+const Store = (() => {
+  let mem = {}, ok = false;
+  try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); ok = true; } catch(e){}
+  return {
+    get(k){ try { return ok ? localStorage.getItem(k) : (mem[k] ?? null); } catch(e){ return mem[k] ?? null; } },
+    set(k,v){ try { ok ? localStorage.setItem(k,v) : (mem[k]=v); } catch(e){ mem[k]=v; } },
+    persistente: ok
+  };
+})();
+
+const KEY = 'piveta_pc_v1';
+let DB = { items: [], locales: [] };
+try { const raw = Store.get(KEY); if (raw) DB = JSON.parse(raw); } catch(e){}
+if (!Array.isArray(DB.items)) DB.items = [];
+if (!Array.isArray(DB.locales)) DB.locales = [];
+const guardar = () => Store.set(KEY, JSON.stringify(DB));
+
+/* ============================================================
+   DICCIONARIO — habla de campo → categoría oficial del Excel
+   ============================================================ */
+const CATEGORIAS = ['Hotel','Passagem','Refeição','Combustível','Manutenção','Outros'];
+
+const DICCIONARIO = {
+  'Combustível': ['gasoil','gasoil','gas oil','gasoíl','diesel','diésel','nafta','gasolina',
+    'combustible','combustivel','surtidor','estacion','estación','estacion de servicio',
+    'copetrol','puma','petrobras','petropar','barcos','shell','ypf','bencina','querosene','kerosene'],
+  'Refeição': ['comida','almuerzo','almorzar','almorce','cena','cenar','desayuno','merienda',
+    'restaurante','restaurant','consumicion','consumición','consumo','asado','parrilla','parrillada',
+    'cafe','café','comedor','empanada','hamburguesa','pizza','viveres','víveres','provista',
+    'mercaderia','mercadería','alimentos','comestibles','bebida','agua','gaseosa'],
+  'Hotel': ['hotel','hospedaje','alojamiento','posada','hostal','hostel','pernocte',
+    'habitacion','habitación','motel','cabaña','estadia','estadía','dormida'],
+  'Passagem': ['pasaje','pasajes','boleto','ticket','vuelo','avion','avión','aereo','aéreo',
+    'colectivo','omnibus','ómnibus','bus','micro','taxi','remis','uber','flete','encomienda',
+    'traslado','peaje','balsa','lancha'],
+  'Manutenção': ['mantenimiento','manutencion','manutención','repuesto','repuestos','taller',
+    'mecanico','mecánico','service','cubierta','cubiertas','neumatico','neumático','goma','gomas',
+    'gomeria','gomería','aceite','filtro','filtros','bateria','batería','reparacion','reparación',
+    'arreglo','lavado','lavadero','chaperia','chapería','pintura','soldadura','herramienta',
+    'herramientas','ferreteria','ferretería','tornillo','correa','bujia','bujía','engrase'],
+  'Outros': ['farmacia','remedio','medicamento','papeleria','papelería','oficina','limpieza',
+    'varios','otros','otro','celular','recarga','internet']
+};
+
+const norm = s => (s||'').toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/\s+/g,' ').trim();
+
+function detectarCategoria(txt){
+  const t = ' ' + norm(txt) + ' ';
+  let mejor = null, largo = 0;
+  for (const [cat, palabras] of Object.entries(DICCIONARIO)){
+    for (const p of palabras){
+      const np = norm(p);
+      if (t.includes(' ' + np) && np.length > largo){ mejor = cat; largo = np.length; }
+    }
+  }
+  return mejor;
+}
+
+/* ============================================================
+   NÚMEROS EN PALABRAS (español)
+   ============================================================ */
+const UNI = {cero:0,un:1,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,
+  diez:10,once:11,doce:12,trece:13,catorce:14,quince:15,dieciseis:16,diecisiete:17,dieciocho:18,
+  diecinueve:19,veinte:20,veintiuno:21,veintidos:22,veintitres:23,veinticuatro:24,veinticinco:25,
+  veintiseis:26,veintisiete:27,veintiocho:28,veintinueve:29,treinta:30,cuarenta:40,cincuenta:50,
+  sesenta:60,setenta:70,ochenta:80,noventa:90,cien:100,ciento:100,doscientos:200,trescientos:300,
+  cuatrocientos:400,quinientos:500,seiscientos:600,setecientos:700,ochocientos:800,novecientos:900};
+
+function palabrasANumero(txt){
+  const tk = norm(txt).split(/[\s\-]+/).filter(Boolean);
+  let total = 0, parcial = 0, hubo = false;
+  for (const w of tk){
+    if (w === 'y') continue;
+    if (w === 'mil'){ parcial = (parcial || 1) * 1000; total += parcial; parcial = 0; hubo = true; continue; }
+    if (/^millon(es)?$/.test(w)){ total = (total + parcial || 1) * 1000000; parcial = 0; hubo = true; continue; }
+    if (w in UNI){ parcial += UNI[w]; hubo = true; continue; }
+    if (/^\d+$/.test(w)){ parcial += parseInt(w,10); hubo = true; continue; }
+  }
+  return hubo ? total + parcial : null;
+}
+
+/* ============================================================
+   PARSER DE LA FRASE DICTADA
+   ============================================================ */
+function limpiarNum(s){ return s.replace(/[.\s]/g,'').replace(',', '.'); }
+
+function extraerNF(t){
+  const re = /(?:factura|nota fiscal|nota|nf|n\.?\s?f\.?|comprobante|boleta|numero|número|nro|n°)\s*(?:numero|número|nro)?\s*[:#]?\s*([0-9][0-9.\-\/]{0,15})/i;
+  const m = t.match(re);
+  if (!m) return null;
+  return { valor: m[1].replace(/[.\s]/g,''), inicio: m.index, fin: m.index + m[0].length };
+}
+
+const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
+  'septiembre','setiembre','octubre','noviembre','diciembre'];
+const MESNUM = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,
+  septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
+
+function extraerFecha(t){
+  const n = norm(t);
+  const hoy = new Date();
+  const iso = d => d.toISOString().slice(0,10);
+  if (/\bantes de ayer\b|\banteayer\b/.test(n)){ const d=new Date(hoy); d.setDate(d.getDate()-2); return iso(d); }
+  if (/\bayer\b/.test(n)){ const d=new Date(hoy); d.setDate(d.getDate()-1); return iso(d); }
+  if (/\bhoy\b/.test(n)) return iso(hoy);
+  let m = n.match(/\b(\d{1,2})\s*(?:de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\b/);
+  if (m){
+    const dd = +m[1], mm = MESNUM[m[2]];
+    return `${hoy.getFullYear()}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+  }
+  m = n.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
+  if (m){
+    const dd=+m[1], mm=+m[2];
+    let yy = m[3] ? +m[3] : hoy.getFullYear();
+    if (yy < 100) yy += 2000;
+    if (dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+  }
+  return null;
+}
+
+// Suma expresiones compuestas: "1 millón 200 mil" → 1.200.000
+function sumaEscalas(s){
+  const re = /(\d[\d.,]*)\s*(millones?|mill[oó]n|mil)\b/gi;
+  let total = 0, hubo = false, fin = 0, m;
+  while ((m = re.exec(s)) !== null){
+    const v = parseFloat(limpiarNum(m[1]));
+    if (isNaN(v)) continue;
+    total += v * (/^mil$/i.test(m[2]) ? 1000 : 1000000);
+    hubo = true; fin = m.index + m[0].length;
+  }
+  if (!hubo) return null;
+  const resto = s.slice(fin).match(/^\s*(?:y\s+)?(\d[\d.,]*)\b/);
+  if (resto){ const v = parseFloat(limpiarNum(resto[1])); if (!isNaN(v)) total += v; }
+  return Math.round(total);
+}
+
+function extraerValor(t){
+  // 1) dígitos con escala ("350 mil", "1 millón 200 mil")
+  const esc = sumaEscalas(t);
+  if (esc && esc > 0) return esc;
+  // 2) número con marcador de moneda ("85.000 guaraníes")
+  let m = t.match(/([\d][\d.,]*)\s*(guaran[ií]es|guaranis|gs\.?|g\$)/i);
+  if (m){
+    const v = parseFloat(limpiarNum(m[1]));
+    if (!isNaN(v) && v > 0) return Math.round(v);
+  }
+  // 3) número escrito en palabras con escala
+  m = norm(t).match(/((?:[a-z]+\s+){0,6}?(?:millones|millon|mil)\b(?:\s+[a-z]+){0,6})/);
+  if (m){
+    const v = palabrasANumero(m[1]);
+    if (v && v >= 1000) return v;
+  }
+  // 4) el número más grande que quede (>= 1000)
+  const nums = [...t.matchAll(/\b(\d{1,3}(?:\.\d{3})+|\d{4,})\b/g)]
+    .map(x => parseFloat(limpiarNum(x[1]))).filter(v => !isNaN(v) && v >= 1000);
+  if (nums.length) return Math.round(Math.max(...nums));
+  return null;
+}
+
+function extraerLocal(t){
+  const n = norm(t);
+  // a) coincide con un local ya usado antes
+  let mejor = null;
+  for (const l of DB.locales){
+    const nl = norm(l);
+    if (nl.length >= 3 && n.includes(nl) && (!mejor || nl.length > norm(mejor).length)) mejor = l;
+  }
+  if (mejor) return mejor;
+  // b) "... en <comercio>" al final de la frase
+  const m = t.match(/\ben\s+(?:el\s+|la\s+|los\s+|las\s+)?([A-Za-zÁÉÍÓÚÑáéíóúñ0-9][^,.;]{2,40})\s*$/i);
+  if (m) return m[1].trim().replace(/\s+/g,' ');
+  return null;
+}
+
+function parsearFrase(txt){
+  let t = txt.trim();
+  const r = { categoria:null, nf:null, fecha:null, valor:null, local:null };
+  const nf = extraerNF(t);
+  if (nf){ r.nf = nf.valor; t = t.slice(0, nf.inicio) + ' , ' + t.slice(nf.fin); }
+  r.categoria = detectarCategoria(txt);
+  r.fecha = extraerFecha(txt);
+  r.valor = extraerValor(t);
+  r.local = extraerLocal(txt);
+  return r;
+}
+
+/* ============================================================
+   ESTADO / UI
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const hoyISO = new Date().toISOString().slice(0,10);
+let colaborador = 'LAURO ZIMMER';
+let categoria = null;
+
+const NOMBRE_MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto',
+  'Septiembre','Octubre','Noviembre','Diciembre'];
+
+(function initPeriodo(){
+  const hoy = new Date();
+  const selM = $('#mes'), selA = $('#ano');
+  NOMBRE_MES.forEach((nm,i) => selM.add(new Option(nm, i+1)));
+  for (let y = hoy.getFullYear()-1; y <= hoy.getFullYear()+1; y++) selA.add(new Option(y, y));
+  selM.value = hoy.getMonth()+1;
+  selA.value = hoy.getFullYear();
+})();
+
+(function initChips(){
+  $('#chips').innerHTML = CATEGORIAS.map(c =>
+    `<button type="button" class="chip" data-cat="${c}" aria-pressed="false">${c}</button>`).join('');
+  $$('.chip').forEach(b => b.onclick = () => setCategoria(b.dataset.cat));
+})();
+
+function setCategoria(c){
+  categoria = c;
+  $$('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c)));
+  validar();
+}
+
+$$('.seg button').forEach(b => b.onclick = () => {
+  colaborador = b.dataset.p;
+  $$('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  render();
+});
+
+$('#mes').onchange = $('#ano').onchange = render;
+$('#fecha').value = hoyISO;
+
+const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n || 0));
+
+$('#valor').addEventListener('input', e => {
+  const raw = e.target.value.replace(/\D/g,'');
+  e.target.value = raw ? fmt(parseInt(raw,10)) : '';
+  validar();
+});
+$('#nf').addEventListener('input', validar);
+
+function valorNum(){ return parseInt($('#valor').value.replace(/\D/g,''),10) || 0; }
+function validar(){
+  $('#btnAdd').disabled = !(categoria && valorNum() > 0 && $('#fecha').value);
+}
+
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* ---------- Voz ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, micActivo = null;
+
+function escuchar(btn, onFinal){
+  if (!SR){ toast('Este navegador no soporta dictado por voz'); return; }
+  if (micActivo){ try{ rec.stop(); }catch(e){} return; }
+  rec = new SR();
+  rec.lang = 'es-PY'; rec.interimResults = false; rec.maxAlternatives = 1; rec.continuous = false;
+  micActivo = btn; btn.dataset.on = '1';
+  if (btn.id === 'micFrase') $('#micLbl').textContent = 'Escuchando… tocá para parar';
+  rec.onresult = e => { const txt = e.results[0][0].transcript; onFinal(txt); };
+  rec.onerror = e => { if (e.error !== 'aborted') toast('No se escuchó bien, probá de nuevo'); };
+  rec.onend = () => {
+    btn.dataset.on = '0'; micActivo = null;
+    if (btn.id === 'micFrase') $('#micLbl').textContent = 'Dictar factura completa';
+  };
+  try { rec.start(); } catch(e){ btn.dataset.on='0'; micActivo=null; }
+}
+
+$('#micFrase').onclick = () => escuchar($('#micFrase'), txt => {
+  $('#trTxt').textContent = txt;
+  $('#tr').classList.add('show');
+  const r = parsearFrase(txt);
+  const puestos = [];
+  if (r.categoria){ setCategoria(r.categoria); puestos.push('despesa'); }
+  if (r.nf){ $('#nf').value = r.nf; puestos.push('NF'); }
+  if (r.fecha){ $('#fecha').value = r.fecha; puestos.push('fecha'); }
+  if (r.valor){ $('#valor').value = fmt(r.valor); puestos.push('valor'); }
+  if (r.local){ $('#local').value = r.local; puestos.push('local'); }
+  validar();
+  toast(puestos.length ? 'Completado: ' + puestos.join(', ') : 'No se reconocieron datos, cargá a mano');
+});
+
+$$('.fmic').forEach(b => b.onclick = () => escuchar(b, txt => {
+  const campo = b.dataset.campo;
+  if (campo === 'nf'){
+    const d = txt.replace(/\D/g,''); $('#nf').value = d || txt.trim();
+  } else if (campo === 'local'){
+    $('#local').value = txt.trim();
+  } else {
+    $('#obs').value = ($('#obs').value ? $('#obs').value + ' ' : '') + txt.trim();
+  }
+  validar();
+}));
+
+$('#trObs').onclick = () => { $('#obs').value = $('#trTxt').textContent; toast('Copiado a Observação'); };
+$('#trClear').onclick = () => $('#tr').classList.remove('show');
+
+/* ---------- Alta ---------- */
+$('#form').onsubmit = e => {
+  e.preventDefault();
+  if (!categoria || valorNum() <= 0) return;
+  const local = $('#local').value.trim();
+  DB.items.push({
+    id: Date.now(),
+    colaborador,
+    mes: +$('#mes').value,
+    ano: +$('#ano').value,
+    despesa: categoria,
+    nf: $('#nf').value.trim(),
+    data: $('#fecha').value,
+    valor: valorNum(),
+    local,
+    obs: $('#obs').value.trim()
+  });
+  if (local && !DB.locales.some(l => norm(l) === norm(local))) DB.locales.push(local);
+  guardar(); limpiar(); render();
+  toast('Factura agregada');
+};
+
+function limpiar(){
+  setCategoria(null); categoria = null;
+  $$('.chip').forEach(b => b.setAttribute('aria-pressed','false'));
+  $('#nf').value=''; $('#valor').value=''; $('#local').value=''; $('#obs').value='';
+  $('#fecha').value = hoyISO;
+  $('#tr').classList.remove('show');
+  validar();
+}
+$('#btnClear').onclick = limpiar;
+
+/* ---------- Render ---------- */
+function actuales(){
+  const m = +$('#mes').value, a = +$('#ano').value;
+  return DB.items.filter(i => i.colaborador === colaborador && i.mes === m && i.ano === a)
+                 .sort((x,y) => (x.data||'').localeCompare(y.data||'') || x.id - y.id);
+}
+
+function render(){
+  const arr = actuales();
+  const total = arr.reduce((s,i) => s + i.valor, 0);
+  $('#totalTxt').textContent = fmt(total);
+  $('#totalPie').textContent = fmt(total);
+  $('#cantTxt').textContent = arr.length;
+  $('#periodoTxt').textContent = `${NOMBRE_MES[+$('#mes').value-1]} ${$('#ano').value}`;
+  $('#btnExport').disabled = arr.length === 0;
+
+  $('#lista').innerHTML = arr.length ? arr.map((i,n) => `
+    <div class="item">
+      <span class="idx">${String(n+1).padStart(2,'0')}</span>
+      <div>
+        <div class="cat">${i.despesa}</div>
+        <div class="meta">${i.nf ? 'NF ' + i.nf + ' · ' : ''}${i.data.split('-').reverse().join('/')}${i.local ? ' · ' + i.local : ''}</div>
+        ${i.obs ? `<div class="obs">${i.obs.replace(/</g,'&lt;')}</div>` : ''}
+      </div>
+      <div>
+        <div class="val">${fmt(i.valor)}</div>
+        <button class="del" data-id="${i.id}" type="button">Quitar</button>
+      </div>
+    </div>`).join('')
+    : `<div class="vacio">Todavía no cargaste facturas<br>para este período.</div>`;
+
+  $$('.del').forEach(b => b.onclick = () => {
+    DB.items = DB.items.filter(x => x.id !== +b.dataset.id);
+    guardar(); render(); toast('Factura quitada');
+  });
+
+  $('#locales').innerHTML = DB.locales.map(l => `<option value="${l.replace(/"/g,'&quot;')}">`).join('');
+}
+
+/* ---------- Exportar ---------- */
+$('#btnExport').onclick = () => {
+  const arr = actuales();
+  if (!arr.length) return;
+  const m = +$('#mes').value, a = +$('#ano').value;
+  const payload = {
+    version: 1,
+    colaborador,
+    empresa: 'Bahia Rica',
+    moeda: 'PYG',
+    periodo: { mes: m, ano: a, nombre: NOMBRE_MES[m-1] },
+    generado_en: new Date().toISOString(),
+    total: arr.reduce((s,i) => s + i.valor, 0),
+    itens: arr.map(i => ({
+      despesa: i.despesa, nf: i.nf, data: i.data,
+      valor: i.valor, local: i.local, obs: i.obs
+    }))
+  };
+  const nombre = `${colaborador.split(' ')[0]}_${NOMBRE_MES[m-1]}_${a}.json`;
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a2 = document.createElement('a');
+  a2.href = url; a2.download = nombre; a2.click();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  toast('Archivo generado: ' + nombre);
+};
+
+validar();
+render();
+</script>
+</body>
+</html>
