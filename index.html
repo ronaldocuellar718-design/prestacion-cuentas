@@ -156,7 +156,10 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .campo:focus{outline:0;border-color:var(--oro)}
 textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;resize:vertical;
   line-height:1.5}
-.fecha-fila{margin-top:9px}
+.campo-fecha{font-size:21px;font-weight:600;letter-spacing:.06em;text-align:center}
+.campo.mal{border-color:var(--rojo);background:#FDF4F3}
+.err{display:none;margin-top:7px;font-size:12.5px;font-weight:600;color:var(--rojo)}
+.err.on{display:block}
 
 .dictar{width:100%;margin-top:10px;padding:15px;border-radius:12px;background:var(--tinta);
   color:var(--papel);font-size:14.5px;font-weight:700;display:flex;align-items:center;
@@ -315,15 +318,10 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
       </div>
 
       <div class="bloque">
-        <span class="et">Data</span>
-        <div class="chips" id="chipsFecha">
-          <button class="chip" type="button" data-d="0" aria-pressed="true">Hoy</button>
-          <button class="chip" type="button" data-d="1" aria-pressed="false">Ayer</button>
-          <button class="chip" type="button" data-d="2" aria-pressed="false">Anteayer</button>
-        </div>
-        <div class="fecha-fila">
-          <input type="date" class="campo" id="fecha">
-        </div>
+        <span class="et">Data <i>· dd / mm / aaaa</i></span>
+        <input type="text" class="campo campo-fecha" id="fecha" inputmode="numeric"
+               placeholder="08/08/2026" maxlength="10" autocomplete="off">
+        <div class="err" id="errFecha">Fecha inválida</div>
       </div>
 
       <div class="bloque">
@@ -526,26 +524,48 @@ function elegirCategoria(c){
   revisarGuardar();
 }
 
-function revisarGuardar(){
-  $('#bGuardar').disabled = !(categoria && parseInt(digitos||'0',10) > 0 && $('#fecha').value);
+/* ── Fecha digitada: se escribe de corrido y se formatea sola ── */
+function isoAVista(iso){
+  if (!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
 }
 
-function fechaRelativa(dias){
-  const d = new Date(); d.setDate(d.getDate() - dias);
-  return d.toISOString().slice(0,10);
+function vistaAIso(txt){
+  const d = (txt||'').replace(/\D/g,'');
+  if (d.length !== 8) return null;
+  const dd = +d.slice(0,2), mm = +d.slice(2,4), yy = +d.slice(4,8);
+  if (mm < 1 || mm > 12 || dd < 1 || yy < 2000 || yy > 2100) return null;
+  const f = new Date(yy, mm-1, dd);
+  // rechaza fechas que no existen, como 31/02
+  if (f.getFullYear() !== yy || f.getMonth() !== mm-1 || f.getDate() !== dd) return null;
+  return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
 }
 
-function marcarChipFecha(){
-  const v = $('#fecha').value;
-  $$('#chipsFecha .chip').forEach(b =>
-    b.setAttribute('aria-pressed', String(v === fechaRelativa(+b.dataset.d))));
+function fechaISO(){ return vistaAIso($('#fecha').value); }
+
+function limpiarErrorFecha(){
+  $('#fecha').classList.remove('mal');
+  $('#errFecha').classList.remove('on');
 }
 
-$$('#chipsFecha .chip').forEach(b => b.onclick = () => {
-  $('#fecha').value = fechaRelativa(+b.dataset.d);
-  marcarChipFecha(); revisarGuardar();
+$('#fecha').addEventListener('input', e => {
+  const d = e.target.value.replace(/\D/g,'').slice(0,8);
+  e.target.value = d.length > 4 ? `${d.slice(0,2)}/${d.slice(2,4)}/${d.slice(4)}`
+                 : d.length > 2 ? `${d.slice(0,2)}/${d.slice(2)}`
+                 : d;
+  const completa = d.length === 8;
+  const mala = completa && !vistaAIso(e.target.value);
+  e.target.classList.toggle('mal', mala);
+  $('#errFecha').classList.toggle('on', mala);
+  revisarGuardar();
 });
-$('#fecha').onchange = () => { marcarChipFecha(); revisarGuardar(); };
+
+$('#fecha').addEventListener('focus', e => e.target.select());
+
+function revisarGuardar(){
+  $('#bGuardar').disabled = !(categoria && parseInt(digitos||'0',10) > 0 && fechaISO());
+}
 
 function pintarLocales(){
   const recientes = DB.locales.slice(-6).reverse();
@@ -569,18 +589,43 @@ $('#obs').addEventListener('input', () => {
 
 /* ═══════════════════════════════════════════════════════
    VOZ — solo para el detalle de la compra
-   Android apaga el micrófono ante cualquier pausa. Si eso
-   pasa mientras la persona sigue hablando lo reencendemos
-   sin que se note; termina solo cuando toca el botón.
+
+   La repetición se producía porque el texto se iba SUMANDO
+   en cada aviso del motor, y Android reenvía resultados ya
+   entregados. Ahora el texto de cada tanda se RECONSTRUYE
+   entero desde cero en cada aviso, así reenviar lo mismo no
+   agrega nada. Solo al cerrarse una tanda se pasa el texto
+   a firme y se arranca la siguiente.
    ═══════════════════════════════════════════════════════ */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, escuchando = false, base = '', dictado = '';
+let rec = null, escuchando = false;
+let base = '';      // lo que ya había escrito antes de dictar
+let firme = '';     // tandas anteriores ya cerradas
+let tanda = '';     // tanda en curso
+
+// Quita repeticiones seguidas de 1 a 6 palabras y deja la primera letra en mayúscula
+function limpiarDictado(t){
+  let s = (t||'').replace(/\s+/g,' ').trim();
+  for (let n = 6; n >= 1; n--){
+    const re = new RegExp('\\b((?:\\S+\\s+){' + (n-1) + '}\\S+)(?:\\s+\\1\\b)+', 'gi');
+    let antes;
+    do { antes = s; s = s.replace(re, '$1'); } while (s !== antes);
+  }
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+}
+
+function pintarDictado(parcial){
+  const todo = [base, firme, tanda, parcial].filter(Boolean).join(' ');
+  $('#obs').value = limpiarDictado(todo);
+}
 
 $('#bDictar').onclick = () => {
   if (!SR){ aviso('Este navegador no permite dictado'); return; }
   if (escuchando){ escuchando = false; try{ rec.stop(); }catch(e){} return; }
 
-  escuchando = true; base = $('#obs').value.trim(); dictado = '';
+  escuchando = true;
+  base = $('#obs').value.trim();
+  firme = ''; tanda = '';
   $('#bDictar').dataset.on = '1';
   $('#lblDictar').textContent = 'Escuchando… tocá para terminar';
 
@@ -588,28 +633,37 @@ $('#bDictar').onclick = () => {
     escuchando = false;
     $('#bDictar').dataset.on = '0';
     $('#lblDictar').textContent = 'Dictar el detalle';
-    $('#obs').value = (base + ' ' + dictado).trim();
+    pintarDictado('');
     $('#obs').dispatchEvent(new Event('input'));
   };
 
   const arrancar = () => {
     rec = new SR();
     rec.lang = 'es-PY'; rec.continuous = true; rec.interimResults = true;
+
     rec.onresult = e => {
-      let parcial = '';
-      for (let i = e.resultIndex; i < e.results.length; i++){
+      // se reconstruye TODA la tanda en cada aviso: reenviar no duplica
+      let cerrado = '', parcial = '';
+      for (let i = 0; i < e.results.length; i++){
         const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) dictado += t + ' '; else parcial += t;
+        if (e.results[i].isFinal) cerrado += t + ' '; else parcial += t + ' ';
       }
-      $('#obs').value = (base + ' ' + dictado + parcial).trim();
+      tanda = cerrado.trim();
+      pintarDictado(parcial.trim());
     };
+
     rec.onerror = e => {
       if (e.error !== 'no-speech' && e.error !== 'aborted') aviso('No se escuchó bien');
     };
+
     rec.onend = () => {
+      // la tanda se cierra: pasa a firme y se limpia para la siguiente
+      if (tanda) firme = (firme + ' ' + tanda).trim();
+      tanda = '';
       if (escuchando){ try { rec.start(); } catch(e){ terminar(); } }
       else terminar();
     };
+
     try { rec.start(); } catch(e){ terminar(); }
   };
 
@@ -621,19 +675,19 @@ $('#bDictar').onclick = () => {
    ═══════════════════════════════════════════════════════ */
 function nuevaFactura(){
   editandoId = null; digitos = ''; categoria = null;
-  $('#fecha').value = isoHoy();
+  $('#fecha').value = isoAVista(isoHoy());
   $('#nf').value = ''; $('#local').value = ''; $('#obs').value = '';
   $('#sugCat').innerHTML = '';
   $$('.tile').forEach(b => b.setAttribute('aria-pressed','false'));
   $('#tit2').textContent = 'Detalles';
   $('#bBorrar').style.display = 'none';
-  marcarChipFecha(); pintarMonto(); pintarLocales();
+  limpiarErrorFecha(); pintarMonto(); pintarLocales();
   ir('vValor');
 }
 
 function abrirFactura(it){
   editandoId = it.id; digitos = String(it.valor); categoria = it.despesa;
-  $('#fecha').value = it.data;
+  $('#fecha').value = isoAVista(it.data);
   $('#nf').value = it.nf || '';
   $('#local').value = it.local || '';
   $('#obs').value = it.obs || '';
@@ -641,7 +695,7 @@ function abrirFactura(it){
   $$('.tile').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === it.despesa)));
   $('#tit2').textContent = 'Modificar';
   $('#bBorrar').style.display = 'flex';
-  marcarChipFecha(); pintarMonto(); pintarLocales();
+  limpiarErrorFecha(); pintarMonto(); pintarLocales();
   $('#dMonto').textContent = fmt(it.valor);
   revisarGuardar();
   ir('vDetalle');
@@ -666,7 +720,7 @@ $('#bGuardar').onclick = () => {
     ano:  +$('#ano').value,
     despesa: categoria,
     nf:   $('#nf').value.trim(),
-    data: $('#fecha').value,
+    data: fechaISO(),
     valor: parseInt(digitos||'0',10),
     local,
     obs:  $('#obs').value.trim()
