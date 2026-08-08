@@ -156,7 +156,15 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .campo:focus{outline:0;border-color:var(--oro)}
 textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;resize:vertical;
   line-height:1.5}
-.campo-fecha{font-size:21px;font-weight:600;letter-spacing:.06em;text-align:center}
+.fecha3{display:flex;align-items:center;gap:8px}
+.fecha3 input{flex:1;min-width:0;background:var(--papel);border:1.5px solid var(--linea);
+  border-radius:11px;padding:15px 6px;font-family:'IBM Plex Mono',monospace;font-size:22px;
+  font-weight:600;text-align:center;color:var(--tinta);letter-spacing:.04em}
+.fecha3 input.ancho{flex:1.6}
+.fecha3 input::placeholder{color:#C6BDAC;font-size:17px;letter-spacing:.08em}
+.fecha3 input:focus{outline:0;border-color:var(--oro);background:#FFFDF8}
+.fecha3 b{color:var(--tinta-3);font-size:19px;font-weight:500}
+.fecha3.mal input{border-color:var(--rojo);background:#FDF4F3}
 .campo.mal{border-color:var(--rojo);background:#FDF4F3}
 .err{display:none;margin-top:7px;font-size:12.5px;font-weight:600;color:var(--rojo)}
 .err.on{display:block}
@@ -191,6 +199,22 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .confirm h3{margin:0 0 6px;font-size:18px;font-weight:700}
 .confirm p{margin:0 0 18px;font-size:14px;color:var(--tinta-3);line-height:1.5}
 .confirm .fila{display:flex;gap:9px}
+.confirm .caja{max-height:88dvh;overflow-y:auto}
+.enlace{display:block;width:100%;margin-top:11px;padding:11px;font-size:12.5px;font-weight:700;
+  color:var(--oro-osc);text-align:center;letter-spacing:.02em}
+.par{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.et2{font-size:9px;letter-spacing:.2em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
+  display:block;margin-bottom:6px}
+.par .campo{font-size:15px;padding:12px}
+.listaPal{margin-top:16px;max-height:34vh;overflow-y:auto}
+.pal{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--papel-2)}
+.pal .de{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--tinta-3);flex:1;min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pal .fl{color:var(--oro);font-weight:700;flex:0 0 auto}
+.pal .a{font-size:13.5px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.pal .x{flex:0 0 auto;color:var(--rojo);font-size:19px;font-weight:600;padding:0 6px;line-height:1}
+.vacioPal{padding:20px 4px;text-align:center;color:var(--tinta-3);font-size:13px}
 </style>
 </head>
 <body>
@@ -318,10 +342,15 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
       </div>
 
       <div class="bloque">
-        <span class="et">Data <i>· dd / mm / aaaa</i></span>
-        <input type="text" class="campo campo-fecha" id="fecha" inputmode="numeric"
-               placeholder="08/08/2026" maxlength="10" autocomplete="off">
-        <div class="err" id="errFecha">Fecha inválida</div>
+        <span class="et">Data</span>
+        <div class="fecha3" id="fecha3">
+          <input type="text" id="fD" inputmode="numeric" maxlength="2" placeholder="dd" autocomplete="off">
+          <b>/</b>
+          <input type="text" id="fM" inputmode="numeric" maxlength="2" placeholder="mm" autocomplete="off">
+          <b>/</b>
+          <input type="text" id="fA" inputmode="numeric" maxlength="4" placeholder="aaaa" class="ancho" autocomplete="off">
+        </div>
+        <div class="err" id="errFecha">Esa fecha no existe</div>
       </div>
 
       <div class="bloque">
@@ -339,10 +368,12 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
         <span class="et">Observação · detalle de la compra</span>
         <textarea class="campo" id="obs" placeholder="Qué se compró"></textarea>
         <div id="sugCat"></div>
+        <div id="sugPal"></div>
         <button class="dictar" id="bDictar" type="button" data-on="0">
           <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z" fill="currentColor"/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           <span id="lblDictar">Dictar el detalle</span>
         </button>
+        <button class="enlace" id="bPalabras" type="button">Palabras enseñadas · <span id="nPal">0</span></button>
       </div>
     </div>
 
@@ -357,6 +388,28 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 </div>
 
 <div class="aviso" id="aviso"></div>
+
+<div class="confirm" id="hojaPal">
+  <div class="caja">
+    <h3>Palabras enseñadas</h3>
+    <p>Cuando el dictado escuche mal una palabra, enseñale acá cómo se escribe. La próxima vez la va a corregir sola.</p>
+    <div class="par">
+      <div>
+        <span class="et2">Cuando escuche</span>
+        <input type="text" class="campo" id="palDe" placeholder="husverna" autocomplete="off">
+      </div>
+      <div>
+        <span class="et2">Escribir</span>
+        <input type="text" class="campo" id="palA" placeholder="Husqvarna" autocomplete="off">
+      </div>
+    </div>
+    <button class="btn btn-1" id="bAddPal" style="margin-top:12px;width:100%">Guardar palabra</button>
+    <div class="listaPal" id="listaPal"></div>
+    <div class="fila" style="margin-top:16px">
+      <button class="btn btn-2" id="bCerrarPal">Cerrar</button>
+    </div>
+  </div>
+</div>
 
 <div class="confirm" id="confirm">
   <div class="caja">
@@ -383,10 +436,11 @@ const Store = (() => {
 })();
 
 const KEY = 'piveta_pc_v1';
-let DB = { items: [], locales: [] };
+let DB = { items: [], locales: [], palabras: [] };
 try { const raw = Store.get(KEY); if (raw) DB = JSON.parse(raw); } catch(e){}
 if (!Array.isArray(DB.items))   DB.items   = [];
 if (!Array.isArray(DB.locales)) DB.locales = [];
+if (!Array.isArray(DB.palabras)) DB.palabras = [];   // palabras enseñadas por el usuario
 const guardarDB = () => Store.set(KEY, JSON.stringify(DB));
 
 /* ═══════════════════════════════════════════════════════
@@ -524,44 +578,63 @@ function elegirCategoria(c){
   revisarGuardar();
 }
 
-/* ── Fecha digitada: se escribe de corrido y se formatea sola ── */
-function isoAVista(iso){
-  if (!iso) return '';
-  const [y,m,d] = iso.split('-');
-  return `${d}/${m}/${y}`;
+/* ── Fecha en tres casillas: se salta sola de una a otra ── */
+const CD = () => $('#fD'), CM = () => $('#fM'), CA = () => $('#fA');
+
+function ponerFecha(iso){
+  if (!iso){ CD().value = CM().value = CA().value = ''; }
+  else {
+    const [y,m,d] = iso.split('-');
+    CD().value = d; CM().value = m; CA().value = y;
+  }
+  marcarFecha();
 }
 
-function vistaAIso(txt){
-  const d = (txt||'').replace(/\D/g,'');
-  if (d.length !== 8) return null;
-  const dd = +d.slice(0,2), mm = +d.slice(2,4), yy = +d.slice(4,8);
+function fechaISO(){
+  const dd = +CD().value, mm = +CM().value, yy = +CA().value;
+  if (!CD().value || !CM().value || CA().value.length !== 4) return null;
   if (mm < 1 || mm > 12 || dd < 1 || yy < 2000 || yy > 2100) return null;
   const f = new Date(yy, mm-1, dd);
-  // rechaza fechas que no existen, como 31/02
   if (f.getFullYear() !== yy || f.getMonth() !== mm-1 || f.getDate() !== dd) return null;
   return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
 }
 
-function fechaISO(){ return vistaAIso($('#fecha').value); }
+function marcarFecha(){
+  const completa = CD().value.length >= 1 && CM().value.length >= 1 && CA().value.length === 4;
+  const mala = completa && !fechaISO();
+  $('#fecha3').classList.toggle('mal', mala);
+  $('#errFecha').classList.toggle('on', mala);
+}
 
 function limpiarErrorFecha(){
-  $('#fecha').classList.remove('mal');
+  $('#fecha3').classList.remove('mal');
   $('#errFecha').classList.remove('on');
 }
 
-$('#fecha').addEventListener('input', e => {
-  const d = e.target.value.replace(/\D/g,'').slice(0,8);
-  e.target.value = d.length > 4 ? `${d.slice(0,2)}/${d.slice(2,4)}/${d.slice(4)}`
-                 : d.length > 2 ? `${d.slice(0,2)}/${d.slice(2)}`
-                 : d;
-  const completa = d.length === 8;
-  const mala = completa && !vistaAIso(e.target.value);
-  e.target.classList.toggle('mal', mala);
-  $('#errFecha').classList.toggle('on', mala);
-  revisarGuardar();
-});
-
-$('#fecha').addEventListener('focus', e => e.target.select());
+(function armarFecha(){
+  const cajas = [CD(), CM(), CA()];
+  cajas.forEach((c, i) => {
+    c.addEventListener('input', () => {
+      c.value = c.value.replace(/\D/g,'').slice(0, +c.maxLength);
+      if (c.value.length === +c.maxLength && cajas[i+1]){
+        cajas[i+1].focus(); cajas[i+1].select();
+      }
+      marcarFecha(); revisarGuardar();
+    });
+    c.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !c.value && cajas[i-1]){
+        cajas[i-1].focus();
+        cajas[i-1].setSelectionRange(cajas[i-1].value.length, cajas[i-1].value.length);
+      }
+    });
+    c.addEventListener('focus', () => c.select());
+    c.addEventListener('blur', () => {
+      // completa a dos dígitos: si escribió 7, queda 07
+      if (c !== CA() && c.value.length === 1) c.value = '0' + c.value;
+      marcarFecha(); revisarGuardar();
+    });
+  });
+})();
 
 function revisarGuardar(){
   $('#bGuardar').disabled = !(categoria && parseInt(digitos||'0',10) > 0 && fechaISO());
@@ -603,6 +676,92 @@ let base = '';      // lo que ya había escrito antes de dictar
 let firme = '';     // tandas anteriores ya cerradas
 let tanda = '';     // tanda en curso
 
+/* ── Palabras enseñadas ──────────────────────────────────
+   El motor de voz de Chrome no aprende. Pero podemos
+   corregir su salida: cada vez que el usuario enseña que
+   "lo que escuchaste como X en realidad es Y", guardamos
+   el par y lo aplicamos a todo dictado posterior.
+   La comparación ignora mayúsculas y acentos.
+   ─────────────────────────────────────────────────────── */
+const VOCAL = {a:'aáàäâ', e:'eéèëê', i:'iíìïî', o:'oóòöô', u:'uúùüû', n:'nñ', c:'cç'};
+
+function patronTolerante(txt){
+  return txt.trim().split(/\s+/).map(palabra =>
+    [...palabra].map(ch => {
+      const b = ch.toLowerCase();
+      if (VOCAL[b]) return '[' + VOCAL[b] + VOCAL[b].toUpperCase() + ']';
+      return ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('')
+  ).join('\\s+');
+}
+
+function aplicarPalabras(txt){
+  let s = txt;
+  for (const par of DB.palabras){
+    if (!par.de || !par.a) continue;
+    try {
+      const re = new RegExp('(^|[^\\p{L}\\p{N}])(' + patronTolerante(par.de) + ')(?![\\p{L}\\p{N}])', 'giu');
+      s = s.replace(re, (m, antes) => antes + par.a);
+    } catch(e){}
+  }
+  return s;
+}
+
+function pintarPalabras(){
+  $('#nPal').textContent = DB.palabras.length;
+  $('#listaPal').innerHTML = DB.palabras.length
+    ? DB.palabras.map((par,i) => `
+        <div class="pal">
+          <span class="de">${par.de.replace(/</g,'&lt;')}</span>
+          <span class="fl">→</span>
+          <span class="a">${par.a.replace(/</g,'&lt;')}</span>
+          <button class="x" type="button" data-i="${i}">×</button>
+        </div>`).join('')
+    : '<div class="vacioPal">Todavía no enseñaste ninguna palabra.</div>';
+  $$('#listaPal .x').forEach(b => b.onclick = () => {
+    DB.palabras.splice(+b.dataset.i, 1); guardarDB(); pintarPalabras();
+  });
+}
+
+function enseñarPalabra(de, a){
+  de = (de||'').trim(); a = (a||'').trim();
+  if (!de || !a) return false;
+  const i = DB.palabras.findIndex(x => norm(x.de) === norm(de));
+  if (i >= 0) DB.palabras[i].a = a; else DB.palabras.push({ de, a });
+  guardarDB(); pintarPalabras();
+  return true;
+}
+
+$('#bPalabras').onclick = () => { pintarPalabras(); $('#hojaPal').classList.add('on'); };
+$('#bCerrarPal').onclick = () => $('#hojaPal').classList.remove('on');
+$('#bAddPal').onclick = () => {
+  if (enseñarPalabra($('#palDe').value, $('#palA').value)){
+    $('#palDe').value = ''; $('#palA').value = '';
+    aviso('Palabra guardada');
+  } else aviso('Completá los dos campos');
+};
+
+/* Detecta si el usuario corrigió a mano una palabra recién dictada
+   y le ofrece recordarla para la próxima vez. */
+let textoDictado = '';
+
+$('#obs').addEventListener('blur', () => {
+  const ahora = $('#obs').value.trim();
+  if (!textoDictado || ahora === textoDictado){ $('#sugPal').innerHTML = ''; return; }
+  const antes = textoDictado.split(/\s+/), luego = ahora.split(/\s+/);
+  if (antes.length !== luego.length){ $('#sugPal').innerHTML = ''; return; }
+  const cambios = antes.map((w,i) => [w, luego[i]]).filter(([a,b]) => norm(a) !== norm(b));
+  if (cambios.length !== 1){ $('#sugPal').innerHTML = ''; return; }
+  const [de, a] = cambios[0];
+  $('#sugPal').innerHTML = `<div class="chips" style="margin-top:10px">
+      <button class="chip sug" type="button">¿Recordar que «${de}» es «${a}»?</button></div>`;
+  $('#sugPal .chip').onclick = () => {
+    enseñarPalabra(de, a);
+    $('#sugPal').innerHTML = ''; textoDictado = '';
+    aviso('Aprendido: ' + a);
+  };
+});
+
 // Quita repeticiones seguidas de 1 a 6 palabras y deja la primera letra en mayúscula
 function limpiarDictado(t){
   let s = (t||'').replace(/\s+/g,' ').trim();
@@ -611,6 +770,7 @@ function limpiarDictado(t){
     let antes;
     do { antes = s; s = s.replace(re, '$1'); } while (s !== antes);
   }
+  s = aplicarPalabras(s);
   return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
 }
 
@@ -634,6 +794,7 @@ $('#bDictar').onclick = () => {
     $('#bDictar').dataset.on = '0';
     $('#lblDictar').textContent = 'Dictar el detalle';
     pintarDictado('');
+    textoDictado = $('#obs').value.trim();
     $('#obs').dispatchEvent(new Event('input'));
   };
 
@@ -675,7 +836,7 @@ $('#bDictar').onclick = () => {
    ═══════════════════════════════════════════════════════ */
 function nuevaFactura(){
   editandoId = null; digitos = ''; categoria = null;
-  $('#fecha').value = isoAVista(isoHoy());
+  ponerFecha(isoHoy());
   $('#nf').value = ''; $('#local').value = ''; $('#obs').value = '';
   $('#sugCat').innerHTML = '';
   $$('.tile').forEach(b => b.setAttribute('aria-pressed','false'));
@@ -687,7 +848,7 @@ function nuevaFactura(){
 
 function abrirFactura(it){
   editandoId = it.id; digitos = String(it.valor); categoria = it.despesa;
-  $('#fecha').value = isoAVista(it.data);
+  ponerFecha(it.data);
   $('#nf').value = it.nf || '';
   $('#local').value = it.local || '';
   $('#obs').value = it.obs || '';
@@ -822,6 +983,7 @@ $('#bExport').onclick = () => {
 
 pintarMonto();
 pintarHome();
+pintarPalabras();
 </script>
 </body>
 </html>
