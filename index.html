@@ -2,833 +2,755 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#002614">
-<title>Prestação de Conta · Grupo Piveta</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#16130E">
+<title>Prestação de Conta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --verde-900:#002614;
-  --verde-800:#00381E;
-  --verde-700:#005629;
-  --verde-600:#0A6B37;
-  --oro-500:#C9A063;
-  --oro-300:#E6CB99;
-  --papel:#F4F2EC;
-  --papel-2:#EAE7DE;
-  --tinta:#14180F;
-  --linea:rgba(0,86,41,.16);
+  --tinta:#16130E;
+  --tinta-2:#2E281E;
+  --tinta-3:#5A5140;
+  --oro:#C08A2E;
+  --oro-osc:#8A6115;
+  --oro-luz:#F2E3C6;
+  --papel:#FBF9F5;
+  --papel-2:#F1ECE2;
+  --papel-3:#E4DCCB;
+  --linea:#DED5C4;
   --rojo:#A33327;
-  --sombra:0 1px 2px rgba(0,38,20,.08), 0 8px 24px rgba(0,38,20,.06);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0}
+html,body{margin:0;padding:0;overscroll-behavior:none}
 body{
-  background:var(--verde-900);
-  font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
-  color:var(--tinta);
-  font-size:16px;
-  line-height:1.4;
+  background:var(--tinta);
+  font-family:'Archivo',system-ui,-apple-system,sans-serif;
+  color:var(--tinta);font-size:16px;line-height:1.4;
 }
-.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
-.wrap{max-width:520px;margin:0 auto;min-height:100vh;background:var(--papel);position:relative}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
 
-/* ---------- Cabecera ---------- */
-header{
-  background:var(--verde-700);
-  color:#fff;
-  padding:18px 18px 16px;
-  position:relative;
-  overflow:hidden;
-}
-header::after{
-  content:"";position:absolute;inset:auto 0 0 0;height:3px;
-  background:linear-gradient(90deg,var(--oro-500) 0 33%,transparent 33% 100%);
-}
-.marca{display:flex;align-items:center;gap:11px}
-.marca svg{flex:0 0 auto}
-.marca .txt{line-height:1}
-.marca .g{
-  font-size:10px;letter-spacing:.34em;font-weight:600;
-  color:var(--oro-300);display:block;margin-bottom:3px;
-}
-.marca .p{
-  font-size:21px;font-weight:800;letter-spacing:.16em;
-  font-stretch:112%;display:block;
-}
-.eyebrow{
-  margin-top:16px;font-size:10.5px;letter-spacing:.2em;font-weight:600;
-  color:rgba(255,255,255,.62);text-transform:uppercase;
-}
-h1{
-  margin:3px 0 0;font-size:20px;font-weight:700;font-stretch:108%;
-  letter-spacing:-.01em;color:#fff;
-}
+.app{max-width:520px;margin:0 auto;min-height:100dvh;background:var(--papel);
+  display:flex;flex-direction:column;position:relative;overflow:hidden}
 
-/* ---------- Selector de colaborador ---------- */
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:16px 0 0;
-  border:1px solid rgba(230,203,153,.36);border-radius:9px;overflow:hidden}
-.seg button{
-  appearance:none;border:0;background:transparent;color:rgba(255,255,255,.72);
-  font-family:inherit;font-size:11.5px;font-weight:600;letter-spacing:.06em;
-  padding:11px 4px;cursor:pointer;border-right:1px solid rgba(230,203,153,.24);
-  transition:background .16s,color .16s;
-}
-.seg button:last-child{border-right:0}
-.seg button[aria-pressed="true"]{background:var(--oro-500);color:var(--verde-900)}
+/* ══════ VISTAS ══════ */
+.vista{display:none;flex-direction:column;flex:1;min-height:0}
+.vista.on{display:flex}
 
-/* ---------- Barra de período ---------- */
-.periodo{
-  display:flex;align-items:center;gap:8px;padding:11px 18px;
-  background:var(--verde-800);border-top:1px solid rgba(230,203,153,.16);
-}
-.periodo label{font-size:10px;letter-spacing:.18em;font-weight:600;
-  color:rgba(230,203,153,.72);text-transform:uppercase;margin-right:2px}
-.periodo select{
-  appearance:none;background:rgba(255,255,255,.07);color:#fff;border:1px solid rgba(230,203,153,.28);
-  border-radius:7px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;
-  font-weight:500;cursor:pointer;
-}
+/* ══════ BARRA SUPERIOR ══════ */
+.top{background:var(--tinta);color:var(--papel);padding:14px 16px;flex:0 0 auto}
+.top .fila{display:flex;align-items:center;gap:12px}
+.volver{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.volver svg{stroke:var(--papel);fill:none}
+.top .tit{flex:1;min-width:0}
+.top .eyebrow{font-size:9.5px;letter-spacing:.24em;font-weight:600;color:var(--oro);
+  text-transform:uppercase;display:block}
+.top h1{margin:2px 0 0;font-size:17px;font-weight:700;font-stretch:106%;letter-spacing:-.01em}
+
+/* ══════ HOME ══════ */
+.quien{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px}
+.quien button{padding:11px 4px;border-radius:9px;background:rgba(255,255,255,.07);
+  color:rgba(251,249,245,.62);font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  border:1px solid transparent;transition:.15s}
+.quien button[aria-pressed="true"]{background:var(--oro);color:var(--tinta);border-color:var(--oro)}
+
+.periodo{display:flex;gap:8px;align-items:center;padding:10px 16px;background:var(--tinta-2);
+  flex:0 0 auto}
+.periodo span{font-size:9.5px;letter-spacing:.2em;font-weight:600;color:rgba(242,227,198,.6);
+  text-transform:uppercase}
+.periodo select{background:rgba(255,255,255,.08);color:var(--papel);border:1px solid rgba(242,227,198,.2);
+  border-radius:8px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;
+  font-weight:500;appearance:none}
 .periodo select option{color:#000}
 
-/* ---------- Totalizador (cinta) ---------- */
-.tape{background:var(--papel);padding:0 0 2px}
-.tape-top{
-  padding:20px 18px 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
-}
-.tape-top .lbl{font-size:10px;letter-spacing:.2em;font-weight:600;color:rgba(20,24,15,.5);text-transform:uppercase}
-.total-num{
-  font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
-  font-size:40px;font-weight:600;line-height:.95;color:var(--verde-700);
-  letter-spacing:-.03em;margin-top:5px;
-}
-.total-num .cur{font-size:14px;font-weight:500;color:rgba(0,86,41,.55);margin-right:7px;letter-spacing:0}
-.contador{text-align:right;flex:0 0 auto}
-.contador .n{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:var(--tinta);line-height:1}
-.contador .u{font-size:9.5px;letter-spacing:.16em;color:rgba(20,24,15,.5);text-transform:uppercase;font-weight:600}
+.resumen{padding:22px 16px 18px;display:flex;align-items:flex-end;justify-content:space-between;
+  gap:14px;background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
+.resumen .lbl{font-size:9.5px;letter-spacing:.22em;font-weight:600;color:var(--tinta-3);
+  text-transform:uppercase;display:block}
+.resumen .big{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
+  font-size:38px;font-weight:600;line-height:1;letter-spacing:-.035em;margin-top:6px;color:var(--tinta)}
+.resumen .big i{font-size:13px;font-style:normal;color:var(--tinta-3);margin-right:6px;
+  letter-spacing:0;font-weight:500}
+.resumen .cant{text-align:right;flex:0 0 auto}
+.resumen .cant b{display:block;font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;
+  line-height:1}
+.resumen .cant span{font-size:9px;letter-spacing:.18em;color:var(--tinta-3);font-weight:600;
+  text-transform:uppercase}
 
-.zigzag{height:9px;background:
-  linear-gradient(-45deg,transparent 74%,var(--papel-2) 75%) 0 0/9px 9px repeat-x,
-  linear-gradient(45deg,transparent 74%,var(--papel-2) 75%) 0 0/9px 9px repeat-x;
-  background-color:var(--papel);}
+.lista{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 0 100px}
+.reg{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+  padding:13px 16px;border-bottom:1px solid var(--papel-2);background:var(--papel)}
+.reg:active{background:var(--papel-2)}
+.reg .n{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--tinta-3);width:20px}
+.reg .cat{font-size:14px;font-weight:700;letter-spacing:-.005em}
+.reg .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--tinta-3);margin-top:2px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.reg .det{font-size:11.5px;color:var(--tinta-3);margin-top:2px;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.reg .mto{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;white-space:nowrap}
+.nada{padding:56px 32px;text-align:center;color:var(--tinta-3);font-size:14px;line-height:1.6}
+.nada svg{margin-bottom:14px;opacity:.35}
 
-/* ---------- Bloque dictado ---------- */
-.dictado{background:var(--papel-2);padding:18px}
-.mic{
-  width:100%;display:flex;align-items:center;justify-content:center;gap:11px;
-  background:var(--verde-700);color:#fff;border:0;border-radius:12px;
-  padding:17px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.02em;
-  cursor:pointer;box-shadow:var(--sombra);transition:transform .12s,background .2s;
-}
-.mic:active{transform:scale(.985)}
-.mic[data-on="1"]{background:var(--rojo);animation:pulso 1.25s ease-in-out infinite}
-@keyframes pulso{0%,100%{box-shadow:0 0 0 0 rgba(163,51,39,.42)}50%{box-shadow:0 0 0 13px rgba(163,51,39,0)}}
-.mic svg{flex:0 0 auto}
-.hint{margin:11px 2px 0;font-size:12px;line-height:1.5;color:rgba(20,24,15,.6)}
-.hint b{color:var(--verde-700);font-weight:600}
-.transcript{
-  margin-top:11px;background:#fff;border:1px solid var(--linea);border-left:3px solid var(--oro-500);
-  border-radius:8px;padding:11px 13px;font-size:13.5px;color:rgba(20,24,15,.85);display:none;
-}
-.transcript.show{display:block}
-.transcript .tl{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:rgba(20,24,15,.45);
-  font-weight:600;margin-bottom:4px;display:block}
-.transcript .acts{margin-top:9px;display:flex;gap:7px;flex-wrap:wrap}
-.mini{
-  background:transparent;border:1px solid var(--linea);border-radius:20px;padding:5px 11px;
-  font-family:inherit;font-size:11.5px;font-weight:600;color:var(--verde-700);cursor:pointer;
-}
-.mini:active{background:var(--papel-2)}
+.flota{position:absolute;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--papel) 68%,rgba(251,249,245,0));display:flex;gap:9px}
+.btn{flex:1;padding:17px;border-radius:13px;font-size:15.5px;font-weight:700;letter-spacing:.01em;
+  display:flex;align-items:center;justify-content:center;gap:9px;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn-1{background:var(--tinta);color:var(--papel)}
+.btn-2{background:var(--papel-2);color:var(--tinta);border:1px solid var(--linea)}
+.btn-oro{background:var(--oro);color:var(--tinta)}
+.btn:disabled{background:var(--papel-2);color:#B5AC9C;border-color:transparent;pointer-events:none}
+.btn-mini{flex:0 0 auto;padding:17px 20px}
 
-/* ---------- Formulario ---------- */
-form{padding:18px;background:var(--papel)}
-fieldset{border:0;margin:0 0 17px;padding:0}
-legend,.flabel{
-  font-size:10px;letter-spacing:.19em;font-weight:600;text-transform:uppercase;
-  color:rgba(20,24,15,.52);padding:0;margin-bottom:8px;display:block;
-}
-.chips{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.chip{
-  background:#fff;border:1px solid var(--linea);border-radius:9px;padding:11px 4px;
-  font-family:inherit;font-size:12px;font-weight:600;color:rgba(20,24,15,.72);cursor:pointer;
-  transition:all .15s;
-}
-.chip[aria-pressed="true"]{background:var(--verde-700);border-color:var(--verde-700);color:#fff}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:15px}
-.f{display:flex;flex-direction:column}
-input[type=text],input[type=date],input[type=number],textarea{
-  width:100%;background:#fff;border:1px solid var(--linea);border-radius:9px;
-  padding:12px 13px;font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--tinta);
-  font-variant-numeric:tabular-nums;
-}
-textarea{font-family:'Archivo',sans-serif;font-size:14.5px;resize:vertical;min-height:64px;line-height:1.45}
-input:focus,textarea:focus{outline:2px solid var(--oro-500);outline-offset:1px;border-color:transparent}
-.with-mic{position:relative}
-.with-mic input,.with-mic textarea{padding-right:44px}
-.fmic{
-  position:absolute;right:6px;top:6px;width:32px;height:32px;border-radius:7px;
-  background:var(--papel-2);border:1px solid var(--linea);display:flex;align-items:center;
-  justify-content:center;cursor:pointer;padding:0;
-}
-.fmic[data-on="1"]{background:var(--rojo);border-color:var(--rojo)}
-.fmic[data-on="1"] svg path{fill:#fff}
-.valor-wrap{position:relative}
-.valor-wrap .gs{
-  position:absolute;left:13px;top:50%;transform:translateY(-50%);font-family:'IBM Plex Mono',monospace;
-  font-size:13px;color:rgba(20,24,15,.4);pointer-events:none;
-}
-.valor-wrap input{padding-left:38px;font-size:18px;font-weight:600}
-.acciones{display:grid;grid-template-columns:1fr;gap:9px;margin-top:4px}
-.btn-add{
-  background:var(--verde-700);color:#fff;border:0;border-radius:11px;padding:16px;
-  font-family:inherit;font-size:15px;font-weight:700;letter-spacing:.02em;cursor:pointer;
-  box-shadow:var(--sombra);
-}
-.btn-add:disabled{background:var(--papel-2);color:rgba(20,24,15,.35);box-shadow:none;cursor:not-allowed}
-.btn-ghost{
-  background:transparent;border:1px solid var(--linea);border-radius:11px;padding:13px;
-  font-family:inherit;font-size:13.5px;font-weight:600;color:rgba(20,24,15,.6);cursor:pointer;
-}
+/* ══════ PASO 1 · VALOR ══════ */
+.monto{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:22px 20px;min-height:0}
+.monto .cur{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--tinta-3);
+  letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+.monto .num{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
+  font-size:clamp(36px,13vw,58px);font-weight:700;letter-spacing:-.045em;line-height:1;
+  color:var(--tinta);word-break:break-all;text-align:center}
+.monto .num.cero{color:#C6BDAC}
+.monto .pie{margin-top:13px;font-size:12.5px;color:var(--tinta-3);text-align:center}
 
-/* ---------- Listado (cinta de recibo) ---------- */
-.lista-sec{background:var(--verde-900);padding:22px 18px 30px}
-.lista-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:13px}
-.lista-head h2{margin:0;font-size:12px;letter-spacing:.2em;text-transform:uppercase;
-  font-weight:600;color:var(--oro-300)}
-.lista-head span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(255,255,255,.45)}
-.recibo{background:var(--papel);border-radius:3px;position:relative;padding:2px 0 0;overflow:hidden}
-.recibo::before{content:"";display:block;height:9px;background:
-  linear-gradient(-45deg,var(--papel) 74%,transparent 75%) 0 0/9px 9px repeat-x,
-  linear-gradient(45deg,var(--papel) 74%,transparent 75%) 0 0/9px 9px repeat-x;}
-.item{padding:12px 15px;border-bottom:1px dashed rgba(0,86,41,.22);display:grid;
-  grid-template-columns:22px 1fr auto;gap:11px;align-items:start}
-.item:last-child{border-bottom:0}
-.item .idx{font-family:'IBM Plex Mono',monospace;font-size:12px;color:rgba(20,24,15,.38);padding-top:2px}
-.item .cat{font-size:13.5px;font-weight:700;color:var(--verde-700);line-height:1.25}
-.item .meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:rgba(20,24,15,.55);margin-top:2px}
-.item .obs{font-size:12px;color:rgba(20,24,15,.62);margin-top:3px;line-height:1.35}
-.item .val{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;
-  text-align:right;white-space:nowrap;padding-top:1px}
-.item .del{background:none;border:0;color:var(--rojo);font-size:11px;font-weight:600;
-  font-family:inherit;cursor:pointer;padding:3px 0 0;display:block;margin-left:auto}
-.vacio{padding:34px 20px;text-align:center;color:rgba(20,24,15,.42);font-size:13.5px;line-height:1.55}
-.recibo-total{background:var(--verde-800);color:#fff;padding:14px 15px;display:flex;
-  justify-content:space-between;align-items:center}
-.recibo-total .l{font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;
-  color:var(--oro-300)}
-.recibo-total .v{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600}
-.export{
-  width:100%;margin-top:18px;background:var(--oro-500);color:var(--verde-900);border:0;
-  border-radius:12px;padding:17px;font-family:inherit;font-size:15px;font-weight:800;
-  letter-spacing:.03em;cursor:pointer;
-}
-.export:disabled{opacity:.34;cursor:not-allowed}
-.pie{margin-top:15px;font-size:11px;line-height:1.6;color:rgba(255,255,255,.4);text-align:center}
-.toast{
-  position:fixed;left:50%;bottom:24px;transform:translate(-50%,90px);background:var(--tinta);
-  color:#fff;padding:13px 20px;border-radius:10px;font-size:13.5px;font-weight:600;
-  transition:transform .28s cubic-bezier(.2,.8,.3,1);z-index:60;max-width:88%;text-align:center;
-}
-.toast.show{transform:translate(-50%,0)}
+.rapidos{display:flex;gap:7px;padding:0 14px 12px;justify-content:center;flex-wrap:wrap;flex:0 0 auto}
+.rapidos button{padding:9px 14px;border-radius:20px;background:var(--papel-2);
+  border:1px solid var(--linea);font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+  font-weight:600;color:var(--tinta-2)}
+.rapidos button:active{background:var(--papel-3)}
+
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--linea);
+  flex:0 0 auto;border-top:1px solid var(--linea)}
+.pad button{background:var(--papel);padding:18px 0;font-family:'IBM Plex Mono',monospace;
+  font-size:25px;font-weight:500;color:var(--tinta);display:flex;align-items:center;
+  justify-content:center;transition:background .08s}
+.pad button:active{background:var(--oro-luz)}
+.pad .zero3{font-size:20px;letter-spacing:-.02em}
+.pad .del svg{stroke:var(--rojo);fill:none}
+
+/* ══════ PASO 2 · DETALLES ══════ */
+.cuerpo{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 108px}
+.bloque{padding:18px 16px 6px}
+.bloque + .bloque{border-top:1px solid var(--papel-2)}
+.et{font-size:9.5px;letter-spacing:.22em;font-weight:700;color:var(--tinta-3);
+  text-transform:uppercase;margin-bottom:11px;display:block}
+.et i{font-style:normal;color:var(--oro-osc)}
+
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.tile{padding:15px 10px;border-radius:11px;background:var(--papel);border:1.5px solid var(--linea);
+  font-size:14px;font-weight:600;text-align:center;transition:.13s}
+.tile[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:var(--papel)}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chip{padding:11px 16px;border-radius:22px;background:var(--papel);border:1.5px solid var(--linea);
+  font-size:13.5px;font-weight:600;transition:.13s}
+.chip[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:var(--papel)}
+.chip.sug{border-color:var(--oro);color:var(--oro-osc);background:#FCF6EA}
+
+.campo{width:100%;background:var(--papel);border:1.5px solid var(--linea);border-radius:11px;
+  padding:14px 15px;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--tinta);
+  font-variant-numeric:tabular-nums}
+.campo::placeholder{color:#B5AC9C}
+.campo:focus{outline:0;border-color:var(--oro)}
+textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;resize:vertical;
+  line-height:1.5}
+.fecha-fila{margin-top:9px}
+
+.dictar{width:100%;margin-top:10px;padding:15px;border-radius:12px;background:var(--tinta);
+  color:var(--papel);font-size:14.5px;font-weight:700;display:flex;align-items:center;
+  justify-content:center;gap:10px}
+.dictar[data-on="1"]{background:var(--rojo);animation:lat 1.3s ease-in-out infinite}
+@keyframes lat{0%,100%{box-shadow:0 0 0 0 rgba(163,51,39,.4)}50%{box-shadow:0 0 0 12px rgba(163,51,39,0)}}
+
+.mini-monto{background:var(--papel-2);padding:13px 16px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid var(--linea);flex:0 0 auto}
+.mini-monto .l{font-size:9.5px;letter-spacing:.2em;font-weight:700;color:var(--tinta-3);
+  text-transform:uppercase}
+.mini-monto .v{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700}
+.mini-monto .v em{font-size:13px;font-style:normal;color:var(--tinta-3)}
+.mini-monto button{font-size:12px;font-weight:700;color:var(--oro-osc);text-decoration:underline;
+  text-underline-offset:3px}
+
+/* ══════ AVISOS ══════ */
+.aviso{position:fixed;left:50%;bottom:26px;transform:translate(-50%,120px);background:var(--tinta);
+  color:var(--papel);padding:14px 22px;border-radius:11px;font-size:14px;font-weight:600;
+  transition:transform .3s cubic-bezier(.2,.9,.3,1);z-index:90;max-width:88%;text-align:center;
+  box-shadow:0 10px 30px rgba(22,19,14,.28)}
+.aviso.on{transform:translate(-50%,0)}
+
+.confirm{position:fixed;inset:0;background:rgba(22,19,14,.55);display:none;align-items:flex-end;
+  z-index:100}
+.confirm.on{display:flex}
+.confirm .caja{background:var(--papel);width:100%;max-width:520px;margin:0 auto;
+  border-radius:18px 18px 0 0;padding:24px 20px calc(20px + env(safe-area-inset-bottom))}
+.confirm h3{margin:0 0 6px;font-size:18px;font-weight:700}
+.confirm p{margin:0 0 18px;font-size:14px;color:var(--tinta-3);line-height:1.5}
+.confirm .fila{display:flex;gap:9px}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="app">
 
-  <header>
-    <div class="marca">
-      <svg width="38" height="38" viewBox="0 0 48 48" aria-hidden="true">
-        <rect width="48" height="48" rx="6" fill="#004320"/>
-        <g fill="none" stroke="#C9A063" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M10 15c0-3 2-5 5-5 3 0 5 2 6 5"/>
-          <path d="M38 15c0-3-2-5-5-5-3 0-5 2-6 5"/>
-          <path d="M13 16c0 8 3 13 11 13s11-5 11-13"/>
-          <path d="M18 20.5h.01M30 20.5h.01" stroke-width="3"/>
-          <path d="M20 26.5c1.4 1.2 6.6 1.2 8 0"/>
-        </g>
-      </svg>
-      <span class="txt">
-        <span class="g">GRUPO</span>
-        <span class="p">PIVETA</span>
-      </span>
-    </div>
-    <p class="eyebrow">Cartão Coorporativo</p>
-    <h1>Prestação de Conta</h1>
-    <div class="seg" role="group" aria-label="Colaborador">
-      <button type="button" data-p="LAURO ZIMMER" aria-pressed="true">LAURO</button>
-      <button type="button" data-p="RENATO MOURA" aria-pressed="false">RENATO</button>
-      <button type="button" data-p="GUTTO BROETTO" aria-pressed="false">GUTTO</button>
-    </div>
-  </header>
-
-  <div class="periodo">
-    <label for="mes">Período</label>
-    <select id="mes"></select>
-    <select id="ano"></select>
-  </div>
-
-  <section class="tape">
-    <div class="tape-top">
-      <div>
-        <span class="lbl">Total del período</span>
-        <div class="total-num"><span class="cur">G$</span><span id="totalTxt">0</span></div>
-      </div>
-      <div class="contador">
-        <div class="n" id="cantTxt">0</div>
-        <div class="u">facturas</div>
-      </div>
-    </div>
-    <div class="zigzag"></div>
-  </section>
-
-  <section class="dictado">
-    <button class="mic" id="micFrase" type="button" data-on="0">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z" fill="currentColor"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <span id="micLbl">Dictar factura completa</span>
-    </button>
-    <p class="hint">Decí todo de corrido: <b>"Gasoil, factura 4521, hoy, 350 mil, en Copetrol"</b> — el sistema separa cada dato solo.</p>
-    <div class="transcript" id="tr">
-      <span class="tl">Escuché</span>
-      <span id="trTxt"></span>
-      <div class="acts">
-        <button class="mini" type="button" id="trObs">Usar como Observação</button>
-        <button class="mini" type="button" id="trClear">Descartar</button>
-      </div>
-    </div>
-  </section>
-
-  <form id="form" autocomplete="off">
-    <fieldset>
-      <legend>Despesa</legend>
-      <div class="chips" id="chips"></div>
-    </fieldset>
-
-    <div class="row">
-      <div class="f">
-        <span class="flabel">Número da NF</span>
-        <div class="with-mic">
-          <input type="text" id="nf" inputmode="numeric" placeholder="0000">
-          <button class="fmic" type="button" data-campo="nf" data-on="0" aria-label="Dictar NF">
-            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0h2a8 8 0 0 1-7 7.9V22h-2v-3.1A8 8 0 0 1 4 11h2z" fill="#005629"/></svg>
-          </button>
+  <!-- ══════════ HOME ══════════ -->
+  <section class="vista on" id="vHome">
+    <div class="top">
+      <div class="fila">
+        <div class="tit">
+          <span class="eyebrow">Cartão Coorporativo</span>
+          <h1>Prestação de Conta</h1>
         </div>
       </div>
-      <div class="f">
-        <span class="flabel">Data</span>
-        <input type="date" id="fecha">
+      <div class="quien" id="quien">
+        <button type="button" data-p="LAURO ZIMMER" aria-pressed="true">LAURO</button>
+        <button type="button" data-p="RENATO MOURA" aria-pressed="false">RENATO</button>
+        <button type="button" data-p="GUTTO BROETTO" aria-pressed="false">GUTTO</button>
       </div>
     </div>
 
-    <div class="f" style="margin-bottom:15px">
-      <span class="flabel">Valor</span>
-      <div class="valor-wrap">
-        <span class="gs">G$</span>
-        <input type="text" id="valor" inputmode="numeric" placeholder="0">
+    <div class="periodo">
+      <span>Período</span>
+      <select id="mes"></select>
+      <select id="ano"></select>
+    </div>
+
+    <div class="resumen">
+      <div>
+        <span class="lbl">Total del período</span>
+        <div class="big"><i>G$</i><span id="hTotal">0</span></div>
+      </div>
+      <div class="cant">
+        <b id="hCant">0</b>
+        <span>facturas</span>
       </div>
     </div>
 
-    <div class="f" style="margin-bottom:15px">
-      <span class="flabel">Local · comercio</span>
-      <div class="with-mic">
-        <input type="text" id="local" list="locales" placeholder="Supermercado, estación…">
-        <button class="fmic" type="button" data-campo="local" data-on="0" aria-label="Dictar local">
-          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0h2a8 8 0 0 1-7 7.9V22h-2v-3.1A8 8 0 0 1 4 11h2z" fill="#005629"/></svg>
+    <div class="lista" id="hLista"></div>
+
+    <div class="flota">
+      <button class="btn btn-1" id="bNueva">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+        Nueva factura
+      </button>
+      <button class="btn btn-2 btn-mini" id="bExport" title="Exportar">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════ PASO 1 · VALOR ══════════ -->
+  <section class="vista" id="vValor">
+    <div class="top">
+      <div class="fila">
+        <button class="volver" id="bSalir1">
+          <svg width="19" height="19" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-width="2.3" stroke-linecap="round"/></svg>
+        </button>
+        <div class="tit">
+          <span class="eyebrow">Paso 1 de 2</span>
+          <h1>¿Cuánto fue?</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="monto">
+      <div class="cur">Guaraníes</div>
+      <div class="num cero" id="pantalla">0</div>
+      <div class="pie">Escribí el monto de la factura</div>
+    </div>
+
+    <div class="rapidos">
+      <button type="button" data-add="1000">+1.000</button>
+      <button type="button" data-add="10000">+10 mil</button>
+      <button type="button" data-add="50000">+50 mil</button>
+      <button type="button" data-add="100000">+100 mil</button>
+    </div>
+
+    <div class="pad" id="pad">
+      <button type="button" data-k="1">1</button>
+      <button type="button" data-k="2">2</button>
+      <button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button>
+      <button type="button" data-k="5">5</button>
+      <button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button>
+      <button type="button" data-k="8">8</button>
+      <button type="button" data-k="9">9</button>
+      <button type="button" data-k="000" class="zero3">000</button>
+      <button type="button" data-k="0">0</button>
+      <button type="button" data-k="del" class="del">
+        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M20 6H9l-5 6 5 6h11a1 1 0 001-1V7a1 1 0 00-1-1z" stroke-width="1.9" stroke-linejoin="round"/><path d="M17 10l-4 4M13 10l4 4" stroke-width="1.9" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="flota" style="position:static;background:var(--papel);border-top:1px solid var(--linea)">
+      <button class="btn btn-oro" id="bPaso2" disabled>Continuar</button>
+    </div>
+  </section>
+
+  <!-- ══════════ PASO 2 · DETALLES ══════════ -->
+  <section class="vista" id="vDetalle">
+    <div class="top">
+      <div class="fila">
+        <button class="volver" id="bVolver2">
+          <svg width="19" height="19" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="tit">
+          <span class="eyebrow">Paso 2 de 2</span>
+          <h1 id="tit2">Detalles</h1>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini-monto">
+      <span class="l">Monto</span>
+      <span class="v"><em>G$ </em><span id="dMonto">0</span></span>
+      <button type="button" id="bEditMonto">cambiar</button>
+    </div>
+
+    <div class="cuerpo">
+      <div class="bloque">
+        <span class="et">Despesa <i>· obligatorio</i></span>
+        <div class="tiles" id="tiles"></div>
+      </div>
+
+      <div class="bloque">
+        <span class="et">Data</span>
+        <div class="chips" id="chipsFecha">
+          <button class="chip" type="button" data-d="0" aria-pressed="true">Hoy</button>
+          <button class="chip" type="button" data-d="1" aria-pressed="false">Ayer</button>
+          <button class="chip" type="button" data-d="2" aria-pressed="false">Anteayer</button>
+        </div>
+        <div class="fecha-fila">
+          <input type="date" class="campo" id="fecha">
+        </div>
+      </div>
+
+      <div class="bloque">
+        <span class="et">Número da NF</span>
+        <input type="text" class="campo" id="nf" inputmode="numeric" placeholder="0000">
+      </div>
+
+      <div class="bloque">
+        <span class="et">Local · comercio</span>
+        <div class="chips" id="chipsLocal" style="margin-bottom:9px"></div>
+        <input type="text" class="campo" id="local" placeholder="Nombre del comercio">
+      </div>
+
+      <div class="bloque">
+        <span class="et">Observação · detalle de la compra</span>
+        <textarea class="campo" id="obs" placeholder="Qué se compró"></textarea>
+        <div id="sugCat"></div>
+        <button class="dictar" id="bDictar" type="button" data-on="0">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z" fill="currentColor"/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <span id="lblDictar">Dictar el detalle</span>
         </button>
       </div>
-      <datalist id="locales"></datalist>
     </div>
 
-    <div class="f" style="margin-bottom:17px">
-      <span class="flabel">Observação · detalle</span>
-      <div class="with-mic">
-        <textarea id="obs" placeholder="Detalle de la compra"></textarea>
-        <button class="fmic" type="button" data-campo="obs" data-on="0" aria-label="Dictar observación">
-          <svg width="14" height="14" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 1 3 3v7a3 3 0 0 1-6 0V5a3 3 0 0 1 3-3zM6 11a6 6 0 0 0 12 0h2a8 8 0 0 1-7 7.9V22h-2v-3.1A8 8 0 0 1 4 11h2z" fill="#005629"/></svg>
-        </button>
-      </div>
+    <div class="flota">
+      <button class="btn btn-2 btn-mini" id="bBorrar" style="display:none">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#A33327"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn btn-oro" id="bGuardar" disabled>Guardar factura</button>
     </div>
-
-    <div class="acciones">
-      <button class="btn-add" type="submit" id="btnAdd">Agregar a la planilla</button>
-      <button class="btn-ghost" type="button" id="btnClear">Limpiar campos</button>
-    </div>
-  </form>
-
-  <section class="lista-sec">
-    <div class="lista-head">
-      <h2>Facturas cargadas</h2>
-      <span id="periodoTxt"></span>
-    </div>
-    <div class="recibo">
-      <div id="lista"></div>
-      <div class="recibo-total">
-        <span class="l">Total G$</span>
-        <span class="v" id="totalPie">0</span>
-      </div>
-    </div>
-    <button class="export" id="btnExport" type="button">Exportar JSON para la PC</button>
-    <p class="pie">Empresa: Bahia Rica · Moeda: PYG<br>Todos los datos quedan guardados en este celular.</p>
   </section>
 
 </div>
-<div class="toast" id="toast"></div>
+
+<div class="aviso" id="aviso"></div>
+
+<div class="confirm" id="confirm">
+  <div class="caja">
+    <h3 id="cTit">¿Seguro?</h3>
+    <p id="cTxt"></p>
+    <div class="fila">
+      <button class="btn btn-2" id="cNo">Cancelar</button>
+      <button class="btn btn-1" id="cSi">Sí</button>
+    </div>
+  </div>
+</div>
 
 <script>
-/* ============================================================
-   ALMACENAMIENTO
-   Usa localStorage cuando está disponible (celular / GitHub Pages).
-   Si el entorno lo bloquea, cae a memoria para no romper nada.
-   ============================================================ */
+/* ═══════════════════════════════════════════════════════
+   ALMACENAMIENTO — todo queda en este teléfono
+   ═══════════════════════════════════════════════════════ */
 const Store = (() => {
   let mem = {}, ok = false;
   try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); ok = true; } catch(e){}
   return {
     get(k){ try { return ok ? localStorage.getItem(k) : (mem[k] ?? null); } catch(e){ return mem[k] ?? null; } },
-    set(k,v){ try { ok ? localStorage.setItem(k,v) : (mem[k]=v); } catch(e){ mem[k]=v; } },
-    persistente: ok
+    set(k,v){ try { ok ? localStorage.setItem(k,v) : (mem[k]=v); } catch(e){ mem[k]=v; } }
   };
 })();
 
 const KEY = 'piveta_pc_v1';
 let DB = { items: [], locales: [] };
 try { const raw = Store.get(KEY); if (raw) DB = JSON.parse(raw); } catch(e){}
-if (!Array.isArray(DB.items)) DB.items = [];
+if (!Array.isArray(DB.items))   DB.items   = [];
 if (!Array.isArray(DB.locales)) DB.locales = [];
-const guardar = () => Store.set(KEY, JSON.stringify(DB));
+const guardarDB = () => Store.set(KEY, JSON.stringify(DB));
 
-/* ============================================================
-   DICCIONARIO — habla de campo → categoría oficial del Excel
-   ============================================================ */
-const CATEGORIAS = ['Hotel','Passagem','Refeição','Combustível','Manutenção','Outros'];
+/* ═══════════════════════════════════════════════════════
+   CATEGORÍAS Y SUGERENCIA
+   El diccionario ya no maneja la carga: solo sugiere una
+   categoría cuando reconoce una palabra en el detalle.
+   ═══════════════════════════════════════════════════════ */
+const CATEGORIAS = ['Combustível','Refeição','Manutenção','Hotel','Passagem','Outros'];
 
-const DICCIONARIO = {
-  'Combustível': ['gasoil','gasoil','gas oil','gasoíl','diesel','diésel','nafta','gasolina',
-    'combustible','combustivel','surtidor','estacion','estación','estacion de servicio',
-    'copetrol','puma','petrobras','petropar','barcos','shell','ypf','bencina','querosene','kerosene'],
-  'Refeição': ['comida','almuerzo','almorzar','almorce','cena','cenar','desayuno','merienda',
-    'restaurante','restaurant','consumicion','consumición','consumo','asado','parrilla','parrillada',
-    'cafe','café','comedor','empanada','hamburguesa','pizza','viveres','víveres','provista',
-    'mercaderia','mercadería','alimentos','comestibles','bebida','agua','gaseosa'],
-  'Hotel': ['hotel','hospedaje','alojamiento','posada','hostal','hostel','pernocte',
-    'habitacion','habitación','motel','cabaña','estadia','estadía','dormida'],
-  'Passagem': ['pasaje','pasajes','boleto','ticket','vuelo','avion','avión','aereo','aéreo',
-    'colectivo','omnibus','ómnibus','bus','micro','taxi','remis','uber','flete','encomienda',
-    'traslado','peaje','balsa','lancha'],
-  'Manutenção': ['mantenimiento','manutencion','manutención','repuesto','repuestos','taller',
-    'mecanico','mecánico','service','cubierta','cubiertas','neumatico','neumático','goma','gomas',
-    'gomeria','gomería','aceite','filtro','filtros','bateria','batería','reparacion','reparación',
-    'arreglo','lavado','lavadero','chaperia','chapería','pintura','soldadura','herramienta',
-    'herramientas','ferreteria','ferretería','tornillo','correa','bujia','bujía','engrase'],
-  'Outros': ['farmacia','remedio','medicamento','papeleria','papelería','oficina','limpieza',
-    'varios','otros','otro','celular','recarga','internet']
+const DICC = {
+  'Combustível':['gasoil','gas oil','gasoíl','diesel','diésel','nafta','gasolina','combustible',
+    'surtidor','estacion','estación','copetrol','puma','petrobras','petropar','shell','ypf','querosene'],
+  'Refeição':['comida','almuerzo','almorzar','cena','cenar','desayuno','merienda','restaurante',
+    'consumicion','consumición','consumo','asado','parrilla','cafe','café','comedor','empanada',
+    'hamburguesa','pizza','viveres','víveres','provista','mercaderia','mercadería','alimentos',
+    'comestibles','bebida','gaseosa','yerba','agua'],
+  'Manutenção':['mantenimiento','manutencion','repuesto','repuestos','taller','mecanico','mecánico',
+    'service','cubierta','cubiertas','neumatico','neumático','goma','gomas','gomeria','gomería',
+    'aceite','filtro','filtros','bateria','batería','reparacion','reparación','arreglo','lavado',
+    'lavadero','chaperia','chapería','pintura','soldadura','herramienta','herramientas','ferreteria',
+    'ferretería','tornillo','correa','bujia','bujía','engrase','carburador','rodamiento','embrague',
+    'radiador','alternador','amortiguador','escape','llanta','manguera','sensor','bomba'],
+  'Hotel':['hotel','hospedaje','alojamiento','posada','hostal','pernocte','habitacion','habitación',
+    'motel','cabaña','estadia','estadía','dormida'],
+  'Passagem':['pasaje','pasajes','boleto','vuelo','avion','avión','aereo','aéreo','colectivo',
+    'omnibus','ómnibus','micro','taxi','remis','flete','encomienda','traslado','peaje','balsa','lancha'],
+  'Outros':['farmacia','remedio','medicamento','papeleria','papelería','oficina','limpieza',
+    'celular','recarga','internet']
 };
 
-const norm = s => (s||'').toLowerCase()
-  .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-  .replace(/\s+/g,' ').trim();
+const norm = s => (s||'').toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
 
-function detectarCategoria(txt){
+function sugerirCategoria(txt){
   const t = ' ' + norm(txt) + ' ';
   let mejor = null, largo = 0;
-  for (const [cat, palabras] of Object.entries(DICCIONARIO)){
-    for (const p of palabras){
+  for (const cat in DICC)
+    for (const p of DICC[cat]){
       const np = norm(p);
       if (t.includes(' ' + np) && np.length > largo){ mejor = cat; largo = np.length; }
     }
-  }
   return mejor;
 }
 
-/* ============================================================
-   NÚMEROS EN PALABRAS (español)
-   ============================================================ */
-const UNI = {cero:0,un:1,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,
-  diez:10,once:11,doce:12,trece:13,catorce:14,quince:15,dieciseis:16,diecisiete:17,dieciocho:18,
-  diecinueve:19,veinte:20,veintiuno:21,veintidos:22,veintitres:23,veinticuatro:24,veinticinco:25,
-  veintiseis:26,veintisiete:27,veintiocho:28,veintinueve:29,treinta:30,cuarenta:40,cincuenta:50,
-  sesenta:60,setenta:70,ochenta:80,noventa:90,cien:100,ciento:100,doscientos:200,trescientos:300,
-  cuatrocientos:400,quinientos:500,seiscientos:600,setecientos:700,ochocientos:800,novecientos:900};
-
-function palabrasANumero(txt){
-  const tk = norm(txt).split(/[\s\-]+/).filter(Boolean);
-  let total = 0, parcial = 0, hubo = false;
-  for (const w of tk){
-    if (w === 'y') continue;
-    if (w === 'mil'){ parcial = (parcial || 1) * 1000; total += parcial; parcial = 0; hubo = true; continue; }
-    if (/^millon(es)?$/.test(w)){ total = (total + parcial || 1) * 1000000; parcial = 0; hubo = true; continue; }
-    if (w in UNI){ parcial += UNI[w]; hubo = true; continue; }
-    if (/^\d+$/.test(w)){ parcial += parseInt(w,10); hubo = true; continue; }
-  }
-  return hubo ? total + parcial : null;
-}
-
-/* ============================================================
-   PARSER DE LA FRASE DICTADA
-   ============================================================ */
-function limpiarNum(s){ return s.replace(/[.\s]/g,'').replace(',', '.'); }
-
-function extraerNF(t){
-  const re = /(?:factura|nota fiscal|nota|nf|n\.?\s?f\.?|comprobante|boleta|numero|número|nro|n°)\s*(?:numero|número|nro)?\s*[:#]?\s*([0-9][0-9.\-\/]{0,15})/i;
-  const m = t.match(re);
-  if (!m) return null;
-  return { valor: m[1].replace(/[.\s]/g,''), inicio: m.index, fin: m.index + m[0].length };
-}
-
-const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto',
-  'septiembre','setiembre','octubre','noviembre','diciembre'];
-const MESNUM = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,
-  septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
-
-function extraerFecha(t){
-  const hoy = new Date();
-  const iso = d => d.toISOString().slice(0,10);
-  const nt = t.toLowerCase();
-  const marcar = (valor, m) => ({ valor, inicio: m.index, fin: m.index + m[0].length });
-  const valida = (dd, mm) => dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12;
-  const armar = (dd, mm, yy) => `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-
-  let m = nt.match(/\bantes de ayer\b|\banteayer\b/);
-  if (m){ const d = new Date(hoy); d.setDate(d.getDate()-2); return marcar(iso(d), m); }
-  m = nt.match(/\bayer\b/);
-  if (m){ const d = new Date(hoy); d.setDate(d.getDate()-1); return marcar(iso(d), m); }
-  m = nt.match(/\bhoy\b/);
-  if (m) return marcar(iso(hoy), m);
-
-  // "15 de agosto" (con o sin año hablado)
-  m = nt.match(/\b(\d{1,2})\s*(?:de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)(?:\s+(?:de\s+)?(\d{4}))?\b/);
-  if (m){
-    const dd = +m[1], mm = MESNUM[m[2]], yy = m[3] ? +m[3] : hoy.getFullYear();
-    return marcar(armar(dd, mm, yy), m);
-  }
-
-  // "30/07/2026", "30-07-2026", o dictada con espacios "30 07 2026"
-  m = nt.match(/\b(\d{1,2})[\/\-\s](\d{1,2})[\/\-\s](\d{4})\b/);
-  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], +m[3]), m);
-
-  // Dictado corrido: "3007 2026" (día+mes pegados, año aparte)
-  m = nt.match(/\b(\d{2})(\d{2})\s+(\d{4})\b/);
-  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], +m[3]), m);
-
-  // Todo pegado: "30072026"
-  m = nt.match(/\b(\d{2})(\d{2})(\d{4})\b/);
-  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], +m[3]), m);
-
-  // "30/07" sin año
-  m = nt.match(/\b(\d{1,2})[\/\-](\d{1,2})\b/);
-  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], hoy.getFullYear()), m);
-
-  return null;
-}
-
-// Suma expresiones compuestas: "1 millón 200 mil" → 1.200.000
-function sumaEscalas(s){
-  const re = /(\d[\d.,]*)\s*(millones?|mill[oó]n|mil)\b/gi;
-  let total = 0, hubo = false, fin = 0, m;
-  while ((m = re.exec(s)) !== null){
-    const v = parseFloat(limpiarNum(m[1]));
-    if (isNaN(v)) continue;
-    total += v * (/^mil$/i.test(m[2]) ? 1000 : 1000000);
-    hubo = true; fin = m.index + m[0].length;
-  }
-  if (!hubo) return null;
-  const resto = s.slice(fin).match(/^\s*(?:y\s+)?(\d[\d.,]*)\b/);
-  if (resto){ const v = parseFloat(limpiarNum(resto[1])); if (!isNaN(v)) total += v; }
-  return Math.round(total);
-}
-
-function extraerValor(t){
-  // 1) dígitos con escala ("350 mil", "1 millón 200 mil")
-  const esc = sumaEscalas(t);
-  if (esc && esc > 0) return esc;
-  // 2) número con marcador de moneda ("85.000 guaraníes")
-  let m = t.match(/([\d][\d.,]*)\s*(guaran[ií]es|guaranis|gs\.?|g\$)/i);
-  if (m){
-    const v = parseFloat(limpiarNum(m[1]));
-    if (!isNaN(v) && v > 0) return Math.round(v);
-  }
-  // 3) número escrito en palabras con escala
-  m = norm(t).match(/((?:[a-z]+\s+){0,6}?(?:millones|millon|mil)\b(?:\s+[a-z]+){0,6})/);
-  if (m){
-    const v = palabrasANumero(m[1]);
-    if (v && v >= 1000) return v;
-  }
-  // 4) el número más grande que quede (>= 1000)
-  const nums = [...t.matchAll(/\b(\d{1,3}(?:\.\d{3})+|\d{4,})\b/g)]
-    .map(x => parseFloat(limpiarNum(x[1]))).filter(v => !isNaN(v) && v >= 1000);
-  if (nums.length) return Math.round(Math.max(...nums));
-  return null;
-}
-
-function extraerLocal(t){
-  const n = norm(t);
-  // a) coincide con un local ya usado antes
-  let mejor = null;
-  for (const l of DB.locales){
-    const nl = norm(l);
-    if (nl.length >= 3 && n.includes(nl) && (!mejor || nl.length > norm(mejor).length)) mejor = l;
-  }
-  if (mejor) return mejor;
-  // b) "... en <comercio>" al final de la frase
-  const m = t.match(/\ben\s+(?:el\s+|la\s+|los\s+|las\s+)?([A-Za-zÁÉÍÓÚÑáéíóúñ0-9][^,.;]{2,40})\s*$/i);
-  if (m) return m[1].trim().replace(/\s+/g,' ');
-  return null;
-}
-
-function parsearFrase(txt){
-  let t = txt.trim();
-  const r = { categoria:null, nf:null, fecha:null, valor:null, local:null };
-  const quitar = (s, ini, fin) => s.slice(0, ini) + ' , ' + s.slice(fin);
-
-  const nf = extraerNF(t);
-  if (nf){ r.nf = nf.valor; t = quitar(t, nf.inicio, nf.fin); }
-
-  const fecha = extraerFecha(t);
-  if (fecha){ r.fecha = fecha.valor; t = quitar(t, fecha.inicio, fecha.fin); }
-
-  r.categoria = detectarCategoria(txt);
-  r.valor = extraerValor(t);
-  r.local = extraerLocal(txt);
-  return r;
-}
-
-/* ============================================================
-   ESTADO / UI
-   ============================================================ */
-const $ = s => document.querySelector(s);
+/* ═══════════════════════════════════════════════════════
+   ESTADO
+   ═══════════════════════════════════════════════════════ */
+const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-const hoyISO = new Date().toISOString().slice(0,10);
-let colaborador = 'LAURO ZIMMER';
-let categoria = null;
-
-const NOMBRE_MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto',
+const MESNOM = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto',
   'Septiembre','Octubre','Noviembre','Diciembre'];
+const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n||0));
+const isoHoy = () => new Date().toISOString().slice(0,10);
 
-(function initPeriodo(){
+let colaborador = 'LAURO ZIMMER';
+let digitos = '';
+let categoria = null;
+let editandoId = null;
+
+/* ═══════════════════════════════════════════════════════
+   NAVEGACIÓN Y AVISOS
+   ═══════════════════════════════════════════════════════ */
+function ir(id){
+  $$('.vista').forEach(v => v.classList.toggle('on', v.id === id));
+  const c = $('#vDetalle .cuerpo'); if (c) c.scrollTop = 0;
+}
+
+function aviso(msg){
+  const a = $('#aviso'); a.textContent = msg; a.classList.add('on');
+  clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('on'), 2300);
+}
+
+function preguntar(titulo, texto, alConfirmar){
+  $('#cTit').textContent = titulo;
+  $('#cTxt').textContent = texto;
+  $('#confirm').classList.add('on');
+  $('#cSi').onclick = () => { $('#confirm').classList.remove('on'); alConfirmar(); };
+  $('#cNo').onclick = () => $('#confirm').classList.remove('on');
+}
+
+/* ═══════════════════════════════════════════════════════
+   ARRANQUE
+   ═══════════════════════════════════════════════════════ */
+(function(){
   const hoy = new Date();
-  const selM = $('#mes'), selA = $('#ano');
-  NOMBRE_MES.forEach((nm,i) => selM.add(new Option(nm, i+1)));
-  for (let y = hoy.getFullYear()-1; y <= hoy.getFullYear()+1; y++) selA.add(new Option(y, y));
-  selM.value = hoy.getMonth()+1;
-  selA.value = hoy.getFullYear();
+  MESNOM.forEach((m,i) => $('#mes').add(new Option(m, i+1)));
+  for (let y = hoy.getFullYear()-1; y <= hoy.getFullYear()+1; y++) $('#ano').add(new Option(y,y));
+  $('#mes').value = hoy.getMonth()+1;
+  $('#ano').value = hoy.getFullYear();
+
+  $('#tiles').innerHTML = CATEGORIAS.map(c =>
+    `<button type="button" class="tile" data-c="${c}" aria-pressed="false">${c}</button>`).join('');
+  $$('.tile').forEach(b => b.onclick = () => elegirCategoria(b.dataset.c));
 })();
 
-(function initChips(){
-  $('#chips').innerHTML = CATEGORIAS.map(c =>
-    `<button type="button" class="chip" data-cat="${c}" aria-pressed="false">${c}</button>`).join('');
-  $$('.chip').forEach(b => b.onclick = () => setCategoria(b.dataset.cat));
-})();
-
-function setCategoria(c){
-  categoria = c;
-  $$('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.cat === c)));
-  validar();
-}
-
-$$('.seg button').forEach(b => b.onclick = () => {
+$$('#quien button').forEach(b => b.onclick = () => {
   colaborador = b.dataset.p;
-  $$('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-  render();
+  $$('#quien button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  pintarHome();
 });
+$('#mes').onchange = $('#ano').onchange = pintarHome;
 
-$('#mes').onchange = $('#ano').onchange = render;
-$('#fecha').value = hoyISO;
-
-const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n || 0));
-
-$('#valor').addEventListener('input', e => {
-  const raw = e.target.value.replace(/\D/g,'');
-  e.target.value = raw ? fmt(parseInt(raw,10)) : '';
-  validar();
-});
-$('#nf').addEventListener('input', validar);
-
-function valorNum(){ return parseInt($('#valor').value.replace(/\D/g,''),10) || 0; }
-function validar(){
-  $('#btnAdd').disabled = !(categoria && valorNum() > 0 && $('#fecha').value);
+/* ═══════════════════════════════════════════════════════
+   PASO 1 · TECLADO DEL MONTO
+   ═══════════════════════════════════════════════════════ */
+function pintarMonto(){
+  const v = parseInt(digitos || '0', 10);
+  const p = $('#pantalla');
+  p.textContent = fmt(v);
+  p.classList.toggle('cero', v === 0);
+  $('#bPaso2').disabled = v <= 0;
 }
 
-function toast(msg){
-  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2400);
-}
-
-/* ---------- Voz ----------
-   Android corta el reconocimiento solo tras una pausa corta, aunque la
-   persona siga hablando. Para que el dictado no se pierda a mitad de
-   frase, si el motor se apaga por su cuenta lo volvemos a prender sin
-   que se note — y solo termina de verdad cuando el usuario toca el
-   botón para parar. */
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, sesionActiva = null, acumulado = '';
-
-function escuchar(btn, onFinal){
-  if (!SR){ toast('Este navegador no soporta dictado por voz'); return; }
-
-  if (sesionActiva === btn){
-    sesionActiva = null;           // el usuario pide parar de verdad
-    try{ rec.stop(); }catch(e){}
-    return;
-  }
-  if (sesionActiva) return;        // ya hay otro campo escuchando
-
-  sesionActiva = btn; acumulado = '';
-  btn.dataset.on = '1';
-  if (btn.id === 'micFrase') $('#micLbl').textContent = 'Escuchando… tocá para parar';
-
-  const lanzar = () => {
-    rec = new SR();
-    rec.lang = 'es-PY'; rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = true;
-
-    rec.onresult = e => {
-      let interim = '';
-      for (let i = e.resultIndex; i < e.results.length; i++){
-        const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) acumulado += t + ' '; else interim += t;
-      }
-      if (btn.id === 'micFrase'){
-        $('#trTxt').textContent = (acumulado + interim).trim();
-        $('#tr').classList.add('show');
-      }
-    };
-    rec.onerror = e => {
-      if (e.error === 'no-speech' || e.error === 'aborted') return;
-      toast('No se escuchó bien, probá de nuevo');
-    };
-    rec.onend = () => {
-      if (sesionActiva === btn){
-        try { rec.start(); }         // se apagó solo: seguimos escuchando
-        catch(e){ finalizar(); }
-      } else {
-        finalizar();                 // el usuario tocó parar
-      }
-    };
-    try { rec.start(); } catch(e){ finalizar(); }
-  };
-
-  const finalizar = () => {
-    btn.dataset.on = '0';
-    if (btn.id === 'micFrase') $('#micLbl').textContent = 'Dictar factura completa';
-    sesionActiva = null;
-    const texto = acumulado.trim();
-    if (texto) onFinal(texto); else toast('No se escuchó nada, probá de nuevo');
-  };
-
-  lanzar();
-}
-
-$('#micFrase').onclick = () => escuchar($('#micFrase'), txt => {
-  $('#trTxt').textContent = txt;
-  $('#tr').classList.add('show');
-  const r = parsearFrase(txt);
-  const puestos = [];
-  if (r.categoria){ setCategoria(r.categoria); puestos.push('despesa'); }
-  if (r.nf){ $('#nf').value = r.nf; puestos.push('NF'); }
-  if (r.fecha){ $('#fecha').value = r.fecha; puestos.push('fecha'); }
-  if (r.valor){ $('#valor').value = fmt(r.valor); puestos.push('valor'); }
-  if (r.local){ $('#local').value = r.local; puestos.push('local'); }
-  validar();
-  toast(puestos.length ? 'Completado: ' + puestos.join(', ') : 'No se reconocieron datos, cargá a mano');
-});
-
-$$('.fmic').forEach(b => b.onclick = () => escuchar(b, txt => {
-  const campo = b.dataset.campo;
-  if (campo === 'nf'){
-    const d = txt.replace(/\D/g,''); $('#nf').value = d || txt.trim();
-  } else if (campo === 'local'){
-    $('#local').value = txt.trim();
-  } else {
-    $('#obs').value = ($('#obs').value ? $('#obs').value + ' ' : '') + txt.trim();
-  }
-  validar();
-}));
-
-$('#trObs').onclick = () => { $('#obs').value = $('#trTxt').textContent; toast('Copiado a Observação'); };
-$('#trClear').onclick = () => $('#tr').classList.remove('show');
-
-/* ---------- Alta ---------- */
-$('#form').onsubmit = e => {
-  e.preventDefault();
-  if (!categoria || valorNum() <= 0) return;
-  const local = $('#local').value.trim();
-  DB.items.push({
-    id: Date.now(),
-    colaborador,
-    mes: +$('#mes').value,
-    ano: +$('#ano').value,
-    despesa: categoria,
-    nf: $('#nf').value.trim(),
-    data: $('#fecha').value,
-    valor: valorNum(),
-    local,
-    obs: $('#obs').value.trim()
-  });
-  if (local && !DB.locales.some(l => norm(l) === norm(local))) DB.locales.push(local);
-  guardar(); limpiar(); render();
-  toast('Factura agregada');
+$('#pad').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const k = b.dataset.k;
+  if (k === 'del')      digitos = digitos.slice(0, -1);
+  else if (k === '000') digitos = digitos ? (digitos + '000').slice(0,12) : '';
+  else                  digitos = (digitos + k).replace(/^0+/,'').slice(0,12);
+  pintarMonto();
 };
 
-function limpiar(){
-  setCategoria(null); categoria = null;
-  $$('.chip').forEach(b => b.setAttribute('aria-pressed','false'));
-  $('#nf').value=''; $('#valor').value=''; $('#local').value=''; $('#obs').value='';
-  $('#fecha').value = hoyISO;
-  $('#tr').classList.remove('show');
-  validar();
-}
-$('#btnClear').onclick = limpiar;
+$$('.rapidos button').forEach(b => b.onclick = () => {
+  digitos = String(parseInt(digitos||'0',10) + parseInt(b.dataset.add,10)).slice(0,12);
+  pintarMonto();
+});
 
-/* ---------- Render ---------- */
-function actuales(){
-  const m = +$('#mes').value, a = +$('#ano').value;
-  return DB.items.filter(i => i.colaborador === colaborador && i.mes === m && i.ano === a)
-                 .sort((x,y) => (x.data||'').localeCompare(y.data||'') || x.id - y.id);
+/* ═══════════════════════════════════════════════════════
+   PASO 2 · DETALLES
+   ═══════════════════════════════════════════════════════ */
+function elegirCategoria(c){
+  categoria = c;
+  $$('.tile').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === c)));
+  $('#sugCat').innerHTML = '';
+  revisarGuardar();
 }
 
-function render(){
-  const arr = actuales();
-  const total = arr.reduce((s,i) => s + i.valor, 0);
-  $('#totalTxt').textContent = fmt(total);
-  $('#totalPie').textContent = fmt(total);
-  $('#cantTxt').textContent = arr.length;
-  $('#periodoTxt').textContent = `${NOMBRE_MES[+$('#mes').value-1]} ${$('#ano').value}`;
-  $('#btnExport').disabled = arr.length === 0;
+function revisarGuardar(){
+  $('#bGuardar').disabled = !(categoria && parseInt(digitos||'0',10) > 0 && $('#fecha').value);
+}
 
-  $('#lista').innerHTML = arr.length ? arr.map((i,n) => `
-    <div class="item">
-      <span class="idx">${String(n+1).padStart(2,'0')}</span>
-      <div>
-        <div class="cat">${i.despesa}</div>
-        <div class="meta">${i.nf ? 'NF ' + i.nf + ' · ' : ''}${i.data.split('-').reverse().join('/')}${i.local ? ' · ' + i.local : ''}</div>
-        ${i.obs ? `<div class="obs">${i.obs.replace(/</g,'&lt;')}</div>` : ''}
-      </div>
-      <div>
-        <div class="val">${fmt(i.valor)}</div>
-        <button class="del" data-id="${i.id}" type="button">Quitar</button>
-      </div>
-    </div>`).join('')
-    : `<div class="vacio">Todavía no cargaste facturas<br>para este período.</div>`;
+function fechaRelativa(dias){
+  const d = new Date(); d.setDate(d.getDate() - dias);
+  return d.toISOString().slice(0,10);
+}
 
-  $$('.del').forEach(b => b.onclick = () => {
-    DB.items = DB.items.filter(x => x.id !== +b.dataset.id);
-    guardar(); render(); toast('Factura quitada');
+function marcarChipFecha(){
+  const v = $('#fecha').value;
+  $$('#chipsFecha .chip').forEach(b =>
+    b.setAttribute('aria-pressed', String(v === fechaRelativa(+b.dataset.d))));
+}
+
+$$('#chipsFecha .chip').forEach(b => b.onclick = () => {
+  $('#fecha').value = fechaRelativa(+b.dataset.d);
+  marcarChipFecha(); revisarGuardar();
+});
+$('#fecha').onchange = () => { marcarChipFecha(); revisarGuardar(); };
+
+function pintarLocales(){
+  const recientes = DB.locales.slice(-6).reverse();
+  $('#chipsLocal').innerHTML = recientes.map(l =>
+    `<button class="chip" type="button" data-l="${l.replace(/"/g,'&quot;')}">${l}</button>`).join('');
+  $$('#chipsLocal .chip').forEach(b => b.onclick = () => {
+    $('#local').value = b.dataset.l;
+    $$('#chipsLocal .chip').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  });
+}
+
+$('#obs').addEventListener('input', () => {
+  if (categoria){ $('#sugCat').innerHTML = ''; return; }
+  const s = sugerirCategoria($('#obs').value);
+  $('#sugCat').innerHTML = s
+    ? `<div class="chips" style="margin-top:10px"><button class="chip sug" type="button">¿Es ${s}?  ·  tocá para aplicar</button></div>`
+    : '';
+  const b = $('#sugCat .chip');
+  if (b) b.onclick = () => elegirCategoria(s);
+});
+
+/* ═══════════════════════════════════════════════════════
+   VOZ — solo para el detalle de la compra
+   Android apaga el micrófono ante cualquier pausa. Si eso
+   pasa mientras la persona sigue hablando lo reencendemos
+   sin que se note; termina solo cuando toca el botón.
+   ═══════════════════════════════════════════════════════ */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, escuchando = false, base = '', dictado = '';
+
+$('#bDictar').onclick = () => {
+  if (!SR){ aviso('Este navegador no permite dictado'); return; }
+  if (escuchando){ escuchando = false; try{ rec.stop(); }catch(e){} return; }
+
+  escuchando = true; base = $('#obs').value.trim(); dictado = '';
+  $('#bDictar').dataset.on = '1';
+  $('#lblDictar').textContent = 'Escuchando… tocá para terminar';
+
+  const terminar = () => {
+    escuchando = false;
+    $('#bDictar').dataset.on = '0';
+    $('#lblDictar').textContent = 'Dictar el detalle';
+    $('#obs').value = (base + ' ' + dictado).trim();
+    $('#obs').dispatchEvent(new Event('input'));
+  };
+
+  const arrancar = () => {
+    rec = new SR();
+    rec.lang = 'es-PY'; rec.continuous = true; rec.interimResults = true;
+    rec.onresult = e => {
+      let parcial = '';
+      for (let i = e.resultIndex; i < e.results.length; i++){
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) dictado += t + ' '; else parcial += t;
+      }
+      $('#obs').value = (base + ' ' + dictado + parcial).trim();
+    };
+    rec.onerror = e => {
+      if (e.error !== 'no-speech' && e.error !== 'aborted') aviso('No se escuchó bien');
+    };
+    rec.onend = () => {
+      if (escuchando){ try { rec.start(); } catch(e){ terminar(); } }
+      else terminar();
+    };
+    try { rec.start(); } catch(e){ terminar(); }
+  };
+
+  arrancar();
+};
+
+/* ═══════════════════════════════════════════════════════
+   ABRIR · GUARDAR · BORRAR
+   ═══════════════════════════════════════════════════════ */
+function nuevaFactura(){
+  editandoId = null; digitos = ''; categoria = null;
+  $('#fecha').value = isoHoy();
+  $('#nf').value = ''; $('#local').value = ''; $('#obs').value = '';
+  $('#sugCat').innerHTML = '';
+  $$('.tile').forEach(b => b.setAttribute('aria-pressed','false'));
+  $('#tit2').textContent = 'Detalles';
+  $('#bBorrar').style.display = 'none';
+  marcarChipFecha(); pintarMonto(); pintarLocales();
+  ir('vValor');
+}
+
+function abrirFactura(it){
+  editandoId = it.id; digitos = String(it.valor); categoria = it.despesa;
+  $('#fecha').value = it.data;
+  $('#nf').value = it.nf || '';
+  $('#local').value = it.local || '';
+  $('#obs').value = it.obs || '';
+  $('#sugCat').innerHTML = '';
+  $$('.tile').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === it.despesa)));
+  $('#tit2').textContent = 'Modificar';
+  $('#bBorrar').style.display = 'flex';
+  marcarChipFecha(); pintarMonto(); pintarLocales();
+  $('#dMonto').textContent = fmt(it.valor);
+  revisarGuardar();
+  ir('vDetalle');
+}
+
+$('#bNueva').onclick    = nuevaFactura;
+$('#bSalir1').onclick   = () => ir('vHome');
+$('#bVolver2').onclick  = () => editandoId ? ir('vHome') : ir('vValor');
+$('#bEditMonto').onclick= () => ir('vValor');
+
+$('#bPaso2').onclick = () => {
+  $('#dMonto').textContent = fmt(parseInt(digitos||'0',10));
+  pintarLocales(); revisarGuardar();
+  ir('vDetalle');
+};
+
+$('#bGuardar').onclick = () => {
+  const local = $('#local').value.trim();
+  const datos = {
+    colaborador,
+    mes:  +$('#mes').value,
+    ano:  +$('#ano').value,
+    despesa: categoria,
+    nf:   $('#nf').value.trim(),
+    data: $('#fecha').value,
+    valor: parseInt(digitos||'0',10),
+    local,
+    obs:  $('#obs').value.trim()
+  };
+
+  if (editandoId){
+    const i = DB.items.findIndex(x => x.id === editandoId);
+    if (i >= 0) DB.items[i] = { ...DB.items[i], ...datos };
+    aviso('Factura modificada');
+  } else {
+    DB.items.push({ id: Date.now(), ...datos });
+    aviso('Factura guardada');
+  }
+
+  if (local && !DB.locales.some(l => norm(l) === norm(local))){
+    DB.locales.push(local);
+    if (DB.locales.length > 40) DB.locales = DB.locales.slice(-40);
+  }
+
+  guardarDB(); pintarHome(); ir('vHome');
+};
+
+$('#bBorrar').onclick = () => preguntar(
+  'Borrar factura',
+  'Se va a quitar de la planilla de este mes. No se puede deshacer.',
+  () => {
+    DB.items = DB.items.filter(x => x.id !== editandoId);
+    guardarDB(); pintarHome(); ir('vHome'); aviso('Factura borrada');
   });
 
-  $('#locales').innerHTML = DB.locales.map(l => `<option value="${l.replace(/"/g,'&quot;')}">`).join('');
+/* ═══════════════════════════════════════════════════════
+   HOME
+   ═══════════════════════════════════════════════════════ */
+function delPeriodo(){
+  const m = +$('#mes').value, a = +$('#ano').value;
+  return DB.items
+    .filter(i => i.colaborador === colaborador && i.mes === m && i.ano === a)
+    .sort((x,y) => (x.data||'').localeCompare(y.data||'') || x.id - y.id);
 }
 
-/* ---------- Exportar ---------- */
-$('#btnExport').onclick = () => {
-  const arr = actuales();
+function pintarHome(){
+  const arr = delPeriodo();
+  const total = arr.reduce((s,i) => s + i.valor, 0);
+  $('#hTotal').textContent = fmt(total);
+  $('#hCant').textContent  = arr.length;
+  $('#bExport').disabled   = arr.length === 0;
+
+  $('#hLista').innerHTML = arr.length ? arr.map((i,n) => `
+    <div class="reg" data-id="${i.id}">
+      <span class="n">${String(n+1).padStart(2,'0')}</span>
+      <div style="min-width:0">
+        <div class="cat">${i.despesa}</div>
+        <div class="sub">${i.data.split('-').reverse().join('/')}${i.nf ? ' · NF ' + i.nf : ''}${i.local ? ' · ' + i.local : ''}</div>
+        ${i.obs ? `<div class="det">${i.obs.replace(/</g,'&lt;')}</div>` : ''}
+      </div>
+      <span class="mto">${fmt(i.valor)}</span>
+    </div>`).join('') : `
+    <div class="nada">
+      <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M6 2h9l5 5v15H6z" stroke-linejoin="round"/><path d="M15 2v5h5" stroke-linejoin="round"/>
+        <path d="M9 13h7M9 17h5" stroke-linecap="round"/>
+      </svg>
+      Todavía no cargaste facturas<br>para este período.
+    </div>`;
+
+  $$('.reg').forEach(r => r.onclick = () => {
+    const it = DB.items.find(x => x.id === +r.dataset.id);
+    if (it) abrirFactura(it);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════
+   EXPORTAR — mismo formato que ya lee el script de la PC
+   ═══════════════════════════════════════════════════════ */
+$('#bExport').onclick = () => {
+  const arr = delPeriodo();
   if (!arr.length) return;
   const m = +$('#mes').value, a = +$('#ano').value;
-  const payload = {
+  const paquete = {
     version: 1,
     colaborador,
     empresa: 'Bahia Rica',
     moeda: 'PYG',
-    periodo: { mes: m, ano: a, nombre: NOMBRE_MES[m-1] },
+    periodo: { mes: m, ano: a, nombre: MESNOM[m-1] },
     generado_en: new Date().toISOString(),
     total: arr.reduce((s,i) => s + i.valor, 0),
     itens: arr.map(i => ({
@@ -836,17 +758,16 @@ $('#btnExport').onclick = () => {
       valor: i.valor, local: i.local, obs: i.obs
     }))
   };
-  const nombre = `${colaborador.split(' ')[0]}_${NOMBRE_MES[m-1]}_${a}.json`;
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
+  const nombre = `${colaborador.split(' ')[0]}_${MESNOM[m-1]}_${a}.json`;
+  const url = URL.createObjectURL(new Blob([JSON.stringify(paquete,null,2)], {type:'application/json'}));
   const a2 = document.createElement('a');
   a2.href = url; a2.download = nombre; a2.click();
   setTimeout(() => URL.revokeObjectURL(url), 4000);
-  toast('Archivo generado: ' + nombre);
+  aviso('Archivo generado: ' + nombre);
 };
 
-validar();
-render();
+pintarMonto();
+pintarHome();
 </script>
 </body>
 </html>
