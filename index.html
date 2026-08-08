@@ -482,24 +482,43 @@ const MESNUM = {enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:
   septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12};
 
 function extraerFecha(t){
-  const n = norm(t);
   const hoy = new Date();
   const iso = d => d.toISOString().slice(0,10);
-  if (/\bantes de ayer\b|\banteayer\b/.test(n)){ const d=new Date(hoy); d.setDate(d.getDate()-2); return iso(d); }
-  if (/\bayer\b/.test(n)){ const d=new Date(hoy); d.setDate(d.getDate()-1); return iso(d); }
-  if (/\bhoy\b/.test(n)) return iso(hoy);
-  let m = n.match(/\b(\d{1,2})\s*(?:de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)\b/);
+  const nt = t.toLowerCase();
+  const marcar = (valor, m) => ({ valor, inicio: m.index, fin: m.index + m[0].length });
+  const valida = (dd, mm) => dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12;
+  const armar = (dd, mm, yy) => `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+
+  let m = nt.match(/\bantes de ayer\b|\banteayer\b/);
+  if (m){ const d = new Date(hoy); d.setDate(d.getDate()-2); return marcar(iso(d), m); }
+  m = nt.match(/\bayer\b/);
+  if (m){ const d = new Date(hoy); d.setDate(d.getDate()-1); return marcar(iso(d), m); }
+  m = nt.match(/\bhoy\b/);
+  if (m) return marcar(iso(hoy), m);
+
+  // "15 de agosto" (con o sin año hablado)
+  m = nt.match(/\b(\d{1,2})\s*(?:de\s+)?(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)(?:\s+(?:de\s+)?(\d{4}))?\b/);
   if (m){
-    const dd = +m[1], mm = MESNUM[m[2]];
-    return `${hoy.getFullYear()}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+    const dd = +m[1], mm = MESNUM[m[2]], yy = m[3] ? +m[3] : hoy.getFullYear();
+    return marcar(armar(dd, mm, yy), m);
   }
-  m = n.match(/\b(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?\b/);
-  if (m){
-    const dd=+m[1], mm=+m[2];
-    let yy = m[3] ? +m[3] : hoy.getFullYear();
-    if (yy < 100) yy += 2000;
-    if (dd>=1&&dd<=31&&mm>=1&&mm<=12) return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-  }
+
+  // "30/07/2026", "30-07-2026", o dictada con espacios "30 07 2026"
+  m = nt.match(/\b(\d{1,2})[\/\-\s](\d{1,2})[\/\-\s](\d{4})\b/);
+  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], +m[3]), m);
+
+  // Dictado corrido: "3007 2026" (día+mes pegados, año aparte)
+  m = nt.match(/\b(\d{2})(\d{2})\s+(\d{4})\b/);
+  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], +m[3]), m);
+
+  // Todo pegado: "30072026"
+  m = nt.match(/\b(\d{2})(\d{2})(\d{4})\b/);
+  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], +m[3]), m);
+
+  // "30/07" sin año
+  m = nt.match(/\b(\d{1,2})[\/\-](\d{1,2})\b/);
+  if (m && valida(+m[1], +m[2])) return marcar(armar(+m[1], +m[2], hoy.getFullYear()), m);
+
   return null;
 }
 
@@ -560,10 +579,15 @@ function extraerLocal(t){
 function parsearFrase(txt){
   let t = txt.trim();
   const r = { categoria:null, nf:null, fecha:null, valor:null, local:null };
+  const quitar = (s, ini, fin) => s.slice(0, ini) + ' , ' + s.slice(fin);
+
   const nf = extraerNF(t);
-  if (nf){ r.nf = nf.valor; t = t.slice(0, nf.inicio) + ' , ' + t.slice(nf.fin); }
+  if (nf){ r.nf = nf.valor; t = quitar(t, nf.inicio, nf.fin); }
+
+  const fecha = extraerFecha(t);
+  if (fecha){ r.fecha = fecha.valor; t = quitar(t, fecha.inicio, fecha.fin); }
+
   r.categoria = detectarCategoria(txt);
-  r.fecha = extraerFecha(txt);
   r.valor = extraerValor(t);
   r.local = extraerLocal(txt);
   return r;
@@ -630,24 +654,68 @@ function toast(msg){
   clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-/* ---------- Voz ---------- */
+/* ---------- Voz ----------
+   Android corta el reconocimiento solo tras una pausa corta, aunque la
+   persona siga hablando. Para que el dictado no se pierda a mitad de
+   frase, si el motor se apaga por su cuenta lo volvemos a prender sin
+   que se note — y solo termina de verdad cuando el usuario toca el
+   botón para parar. */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, micActivo = null;
+let rec = null, sesionActiva = null, acumulado = '';
 
 function escuchar(btn, onFinal){
   if (!SR){ toast('Este navegador no soporta dictado por voz'); return; }
-  if (micActivo){ try{ rec.stop(); }catch(e){} return; }
-  rec = new SR();
-  rec.lang = 'es-PY'; rec.interimResults = false; rec.maxAlternatives = 1; rec.continuous = false;
-  micActivo = btn; btn.dataset.on = '1';
+
+  if (sesionActiva === btn){
+    sesionActiva = null;           // el usuario pide parar de verdad
+    try{ rec.stop(); }catch(e){}
+    return;
+  }
+  if (sesionActiva) return;        // ya hay otro campo escuchando
+
+  sesionActiva = btn; acumulado = '';
+  btn.dataset.on = '1';
   if (btn.id === 'micFrase') $('#micLbl').textContent = 'Escuchando… tocá para parar';
-  rec.onresult = e => { const txt = e.results[0][0].transcript; onFinal(txt); };
-  rec.onerror = e => { if (e.error !== 'aborted') toast('No se escuchó bien, probá de nuevo'); };
-  rec.onend = () => {
-    btn.dataset.on = '0'; micActivo = null;
-    if (btn.id === 'micFrase') $('#micLbl').textContent = 'Dictar factura completa';
+
+  const lanzar = () => {
+    rec = new SR();
+    rec.lang = 'es-PY'; rec.interimResults = true; rec.maxAlternatives = 1; rec.continuous = true;
+
+    rec.onresult = e => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++){
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) acumulado += t + ' '; else interim += t;
+      }
+      if (btn.id === 'micFrase'){
+        $('#trTxt').textContent = (acumulado + interim).trim();
+        $('#tr').classList.add('show');
+      }
+    };
+    rec.onerror = e => {
+      if (e.error === 'no-speech' || e.error === 'aborted') return;
+      toast('No se escuchó bien, probá de nuevo');
+    };
+    rec.onend = () => {
+      if (sesionActiva === btn){
+        try { rec.start(); }         // se apagó solo: seguimos escuchando
+        catch(e){ finalizar(); }
+      } else {
+        finalizar();                 // el usuario tocó parar
+      }
+    };
+    try { rec.start(); } catch(e){ finalizar(); }
   };
-  try { rec.start(); } catch(e){ btn.dataset.on='0'; micActivo=null; }
+
+  const finalizar = () => {
+    btn.dataset.on = '0';
+    if (btn.id === 'micFrase') $('#micLbl').textContent = 'Dictar factura completa';
+    sesionActiva = null;
+    const texto = acumulado.trim();
+    if (texto) onFinal(texto); else toast('No se escuchó nada, probá de nuevo');
+  };
+
+  lanzar();
 }
 
 $('#micFrase').onclick = () => escuchar($('#micFrase'), txt => {
