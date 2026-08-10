@@ -80,6 +80,16 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   text-transform:uppercase}
 .hCantTxt{margin-top:5px;font-size:11.5px;color:var(--tinta-3);font-weight:600}
 .accionesTop{display:flex;gap:7px;flex:0 0 auto}
+.barraFiltro{display:none;align-items:center;gap:9px;padding:10px 16px;
+  background:var(--papel-2);border-bottom:1px solid var(--linea)}
+.barraFiltro.on{display:flex}
+.barraFiltro svg{color:var(--tinta-3);flex:0 0 auto}
+.barraFiltro input{flex:1;min-width:0;border:0;background:transparent;font-family:'IBM Plex Mono',monospace;
+  font-size:15px;color:var(--tinta);padding:0}
+.barraFiltro input:focus{outline:0}
+.barraFiltro input::placeholder{font-family:'Archivo',sans-serif;color:#B5AC9C}
+.barraFiltro button{flex:0 0 auto;color:var(--tinta-3);display:flex}
+.bFiltro-activo{background:var(--oro);border-color:var(--oro)}
 .ibtn{display:flex;align-items:center;gap:6px;padding:11px 14px;border-radius:10px;
   background:var(--papel-2);border:1px solid var(--linea);font-size:12.5px;font-weight:700;
   color:var(--tinta)}
@@ -179,7 +189,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .fecha3 input:focus{outline:0;border-color:var(--oro);background:#FFFDF8}
 .fecha3 b{color:var(--tinta-3);font-size:19px;font-weight:500}
 .fecha3.mal input{border-color:var(--rojo);background:#FDF4F3}
-.campo-nf{width:130px;font-size:19px;font-weight:600;letter-spacing:.06em;text-align:center}
+.campo-nf{width:auto;min-width:130px;max-width:100%;font-size:19px;font-weight:600;letter-spacing:.06em;text-align:center}
 
 /* ── Selector de comercios ── */
 .selLocal{display:flex;align-items:center;gap:11px;width:100%;background:var(--papel);
@@ -317,10 +327,21 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
           Nueva
         </button>
+        <button class="ibtn" id="bFiltro" title="Buscar">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
         <button class="ibtn" id="bExport" title="Exportar">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
+    </div>
+
+    <div class="barraFiltro" id="barraFiltro">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" id="qFiltro" inputmode="numeric" placeholder="Buscar por NF o monto…" autocomplete="off">
+      <button type="button" id="bLimpiarFiltro" title="Limpiar">
+        <svg width="15" height="15" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-width="2.2" stroke-linecap="round"/></svg>
+      </button>
     </div>
 
     <div class="lista" id="hLista"></div>
@@ -408,7 +429,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 
       <div class="bloque">
         <span class="et">Número da NF</span>
-        <input type="text" class="campo campo-nf" id="nf" inputmode="numeric" maxlength="6" placeholder="000000">
+        <input type="text" class="campo campo-nf" id="nf" inputmode="numeric" maxlength="13" placeholder="000000">
       </div>
 
       <div class="bloque">
@@ -678,9 +699,9 @@ function ir(id){
   const c = $('#vDetalle .cuerpo'); if (c) c.scrollTop = 0;
 }
 
-function aviso(msg){
+function aviso(msg, ms){
   const a = $('#aviso'); a.textContent = msg; a.classList.add('on');
-  clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('on'), 2300);
+  clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('on'), ms || 2300);
 }
 
 function preguntar(titulo, texto, alConfirmar){
@@ -1254,6 +1275,18 @@ $('#bPaso2').onclick = () => {
   ir('vDetalle');
 };
 
+// Busca otra factura del mismo período con el mismo NF + comercio + monto.
+// Solo avisa — nunca impide guardar, la decisión final es de la persona.
+function buscarPosibleDuplicada(datos, idExcluir){
+  if (!datos.nf || !datos.local || !datos.valor) return null;
+  return delPeriodo().find(it =>
+    it.id !== idExcluir &&
+    it.nf === datos.nf &&
+    normNom(it.local) === normNom(datos.local) &&
+    it.valor === datos.valor
+  ) || null;
+}
+
 $('#bGuardar').onclick = () => {
   const local = localElegido.trim();
   const datos = {
@@ -1267,6 +1300,8 @@ $('#bGuardar').onclick = () => {
     local,
     obs:  $('#obs').value.trim()
   };
+
+  const duplicada = buscarPosibleDuplicada(datos, editandoId);
 
   if (editandoId){
     const i = DB.items.findIndex(x => x.id === editandoId);
@@ -1287,6 +1322,14 @@ $('#bGuardar').onclick = () => {
   registrarLocal(colaborador, local);
 
   guardarDB(); pintarHome(); ir('vHome');
+
+  if (duplicada){
+    const fechaTxt = (duplicada.data||'').split('-').reverse().join('/');
+    setTimeout(() => aviso(
+      `⚠ Parece repetida: ya hay una factura NF ${duplicada.nf} en ${duplicada.local}, ${fechaTxt}, por G$ ${fmt(duplicada.valor)}`,
+      4500
+    ), 1600);
+  }
 };
 
 $('#bBorrar').onclick = () => preguntar(
@@ -1305,6 +1348,14 @@ function delPeriodo(){
   return DB.items
     .filter(i => i.colaborador === colaborador && i.mes === m && i.ano === a)
     .sort((x,y) => (x.data||'').localeCompare(y.data||'') || x.id - y.id);
+}
+
+// Filtro por NF o por monto. Sin separadores: "4521" encuentra NF 4521,
+// y también encuentra un monto que contenga esos dígitos (ej: 450.000).
+function coincideFiltro(it, textoFiltro){
+  const q = textoFiltro.replace(/\D/g,'');
+  if (!q) return true;
+  return (it.nf||'').includes(q) || String(it.valor).includes(q);
 }
 
 function filaHTML(i, n, exportada){
@@ -1328,6 +1379,9 @@ function pintarHome(){
   $('#hCant').textContent  = arr.length;
   $('#bExport').disabled   = arr.length === 0;
 
+  const textoFiltro = $('#qFiltro').value.trim();
+  const visibles = textoFiltro ? arr.filter(i => coincideFiltro(i, textoFiltro)) : arr;
+
   if (!arr.length){
     $('#hLista').innerHTML = `
       <div class="nada">
@@ -1337,15 +1391,20 @@ function pintarHome(){
         </svg>
         Todavía no cargaste facturas<br>para este período.
       </div>`;
+  } else if (textoFiltro && !visibles.length){
+    $('#hLista').innerHTML = `<div class="nadaChica" style="padding:22px 16px">
+      Ninguna factura coincide con «${textoFiltro.replace(/</g,'&lt;')}».</div>`;
   } else {
-    const pendientes = arr.filter(i => !i.exportado);
-    const exportadas = arr.filter(i => i.exportado);
+    const pendientes = visibles.filter(i => !i.exportado);
+    const exportadas = visibles.filter(i => i.exportado);
     let html = '';
 
-    html += `<div class="seccionTit"><span class="pt">Pendientes</span> · ${pendientes.length}</div>`;
-    html += pendientes.length
-      ? pendientes.map((i,n) => filaHTML(i,n,false)).join('')
-      : `<div class="nadaChica">Todo lo cargado ya se exportó ✓</div>`;
+    if (!textoFiltro || pendientes.length){
+      html += `<div class="seccionTit"><span class="pt">Pendientes</span> · ${pendientes.length}</div>`;
+      html += pendientes.length
+        ? pendientes.map((i,n) => filaHTML(i,n,false)).join('')
+        : `<div class="nadaChica">Todo lo cargado ya se exportó ✓</div>`;
+    }
 
     if (exportadas.length){
       html += `<div class="seccionTit"><span class="pt2">Ya exportadas</span> · ${exportadas.length}</div>`;
@@ -1360,6 +1419,16 @@ function pintarHome(){
     if (it) abrirFactura(it);
   });
 }
+
+$('#bFiltro').onclick = () => {
+  const b = $('#barraFiltro');
+  b.classList.toggle('on');
+  $('#bFiltro').classList.toggle('bFiltro-activo', b.classList.contains('on'));
+  if (b.classList.contains('on')) setTimeout(() => $('#qFiltro').focus(), 100);
+  else { $('#qFiltro').value = ''; pintarHome(); }
+};
+$('#qFiltro').addEventListener('input', pintarHome);
+$('#bLimpiarFiltro').onclick = () => { $('#qFiltro').value = ''; pintarHome(); $('#qFiltro').focus(); };
 
 /* ═══════════════════════════════════════════════════════
    EXPORTAR — mismo formato que ya lee el script de la PC
