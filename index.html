@@ -207,13 +207,14 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   font-size:16px;color:var(--tinta);padding:0}
 .barraLocal input:focus{outline:0}
 .barraLocal button{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--oro-osc)}
-.resLocal{overflow-y:auto;-webkit-overflow-scrolling:touch;
+.resLocal{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
   padding-bottom:env(safe-area-inset-bottom)}
 .grupoLocal{padding:11px 16px 7px;font-size:9.5px;letter-spacing:.2em;font-weight:700;
   color:var(--tinta-3);text-transform:uppercase;background:var(--papel-2)}
-.itemLocal{display:flex;align-items:center;gap:12px;padding:12px 16px;
-  border-bottom:1px solid var(--papel-2);width:100%;text-align:left}
-.itemLocal:active{background:var(--papel-2)}
+.filaLocal{display:flex;align-items:stretch;border-bottom:1px solid var(--papel-2)}
+.filaLocal:active{background:var(--papel-2)}
+.itemLocal{display:flex;align-items:center;gap:12px;padding:12px 4px 12px 16px;
+  flex:1;min-width:0;text-align:left}
 .itemLocal .mono{width:32px;height:32px;border-radius:50%;background:var(--papel-3);
   color:var(--tinta-3);display:flex;align-items:center;justify-content:center;
   font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto}
@@ -221,8 +222,12 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   white-space:nowrap}
 .itemLocal .uso{flex:0 0 auto;font-family:'IBM Plex Mono',monospace;font-size:11px;
   color:var(--tinta-3)}
+.itemLocal.crear{width:100%;padding:12px 16px}
 .itemLocal.crear{color:var(--oro-osc);font-weight:700}
 .itemLocal.crear .mono{background:var(--oro-luz);color:var(--oro-osc)}
+.kebab{flex:0 0 auto;width:42px;display:flex;align-items:center;justify-content:center;
+  color:var(--tinta-3);font-size:19px;letter-spacing:1px}
+.kebab:active{color:var(--tinta)}
 .sinRes{padding:22px 16px;font-size:13.5px;color:var(--tinta-3);text-align:center}
 .campo.mal{border-color:var(--rojo);background:#FDF4F3}
 .err{display:none;margin-top:7px;font-size:12.5px;font-weight:600;color:var(--rojo)}
@@ -441,13 +446,25 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 <div class="aviso" id="aviso"></div>
 
 <div class="hojaLocal" id="hojaLocal">
-  <div class="cajaLocal">
+  <div class="cajaLocal" id="cajaLocal">
     <div class="barraLocal">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
       <input type="text" id="qLocal" placeholder="Buscar comercio" autocomplete="off">
       <button type="button" id="bCerrarLocal">Cerrar</button>
     </div>
     <div class="resLocal" id="resLocal"></div>
+  </div>
+</div>
+
+<div class="confirm" id="accLocal">
+  <div class="caja">
+    <h3>Editar comercio</h3>
+    <input type="text" class="campo" id="accInput" style="margin-bottom:14px" autocomplete="off">
+    <div class="fila">
+      <button class="btn btn-2" id="accEliminar" style="color:var(--rojo)">Eliminar</button>
+      <button class="btn btn-1" id="accGuardar">Guardar</button>
+    </div>
+    <button class="btn btn-2" id="accCancelar" style="width:100%;margin-top:9px">Cancelar</button>
   </div>
 </div>
 
@@ -527,8 +544,11 @@ DB.items.forEach(it => {
   if (typeof it.tocadoTrasExport !== 'boolean') it.tocadoTrasExport = false;
 });
 
+// Ignora mayúsculas, acentos Y puntuación. Así "COOP." y "COOP" (o
+// "S.A." y "SA") se reconocen como el mismo comercio y no se duplican.
 const normNom = s => (s||'').toLowerCase().normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
+  .replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}\s]/gu,'')
+  .replace(/\s+/g,' ').trim();
 
 // Los comercios pasan de ser una lista de nombres a llevar contador de uso,
 // para poder mostrar los frecuentes primero. Si venían como texto suelto,
@@ -544,6 +564,22 @@ DB.items.forEach(it => {
   const hallado = lista.find(x => normNom(x.n) === normNom(it.local));
   if (hallado) hallado.u = (hallado.u || 0) + 1;
   else lista.push({ n: it.local, u: 1 });
+});
+
+// Fusiona duplicados que ya existan por diferencias de puntuación
+// (ej: "COOP CHORTIZER LTDA" y "COOP. CHORTIZER LTDA"), sumando sus usos.
+PERSONAS.forEach(p => {
+  const lista = DB.locales[p];
+  const vistos = new Map();
+  DB.locales[p] = lista.filter(item => {
+    const clave = normNom(item.n);
+    if (vistos.has(clave)){
+      vistos.get(clave).u = (vistos.get(clave).u || 0) + (item.u || 0);
+      return false;
+    }
+    vistos.set(clave, item);
+    return true;
+  });
 });
 
 const guardarDB = () => Store.set(KEY, JSON.stringify(DB));
@@ -774,26 +810,54 @@ function limpiarErrorFecha(){
 
 (function armarFecha(){
   const cajas = [CD(), CM(), CA()];
+
+  // El cursor va al final sin seleccionar texto. Seleccionar dispara la
+  // barra de Cortar/Copiar/Pegar de Android, que tapa la pantalla.
+  const alFinal = c => {
+    try { c.setSelectionRange(c.value.length, c.value.length); } catch(e){}
+  };
+
   cajas.forEach((c, i) => {
+    c.addEventListener('focus', () => {
+      c.dataset.recienEntro = '1';   // el próximo dígito reemplaza lo que había
+      alFinal(c);
+    });
+
+    c.addEventListener('keydown', e => {
+      // Sin selección visible, pero se comporta como si estuviera todo elegido:
+      // al escribir el primer dígito se limpia lo anterior.
+      if (/^[0-9]$/.test(e.key) && c.dataset.recienEntro === '1'){
+        c.value = '';
+        c.dataset.recienEntro = '0';
+      }
+      if (e.key === 'Backspace'){
+        c.dataset.recienEntro = '0';
+        if (!c.value && cajas[i-1]){
+          cajas[i-1].focus();
+          alFinal(cajas[i-1]);
+        }
+      }
+    });
+
     c.addEventListener('input', () => {
+      c.dataset.recienEntro = '0';
       c.value = c.value.replace(/\D/g,'').slice(0, +c.maxLength);
       if (c.value.length === +c.maxLength && cajas[i+1]){
-        cajas[i+1].focus(); cajas[i+1].select();
+        cajas[i+1].focus();
+        alFinal(cajas[i+1]);
       }
       marcarFecha(); revisarGuardar();
     });
-    c.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !c.value && cajas[i-1]){
-        cajas[i-1].focus();
-        cajas[i-1].setSelectionRange(cajas[i-1].value.length, cajas[i-1].value.length);
-      }
-    });
-    c.addEventListener('focus', () => c.select());
+
     c.addEventListener('blur', () => {
+      c.dataset.recienEntro = '0';
       // completa a dos dígitos: si escribió 7, queda 07
       if (c !== CA() && c.value.length === 1) c.value = '0' + c.value;
       marcarFecha(); revisarGuardar();
     });
+
+    // Evita el menú contextual de Android sobre las casillas
+    c.addEventListener('contextmenu', e => e.preventDefault());
   });
 })();
 
@@ -818,11 +882,15 @@ function ponerLocal(nombre){
 }
 
 function filaLocal(item){
-  return `<button class="itemLocal" type="button" data-n="${item.n.replace(/"/g,'&quot;')}">
-      <span class="mono">${iniciales(item.n)}</span>
-      <span class="nom">${item.n.replace(/</g,'&lt;')}</span>
-      ${item.u ? `<span class="uso">${item.u}</span>` : ''}
-    </button>`;
+  const val = item.n.replace(/"/g,'&quot;');
+  return `<div class="filaLocal">
+      <button class="itemLocal" type="button" data-n="${val}">
+        <span class="mono">${iniciales(item.n)}</span>
+        <span class="nom">${item.n.replace(/</g,'&lt;')}</span>
+        ${item.u ? `<span class="uso">${item.u}</span>` : ''}
+      </button>
+      <button class="kebab" type="button" data-editar="${val}" aria-label="Editar comercio">⋮</button>
+    </div>`;
 }
 
 function pintarSelector(){
@@ -868,18 +936,88 @@ function pintarSelector(){
     ponerLocal(b.dataset.nuevo ? $('#qLocal').value.trim() : b.dataset.n);
     cerrarSelector();
   });
+  $$('#resLocal .kebab').forEach(b => b.onclick = e => {
+    e.stopPropagation();
+    abrirEdicionLocal(b.dataset.editar);
+  });
 }
+
+/* Editar o eliminar un comercio ya guardado. Renombrar no toca las
+   facturas ya cargadas con ese texto — solo cambia la sugerencia futura. */
+function abrirEdicionLocal(nombre){
+  $('#accLocal').dataset.original = nombre;
+  $('#accInput').value = nombre;
+  $('#accLocal').classList.add('on');
+  setTimeout(() => $('#accInput').focus(), 100);   // sin seleccionar: evita el menú de Android
+}
+
+$('#accCancelar').onclick = () => $('#accLocal').classList.remove('on');
+
+$('#accGuardar').onclick = () => {
+  const original = $('#accLocal').dataset.original;
+  const nuevo = $('#accInput').value.trim();
+  if (!nuevo) return;
+  const lista = localesDe(colaborador);
+  const iOriginal = lista.findIndex(x => x.n === original);
+  if (iOriginal < 0){ $('#accLocal').classList.remove('on'); return; }
+
+  const iIgual = lista.findIndex((x,i) => i !== iOriginal && normNom(x.n) === normNom(nuevo));
+  if (iIgual >= 0){
+    // El nuevo nombre coincide con otro que ya existía: se fusionan
+    lista[iIgual].u = (lista[iIgual].u || 0) + (lista[iOriginal].u || 0);
+    lista.splice(iOriginal, 1);
+  } else {
+    lista[iOriginal].n = nuevo;
+  }
+
+  if (localElegido === original) ponerLocal(nuevo);
+  guardarDB();
+  $('#accLocal').classList.remove('on');
+  pintarSelector();
+  aviso('Comercio actualizado');
+};
+
+$('#accEliminar').onclick = () => {
+  const original = $('#accLocal').dataset.original;
+  $('#accLocal').classList.remove('on');
+  preguntar('Eliminar comercio',
+    `Se va a quitar «${original}» de la lista de comercios guardados. Las facturas que ya cargaste con ese nombre no se modifican.`,
+    () => {
+      const lista = localesDe(colaborador);
+      const i = lista.findIndex(x => x.n === original);
+      if (i >= 0) lista.splice(i, 1);
+      if (localElegido === original) ponerLocal('');
+      guardarDB();
+      pintarSelector();
+      aviso('Comercio eliminado');
+    });
+};
 
 function abrirSelector(){
   $('#qLocal').value = '';
   pintarSelector();
   $('#hojaLocal').classList.add('on');
+  ajustarAlturaPanelLocal();
   setTimeout(() => $('#qLocal').focus(), 120);
 }
 
 function cerrarSelector(){
   $('#hojaLocal').classList.remove('on');
   $('#qLocal').blur();
+}
+
+// El teclado de Android reduce el área visible de la pantalla. Sin esto,
+// la lista de comercios quedaba tapada por el teclado en vez de mostrar
+// su propio scroll. Se ajusta la altura del panel a lo que realmente
+// queda visible por encima del teclado.
+function ajustarAlturaPanelLocal(){
+  const vv = window.visualViewport;
+  const caja = $('#cajaLocal');
+  if (!vv || !caja) return;
+  caja.style.maxHeight = Math.round(vv.height * 0.94) + 'px';
+}
+if (window.visualViewport){
+  window.visualViewport.addEventListener('resize', ajustarAlturaPanelLocal);
 }
 
 $('#bLocal').onclick        = abrirSelector;
