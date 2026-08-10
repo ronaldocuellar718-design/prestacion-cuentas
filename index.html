@@ -1669,11 +1669,9 @@ $('#expCancelar').onclick = () => cerrarPanel('#hojaExport');
 
 /* Descargar: uno por uno y escalonado, porque si se disparan juntas
    Chrome de Android bloquea todas menos la primera. */
-$('#expDescargar').onclick = () => {
-  const paquetes = paquetesSegunAlcance();
-  if (!paquetes.length) return;
-  cerrarPanel('#hojaExport');
-
+/* Descarga escalonada: si se disparan juntas, Chrome de Android
+   bloquea todas menos la primera. */
+function descargarPaquetes(paquetes, mensaje){
   paquetes.forEach((p, i) => setTimeout(() => {
     const url = URL.createObjectURL(new Blob([p.texto], {type:'application/json'}));
     const enlace = document.createElement('a');
@@ -1681,40 +1679,53 @@ $('#expDescargar').onclick = () => {
     setTimeout(() => URL.revokeObjectURL(url), 6000);
     if (i === paquetes.length - 1){
       marcarExportados(paquetes);
-      aviso('Descargado: ' + resumenSalida(paquetes), 'ok');
+      aviso(mensaje || ('Descargado: ' + resumenSalida(paquetes)), 'ok');
     }
   }, i * 700));
+}
+
+$('#expDescargar').onclick = () => {
+  const paquetes = paquetesSegunAlcance();
+  if (!paquetes.length) return;
+  cerrarPanel('#hojaExport');
+  descargarPaquetes(paquetes);
 };
 
 /* Compartir: abre el menú de Android y evita el diálogo de descarga.
-   Si el celular no lo soporta, cae a descarga normal. */
+
+   Se manda como .txt y no como .json a propósito: Android solo permite
+   compartir ciertos tipos de archivo, y JSON no está en esa lista — por
+   eso WhatsApp rechazaba el envío. El contenido es exactamente el mismo,
+   y el script de la PC reconoce las facturas por su contenido, así que
+   la extensión no cambia nada del lado de la computadora.
+
+   Si algo falla igual, se descarga automáticamente: nunca queda sin salida. */
 $('#expCompartir').onclick = async () => {
   const paquetes = paquetesSegunAlcance();
   if (!paquetes.length) return;
 
-  const archivos = paquetes.map(p =>
-    new File([p.texto], p.nombre, { type: 'application/json' }));
+  const archivos = paquetes.map(p => new File(
+    [p.texto],
+    p.nombre.replace(/\.json$/i, '.txt'),
+    { type: 'text/plain' }
+  ));
 
   if (!navigator.canShare || !navigator.canShare({ files: archivos })){
     cerrarPanel('#hojaExport');
-    aviso('Este celular no permite compartir archivos. Usá Descargar.', 'alerta');
+    descargarPaquetes(paquetes, 'Este celular no permite compartir. Se descargó en su lugar.');
     return;
   }
 
   try {
-    await navigator.share({
-      files: archivos,
-      title: 'Prestação de Conta'
-    });
+    await navigator.share({ files: archivos });
     cerrarPanel('#hojaExport');
     marcarExportados(paquetes);
     aviso('Enviado: ' + resumenSalida(paquetes), 'ok');
   } catch(e){
-    // El usuario canceló el menú: no se marca nada como exportado
-    if (e && e.name !== 'AbortError'){
-      cerrarPanel('#hojaExport');
-      aviso('No se pudo compartir. Probá con Descargar.', 'alerta');
-    }
+    if (e && e.name === 'AbortError') return;   // canceló: no se marca nada
+    cerrarPanel('#hojaExport');
+    descargarPaquetes(paquetes,
+      `No se pudo compartir (${e && e.name ? e.name : 'error'}). Se descargó en su lugar.`);
   }
 };
 
