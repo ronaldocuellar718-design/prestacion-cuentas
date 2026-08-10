@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, interactive-widget=resizes-content">
 <meta name="theme-color" content="#16130E">
 <title>Prestação de Conta</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Prestação">
+<link rel="icon" href="icono-192.png">
+<link rel="apple-touch-icon" href="icono-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -41,54 +49,53 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .vista.on{display:flex}
 
 /* ══════ BARRA SUPERIOR ══════ */
-.top{background:var(--tinta);color:var(--papel);padding:14px 16px;flex:0 0 auto}
+.top{background:var(--tinta);color:var(--papel);padding:12px 16px;flex:0 0 auto}
 .top .fila{display:flex;align-items:center;gap:12px}
 .volver{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);
   display:flex;align-items:center;justify-content:center;flex:0 0 auto}
 .volver svg{stroke:var(--papel);fill:none}
 .top .tit{flex:1;min-width:0}
-.top .eyebrow{font-size:9.5px;letter-spacing:.24em;font-weight:600;color:var(--oro);
+.top .eyebrow{font-size:9px;letter-spacing:.22em;font-weight:600;color:var(--oro);
   text-transform:uppercase;display:block}
-.top h1{margin:2px 0 0;font-size:17px;font-weight:700;font-stretch:106%;letter-spacing:-.01em}
+.top h1{margin:1px 0 0;font-size:15px;font-weight:700;font-stretch:106%;letter-spacing:-.01em}
 
 /* ══════ HOME ══════ */
-.quien{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:14px}
-.quien button{padding:11px 4px;border-radius:9px;background:rgba(255,255,255,.07);
-  color:rgba(251,249,245,.62);font-size:11.5px;font-weight:700;letter-spacing:.05em;
+.quien{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:11px}
+.quien button{padding:10px 4px;border-radius:8px;background:rgba(255,255,255,.07);
+  color:rgba(251,249,245,.62);font-size:12px;font-weight:700;letter-spacing:.05em;
   border:1px solid transparent;transition:.15s}
 .quien button[aria-pressed="true"]{background:var(--oro);color:var(--tinta);border-color:var(--oro)}
 
-.periodo{display:flex;gap:8px;align-items:center;padding:10px 16px;background:var(--tinta-2);
-  flex:0 0 auto}
-.periodo span{font-size:9.5px;letter-spacing:.2em;font-weight:600;color:rgba(242,227,198,.6);
-  text-transform:uppercase}
-.periodo select{background:rgba(255,255,255,.08);color:var(--papel);border:1px solid rgba(242,227,198,.2);
-  border-radius:8px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;
-  font-weight:500;appearance:none}
-.periodo select option{color:#000}
+.selPeriodo{display:flex;gap:5px;flex:0 0 auto}
+.selPeriodo select{background:rgba(255,255,255,.08);color:var(--papel);
+  border:1px solid rgba(242,227,198,.22);border-radius:7px;padding:7px 8px;
+  font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500;appearance:none}
+.selPeriodo select option{color:#000}
 
 /* ── Pantalla de inicio: elegir colaborador ── */
 .elegir{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 20px 60px;
   background:var(--papel)}
-.elegirTit{margin:0 0 22px;font-size:15px;font-weight:600;color:var(--tinta-3);text-align:center}
+.elegirTit{margin:0 0 22px;font-size:15.5px;font-weight:600;color:var(--tinta-3);text-align:center}
 .elegirLista{display:flex;flex-direction:column;gap:11px}
 .elegirLista button{padding:22px;border-radius:13px;background:var(--papel);
   border:1.5px solid var(--linea);font-size:17px;font-weight:700;letter-spacing:.07em;
   color:var(--tinta);transition:.15s}
 .elegirLista button:active{background:var(--oro);border-color:var(--oro);transform:scale(.98)}
 
-.resumen{padding:20px 16px 16px;display:flex;flex-direction:column;gap:15px;
+.resumen{padding:14px 16px 14px;display:flex;flex-direction:column;gap:13px;
   background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
-.resTotal{min-width:0}
-.resumen .lbl{font-size:9.5px;letter-spacing:.22em;font-weight:600;color:var(--tinta-3);
+.resTotal{min-width:0;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.resIzq{min-width:0}
+.resumen .lbl{font-size:9.5px;letter-spacing:.2em;font-weight:600;color:var(--tinta-3);
   text-transform:uppercase;display:block}
 /* El monto NUNCA se recorta: tiene toda la línea para sí solo. */
 .resumen .big{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
-  font-size:clamp(28px,9.4vw,40px);font-weight:600;line-height:1.05;letter-spacing:-.035em;
-  margin-top:7px;color:var(--tinta)}
+  font-size:clamp(26px,8.4vw,34px);font-weight:600;line-height:1.05;letter-spacing:-.035em;
+  margin-top:5px;color:var(--tinta)}
 .resumen .big i{font-size:14px;font-style:normal;color:var(--tinta-3);margin-right:7px;
   letter-spacing:0;font-weight:500}
-.hCantTxt{margin-top:6px;font-size:11.5px;color:var(--tinta-3);font-weight:600}
+.hCantTxt{font-size:12.5px;color:var(--tinta-3);font-weight:600;white-space:nowrap;
+  flex:0 0 auto;padding-bottom:4px}
 .accionesTop{display:flex;gap:8px;align-items:stretch}
 .barraFiltro{display:none;align-items:center;gap:9px;padding:10px 16px;
   background:var(--papel-2);border-bottom:1px solid var(--linea)}
@@ -107,12 +114,12 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .ibtn:disabled{opacity:.4;pointer-events:none}
 .ibtn:active{transform:scale(.97)}
 
-.seccionTit{display:flex;align-items:center;gap:8px;padding:14px 16px 8px;font-size:10px;
-  letter-spacing:.18em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
+.seccionTit{display:flex;align-items:center;gap:8px;padding:12px 16px 8px;font-size:10.5px;
+  letter-spacing:.16em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
   background:var(--papel)}
 .seccionTit .pt{color:var(--oro-osc)}
 .seccionTit .pt2{color:var(--tinta-3);opacity:.65}
-.nadaChica{padding:4px 16px 14px;font-size:12.5px;color:var(--tinta-3)}
+.nadaChica{padding:4px 16px 14px;font-size:13px;color:var(--tinta-3)}
 .tagEdit{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:20px;
   background:var(--oro-luz);color:var(--oro-osc);font-size:9.5px;font-weight:700;
   letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
@@ -122,13 +129,13 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .reg{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
   padding:13px 16px;border-bottom:1px solid var(--papel-2);background:var(--papel)}
 .reg:active{background:var(--papel-2)}
-.reg .n{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--tinta-3);width:20px}
-.reg .cat{font-size:14px;font-weight:700;letter-spacing:-.005em}
-.reg .sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--tinta-3);margin-top:2px;
+.reg .n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--tinta-3);width:21px}
+.reg .cat{font-size:15.5px;font-weight:700;letter-spacing:-.005em}
+.reg .sub{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--tinta-3);margin-top:3px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.reg .det{font-size:11.5px;color:var(--tinta-3);margin-top:2px;overflow:hidden;
+.reg .det{font-size:13px;color:var(--tinta-3);margin-top:3px;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
-.reg .mto{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:600;white-space:nowrap}
+.reg .mto{font-family:'IBM Plex Mono',monospace;font-size:16.5px;font-weight:600;white-space:nowrap}
 .nada{padding:56px 32px;text-align:center;color:var(--tinta-3);font-size:14px;line-height:1.6}
 .nada svg{margin-bottom:14px;opacity:.35}
 
@@ -152,7 +159,7 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   font-size:clamp(36px,13vw,58px);font-weight:700;letter-spacing:-.045em;line-height:1;
   color:var(--tinta);word-break:break-all;text-align:center}
 .monto .num.cero{color:#C6BDAC}
-.monto .pie{margin-top:13px;font-size:12.5px;color:var(--tinta-3);text-align:center}
+.monto .pie{margin-top:13px;font-size:13px;color:var(--tinta-3);text-align:center}
 
 
 .pad{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--linea);
@@ -168,13 +175,13 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .cuerpo{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 108px}
 .bloque{padding:18px 16px 6px}
 .bloque + .bloque{border-top:1px solid var(--papel-2)}
-.et{font-size:9.5px;letter-spacing:.22em;font-weight:700;color:var(--tinta-3);
+.et{font-size:10px;letter-spacing:.18em;font-weight:700;color:var(--tinta-3);
   text-transform:uppercase;margin-bottom:11px;display:block}
 .et i{font-style:normal;color:var(--oro-osc)}
 
 .tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.tile{padding:15px 10px;border-radius:11px;background:var(--papel);border:1.5px solid var(--linea);
-  font-size:14px;font-weight:600;text-align:center;transition:.13s}
+.tile{padding:16px 10px;border-radius:11px;background:var(--papel);border:1.5px solid var(--linea);
+  font-size:15.5px;font-weight:600;text-align:center;transition:.13s}
 .tile[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:var(--papel)}
 
 .chips{display:flex;gap:7px;flex-wrap:wrap}
@@ -192,14 +199,14 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   line-height:1.5}
 .fecha3{display:flex;align-items:center;gap:7px}
 .fecha3 input{width:56px;flex:0 0 auto;background:var(--papel);border:1.5px solid var(--linea);
-  border-radius:11px;padding:14px 4px;font-family:'IBM Plex Mono',monospace;font-size:20px;
+  border-radius:11px;padding:14px 4px;font-family:'IBM Plex Mono',monospace;font-size:21px;
   font-weight:600;text-align:center;color:var(--tinta);letter-spacing:.04em}
 .fecha3 input.ancho{width:78px}
 .fecha3 input::placeholder{color:#C6BDAC;font-size:17px;letter-spacing:.08em}
 .fecha3 input:focus{outline:0;border-color:var(--oro);background:#FFFDF8}
 .fecha3 b{color:var(--tinta-3);font-size:19px;font-weight:500}
 .fecha3.mal input{border-color:var(--rojo);background:#FDF4F3}
-.campo-nf{width:auto;min-width:130px;max-width:100%;font-size:19px;font-weight:600;letter-spacing:.06em;text-align:center}
+.campo-nf{width:auto;min-width:130px;max-width:100%;font-size:20px;font-weight:600;letter-spacing:.06em;text-align:center}
 
 /* ── Selector de comercios ── */
 .selLocal{display:flex;align-items:center;gap:11px;width:100%;background:var(--papel);
@@ -209,7 +216,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   color:var(--tinta-3);display:flex;align-items:center;justify-content:center;
   font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;flex:0 0 auto}
 .selLocal.puesto .mono{background:var(--oro-luz);color:var(--oro-osc)}
-.selLocal .txt{flex:1;min-width:0;font-size:15px;color:#B5AC9C;overflow:hidden;
+.selLocal .txt{flex:1;min-width:0;font-size:15.5px;color:#B5AC9C;overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
 .selLocal.puesto .txt{color:var(--tinta);font-weight:600}
 .selLocal svg{color:var(--tinta-3);flex:0 0 auto}
@@ -224,12 +231,12 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   border-bottom:1px solid var(--linea);flex:0 0 auto}
 .barraLocal svg{color:var(--tinta-3);flex:0 0 auto}
 .barraLocal input{flex:1;min-width:0;border:0;background:transparent;font-family:inherit;
-  font-size:16px;color:var(--tinta);padding:0}
+  font-size:16.5px;color:var(--tinta);padding:0}
 .barraLocal input:focus{outline:0}
-.barraLocal button{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--oro-osc)}
+.barraLocal button{flex:0 0 auto;font-size:13.5px;font-weight:700;color:var(--oro-osc)}
 .resLocal{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;
   padding-bottom:env(safe-area-inset-bottom)}
-.grupoLocal{padding:11px 16px 7px;font-size:9.5px;letter-spacing:.2em;font-weight:700;
+.grupoLocal{padding:11px 16px 7px;font-size:10px;letter-spacing:.18em;font-weight:700;
   color:var(--tinta-3);text-transform:uppercase;background:var(--papel-2)}
 .filaLocal{display:flex;align-items:stretch;border-bottom:1px solid var(--papel-2)}
 .filaLocal:active{background:var(--papel-2)}
@@ -238,9 +245,9 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .itemLocal .mono{width:32px;height:32px;border-radius:50%;background:var(--papel-3);
   color:var(--tinta-3);display:flex;align-items:center;justify-content:center;
   font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto}
-.itemLocal .nom{flex:1;min-width:0;font-size:14.5px;overflow:hidden;text-overflow:ellipsis;
+.itemLocal .nom{flex:1;min-width:0;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;
   white-space:nowrap}
-.itemLocal .uso{flex:0 0 auto;font-family:'IBM Plex Mono',monospace;font-size:11px;
+.itemLocal .uso{flex:0 0 auto;font-family:'IBM Plex Mono',monospace;font-size:12px;
   color:var(--tinta-3)}
 .itemLocal.crear{width:100%;padding:12px 16px}
 .itemLocal.crear{color:var(--oro-osc);font-weight:700}
@@ -261,11 +268,11 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 
 .mini-monto{background:var(--papel-2);padding:13px 16px;display:flex;align-items:center;
   justify-content:space-between;border-bottom:1px solid var(--linea);flex:0 0 auto}
-.mini-monto .l{font-size:9.5px;letter-spacing:.2em;font-weight:700;color:var(--tinta-3);
+.mini-monto .l{font-size:10px;letter-spacing:.18em;font-weight:700;color:var(--tinta-3);
   text-transform:uppercase}
-.mini-monto .v{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700}
+.mini-monto .v{font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:700}
 .mini-monto .v em{font-size:13px;font-style:normal;color:var(--tinta-3)}
-.mini-monto button{font-size:12px;font-weight:700;color:var(--oro-osc);text-decoration:underline;
+.mini-monto button{font-size:12.5px;font-weight:700;color:var(--oro-osc);text-decoration:underline;
   text-underline-offset:3px}
 
 /* ══════ AVISOS ══════ */
@@ -277,8 +284,8 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .opcion svg{flex:0 0 auto;color:var(--tinta-3)}
 .opcion.destacada svg{color:var(--oro-osc)}
 .opcion .txt{flex:1;min-width:0}
-.opcion .txt b{display:block;font-size:14.5px;font-weight:700;color:var(--tinta)}
-.opcion .txt em{display:block;font-style:normal;font-size:12px;color:var(--tinta-3);margin-top:2px}
+.opcion .txt b{display:block;font-size:15px;font-weight:700;color:var(--tinta)}
+.opcion .txt em{display:block;font-style:normal;font-size:12.5px;color:var(--tinta-3);margin-top:2px}
 .separador{height:1px;background:var(--linea);margin:14px 0 12px}
 .alcance{display:flex;gap:8px}
 .alcance button{flex:1;padding:11px 8px;border-radius:10px;background:var(--papel);
@@ -295,7 +302,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   box-shadow:0 10px 32px rgba(22,19,14,.22)}
 .aviso.on{transform:translateY(0)}
 .aviso svg{flex:0 0 auto;margin-top:1px;color:var(--tinta-3)}
-.aviso span{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:var(--tinta);line-height:1.45}
+.aviso span{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--tinta);line-height:1.45}
 .aviso.ok{border-left-color:var(--verde-ok)}
 .aviso.ok svg{color:var(--verde-ok)}
 .aviso.alerta{border-left-color:var(--oro)}
@@ -310,7 +317,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .confirm p{margin:0 0 18px;font-size:14px;color:var(--tinta-3);line-height:1.5}
 .confirm .fila{display:flex;gap:9px}
 .confirm .caja{max-height:88dvh;overflow-y:auto}
-.enlace{display:block;width:100%;margin-top:11px;padding:11px;font-size:12.5px;font-weight:700;
+.enlace{display:block;width:100%;margin-top:11px;padding:11px;font-size:13px;font-weight:700;
   color:var(--oro-osc);text-align:center;letter-spacing:.02em}
 .par{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .et2{font-size:9px;letter-spacing:.2em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
@@ -321,7 +328,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .pal .de{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--tinta-3);flex:1;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pal .fl{color:var(--oro);font-weight:700;flex:0 0 auto}
-.pal .a{font-size:13.5px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
+.pal .a{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
   white-space:nowrap}
 .pal .x{flex:0 0 auto;color:var(--rojo);font-size:19px;font-weight:600;padding:0 6px;line-height:1}
 .vacioPal{padding:20px 4px;text-align:center;color:var(--tinta-3);font-size:13px}
@@ -358,6 +365,10 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
           <span class="eyebrow">Cartão Coorporativo</span>
           <h1>Prestação de Conta</h1>
         </div>
+        <div class="selPeriodo">
+          <select id="mes" aria-label="Mes"></select>
+          <select id="ano" aria-label="Año"></select>
+        </div>
       </div>
       <div class="quien" id="quien">
         <button type="button" data-p="LAURO ZIMMER" aria-pressed="false">LAURO</button>
@@ -366,16 +377,12 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
       </div>
     </div>
 
-    <div class="periodo">
-      <span>Período</span>
-      <select id="mes"></select>
-      <select id="ano"></select>
-    </div>
-
     <div class="resumen">
       <div class="resTotal">
-        <span class="lbl">Total del período</span>
-        <div class="big"><i>G$</i><span id="hTotal">0</span></div>
+        <div class="resIzq">
+          <span class="lbl">Total del período</span>
+          <div class="big"><i>G$</i><span id="hTotal">0</span></div>
+        </div>
         <div class="hCantTxt"><span id="hCant">0</span> facturas</div>
       </div>
       <div class="accionesTop">
@@ -774,6 +781,8 @@ const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const MESNOM = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto',
   'Septiembre','Octubre','Noviembre','Diciembre'];
+// Abreviados solo para el desplegable del encabezado, donde el espacio es corto
+const MESCORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n||0));
 const isoHoy = () => new Date().toISOString().slice(0,10);
 
@@ -842,7 +851,7 @@ function preguntar(titulo, texto, alConfirmar){
    ═══════════════════════════════════════════════════════ */
 (function(){
   const hoy = new Date();
-  MESNOM.forEach((m,i) => $('#mes').add(new Option(m, i+1)));
+  MESCORTO.forEach((m,i) => $('#mes').add(new Option(m, i+1)));
   for (let y = hoy.getFullYear()-1; y <= hoy.getFullYear()+1; y++) $('#ano').add(new Option(y,y));
   $('#mes').value = hoy.getMonth()+1;
   $('#ano').value = hoy.getFullYear();
