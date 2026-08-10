@@ -21,6 +21,7 @@
   --papel-3:#E4DCCB;
   --linea:#DED5C4;
   --rojo:#A33327;
+  --verde-ok:#2F6B4F;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;overscroll-behavior:none}
@@ -65,6 +66,16 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   border-radius:8px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;
   font-weight:500;appearance:none}
 .periodo select option{color:#000}
+
+/* ── Pantalla de inicio: elegir colaborador ── */
+.elegir{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 20px 60px;
+  background:var(--papel)}
+.elegirTit{margin:0 0 22px;font-size:15px;font-weight:600;color:var(--tinta-3);text-align:center}
+.elegirLista{display:flex;flex-direction:column;gap:11px}
+.elegirLista button{padding:22px;border-radius:13px;background:var(--papel);
+  border:1.5px solid var(--linea);font-size:17px;font-weight:700;letter-spacing:.07em;
+  color:var(--tinta);transition:.15s}
+.elegirLista button:active{background:var(--oro);border-color:var(--oro);transform:scale(.98)}
 
 .resumen{padding:20px 16px 16px;display:flex;flex-direction:column;gap:15px;
   background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
@@ -258,11 +269,37 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   text-underline-offset:3px}
 
 /* ══════ AVISOS ══════ */
-.aviso{position:fixed;left:50%;bottom:26px;transform:translate(-50%,120px);background:var(--tinta);
-  color:var(--papel);padding:14px 22px;border-radius:11px;font-size:14px;font-weight:600;
-  transition:transform .3s cubic-bezier(.2,.9,.3,1);z-index:90;max-width:88%;text-align:center;
-  box-shadow:0 10px 30px rgba(22,19,14,.28);cursor:pointer}
-.aviso.on{transform:translate(-50%,0)}
+/* ── Opciones del panel de exportar ── */
+.opcion{display:flex;align-items:center;gap:13px;width:100%;padding:14px;margin-bottom:9px;
+  border-radius:12px;background:var(--papel);border:1.5px solid var(--linea);text-align:left}
+.opcion:active{background:var(--papel-2)}
+.opcion.destacada{border-color:var(--oro);border-width:2px}
+.opcion svg{flex:0 0 auto;color:var(--tinta-3)}
+.opcion.destacada svg{color:var(--oro-osc)}
+.opcion .txt{flex:1;min-width:0}
+.opcion .txt b{display:block;font-size:14.5px;font-weight:700;color:var(--tinta)}
+.opcion .txt em{display:block;font-style:normal;font-size:12px;color:var(--tinta-3);margin-top:2px}
+.separador{height:1px;background:var(--linea);margin:14px 0 12px}
+.alcance{display:flex;gap:8px}
+.alcance button{flex:1;padding:11px 8px;border-radius:10px;background:var(--papel);
+  border:1.5px solid var(--linea);font-size:13px;font-weight:700;color:var(--tinta-3)}
+.alcance button[aria-pressed="true"]{background:var(--oro-luz);border-color:var(--oro);
+  color:var(--oro-osc)}
+
+/* ── Aviso: misma lógica visual que los paneles ── */
+.aviso{position:fixed;left:16px;right:16px;bottom:24px;max-width:488px;margin:0 auto;
+  transform:translateY(140px);background:var(--papel);border:1px solid var(--linea);
+  border-left:4px solid var(--tinta-3);border-radius:12px;padding:13px 15px;
+  display:flex;align-items:flex-start;gap:11px;text-align:left;
+  transition:transform .3s cubic-bezier(.2,.9,.3,1);z-index:130;cursor:pointer;
+  box-shadow:0 10px 32px rgba(22,19,14,.22)}
+.aviso.on{transform:translateY(0)}
+.aviso svg{flex:0 0 auto;margin-top:1px;color:var(--tinta-3)}
+.aviso span{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:var(--tinta);line-height:1.45}
+.aviso.ok{border-left-color:var(--verde-ok)}
+.aviso.ok svg{color:var(--verde-ok)}
+.aviso.alerta{border-left-color:var(--oro)}
+.aviso.alerta svg{color:var(--oro-osc)}
 
 .confirm{position:fixed;inset:0;background:rgba(22,19,14,.55);display:none;align-items:flex-end;
   z-index:120;touch-action:none}
@@ -294,7 +331,27 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 <div class="app">
 
   <!-- ══════════ HOME ══════════ -->
-  <section class="vista on" id="vHome">
+  <!-- ══════════ INICIO · elegir colaborador ══════════ -->
+  <section class="vista on" id="vInicio">
+    <div class="top">
+      <div class="fila">
+        <div class="tit">
+          <span class="eyebrow">Cartão Coorporativo</span>
+          <h1>Prestação de Conta</h1>
+        </div>
+      </div>
+    </div>
+    <div class="elegir">
+      <p class="elegirTit">¿Con qué usuario querés trabajar?</p>
+      <div class="elegirLista" id="elegirLista">
+        <button type="button" data-p="LAURO ZIMMER">LAURO</button>
+        <button type="button" data-p="RENATO MOURA">RENATO</button>
+        <button type="button" data-p="GUTTO BROETTO">GUTTO</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="vista" id="vHome">
     <div class="top">
       <div class="fila">
         <div class="tit">
@@ -303,7 +360,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
         </div>
       </div>
       <div class="quien" id="quien">
-        <button type="button" data-p="LAURO ZIMMER" aria-pressed="true">LAURO</button>
+        <button type="button" data-p="LAURO ZIMMER" aria-pressed="false">LAURO</button>
         <button type="button" data-p="RENATO MOURA" aria-pressed="false">RENATO</button>
         <button type="button" data-p="GUTTO BROETTO" aria-pressed="false">GUTTO</button>
       </div>
@@ -463,7 +520,10 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 
 </div>
 
-<div class="aviso" id="aviso"></div>
+<div class="aviso" id="aviso">
+  <svg id="avisoIcono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+  <span id="avisoTxt"></span>
+</div>
 
 <div class="hojaLocal" id="hojaLocal">
   <div class="cajaLocal" id="cajaLocal">
@@ -485,6 +545,38 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
       <button class="btn btn-1" id="accGuardar">Guardar</button>
     </div>
     <button class="btn btn-2" id="accCancelar" style="width:100%;margin-top:9px">Cancelar</button>
+  </div>
+</div>
+
+<div class="confirm" id="hojaExport">
+  <div class="caja">
+    <h3>Exportar</h3>
+    <p id="expResumen">—</p>
+
+    <button class="opcion destacada" type="button" id="expCompartir">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+      <span class="txt">
+        <b>Compartir</b>
+        <em>WhatsApp, Drive, correo…</em>
+      </span>
+    </button>
+
+    <button class="opcion" type="button" id="expDescargar">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+      <span class="txt">
+        <b>Descargar al teléfono</b>
+        <em>Queda en la carpeta Descargas</em>
+      </span>
+    </button>
+
+    <div class="separador"></div>
+
+    <div class="alcance" id="alcance">
+      <button type="button" data-a="uno" aria-pressed="true">Solo <span id="expNombre">Lauro</span></button>
+      <button type="button" data-a="todos" aria-pressed="false">Los 3</button>
+    </div>
+
+    <button class="btn btn-2" id="expCancelar" style="width:100%;margin-top:14px">Cancelar</button>
   </div>
 </div>
 
@@ -713,9 +805,24 @@ function cerrarPanel(id){
   if (panelesAbiertos === 0) document.documentElement.classList.remove('sinScroll');
 }
 
-function aviso(msg, ms){
-  const a = $('#aviso'); a.textContent = msg; a.classList.add('on');
-  clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('on'), ms || 2300);
+/* Tres tipos de aviso, con el mismo lenguaje visual que los paneles:
+   ok (confirmación), alerta (algo para revisar), info (neutro). */
+const ICONOS = {
+  ok:     '<path d="M20 6L9 17l-5-5"/>',
+  alerta: '<path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/>',
+  info:   '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>'
+};
+
+function aviso(msg, tipo, ms){
+  tipo = tipo || 'info';
+  const a = $('#aviso');
+  $('#avisoIcono').innerHTML = ICONOS[tipo] || ICONOS.info;
+  $('#avisoTxt').textContent = msg;
+  a.classList.remove('ok','alerta');
+  if (tipo !== 'info') a.classList.add(tipo);
+  a.classList.add('on');
+  clearTimeout(a._t);
+  a._t = setTimeout(() => a.classList.remove('on'), ms || (tipo === 'alerta' ? 4500 : 2400));
 }
 $('#aviso').addEventListener('click', () => {
   $('#aviso').classList.remove('on');
@@ -745,11 +852,22 @@ function preguntar(titulo, texto, alConfirmar){
   $$('.tile').forEach(b => b.onclick = () => elegirCategoria(b.dataset.c));
 })();
 
-$$('#quien button').forEach(b => b.onclick = () => {
-  colaborador = b.dataset.p;
-  $$('#quien button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+/* La app arranca SIEMPRE preguntando quién la va a usar. Sin valor por
+   defecto: así nadie carga facturas a nombre de otro sin darse cuenta. */
+function elegirColaborador(p){
+  colaborador = p;
+  $$('#quien button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.p === p)));
+  $('#qFiltro').value = '';
+  $('#barraFiltro').classList.remove('on');
+  $('#bFiltro').classList.remove('bFiltro-activo');
   pintarHome();
-});
+  pintarPalabras();
+  ir('vHome');
+}
+
+$$('#elegirLista button').forEach(b => b.onclick = () => elegirColaborador(b.dataset.p));
+
+$$('#quien button').forEach(b => b.onclick = () => elegirColaborador(b.dataset.p));
 $('#mes').onchange = $('#ano').onchange = pintarHome;
 
 /* ═══════════════════════════════════════════════════════
@@ -1013,7 +1131,7 @@ $('#accGuardar').onclick = () => {
   guardarDB();
   cerrarPanel('#accLocal');
   pintarSelector();
-  aviso('Comercio actualizado');
+  aviso('Comercio actualizado', 'ok');
 };
 
 $('#accEliminar').onclick = () => {
@@ -1028,7 +1146,7 @@ $('#accEliminar').onclick = () => {
       if (localElegido === original) ponerLocal('');
       guardarDB();
       pintarSelector();
-      aviso('Comercio eliminado');
+      aviso('Comercio eliminado', 'ok');
     });
 };
 
@@ -1156,8 +1274,8 @@ $('#bCerrarPal').onclick = () => cerrarPanel('#hojaPal');
 $('#bAddPal').onclick = () => {
   if (enseñarPalabra($('#palDe').value, $('#palA').value)){
     $('#palDe').value = ''; $('#palA').value = '';
-    aviso('Palabra guardada');
-  } else aviso('Completá los dos campos');
+    aviso('Palabra guardada', 'ok');
+  } else aviso('Completá los dos campos', 'alerta');
 };
 
 /* Detecta si el usuario corrigió a mano una palabra recién dictada
@@ -1177,7 +1295,7 @@ $('#obs').addEventListener('blur', () => {
   $('#sugPal .chip').onclick = () => {
     enseñarPalabra(de, a);
     $('#sugPal').innerHTML = ''; textoDictado = '';
-    aviso('Aprendido: ' + a);
+    aviso('Aprendido: ' + a, 'ok');
   };
 });
 
@@ -1199,7 +1317,7 @@ function pintarDictado(parcial){
 }
 
 $('#bDictar').onclick = () => {
-  if (!SR){ aviso('Este navegador no permite dictado'); return; }
+  if (!SR){ aviso('Este navegador no permite dictado', 'alerta'); return; }
   if (escuchando){ escuchando = false; try{ rec.stop(); }catch(e){} return; }
 
   escuchando = true;
@@ -1233,7 +1351,7 @@ $('#bDictar').onclick = () => {
     };
 
     rec.onerror = e => {
-      if (e.error !== 'no-speech' && e.error !== 'aborted') aviso('No se escuchó bien');
+      if (e.error !== 'no-speech' && e.error !== 'aborted') aviso('No se escuchó bien', 'alerta');
     };
 
     rec.onend = () => {
@@ -1331,10 +1449,10 @@ $('#bGuardar').onclick = () => {
       if (previo.exportado){ actualizado.exportado = true; actualizado.tocadoTrasExport = true; }
       DB.items[i] = actualizado;
     }
-    aviso('Factura modificada');
+    aviso('Factura modificada', 'ok');
   } else {
     DB.items.push({ id: Date.now(), exportado: false, tocadoTrasExport: false, ...datos });
-    aviso('Factura guardada');
+    aviso('Factura guardada', 'ok');
   }
 
   registrarLocal(colaborador, local);
@@ -1344,8 +1462,8 @@ $('#bGuardar').onclick = () => {
   if (duplicada){
     const fechaTxt = (duplicada.data||'').split('-').reverse().join('/');
     setTimeout(() => aviso(
-      `⚠ Parece repetida: ya hay una factura NF ${duplicada.nf} en ${duplicada.local}, ${fechaTxt}, por G$ ${fmt(duplicada.valor)}`,
-      4500
+      `Parece repetida: ya hay una factura NF ${duplicada.nf} en ${duplicada.local}, ${fechaTxt}, por G$ ${fmt(duplicada.valor)}`,
+      'alerta', 5000
     ), 1600);
   }
 };
@@ -1355,7 +1473,7 @@ $('#bBorrar').onclick = () => preguntar(
   'Se va a quitar de la planilla de este mes. No se puede deshacer.',
   () => {
     DB.items = DB.items.filter(x => x.id !== editandoId);
-    guardarDB(); pintarHome(); ir('vHome'); aviso('Factura borrada');
+    guardarDB(); pintarHome(); ir('vHome'); aviso('Factura borrada', 'ok');
   });
 
 /* ═══════════════════════════════════════════════════════
@@ -1395,7 +1513,7 @@ function pintarHome(){
   const total = arr.reduce((s,i) => s + i.valor, 0);
   $('#hTotal').textContent = fmt(total);
   $('#hCant').textContent  = arr.length;
-  $('#bExport').disabled   = arr.length === 0;
+  $('#bExport').disabled   = PERSONAS.every(p => facturasDe(p).length === 0);
 
   const textoFiltro = $('#qFiltro').value.trim();
   const visibles = textoFiltro ? arr.filter(i => coincideFiltro(i, textoFiltro)) : arr;
@@ -1456,16 +1574,28 @@ $('#bLimpiarFiltro').onclick = () => { $('#qFiltro').value = ''; pintarHome(); $
    exportadas"; si algo ya exportado había sido editado,
    el aviso lo menciona.
    ═══════════════════════════════════════════════════════ */
-$('#bExport').onclick = () => {
-  const arr = delPeriodo();
-  if (!arr.length) return;
+/* ═══════════════════════════════════════════════════════
+   EXPORTAR
+   Se puede exportar solo el colaborador activo, o los tres
+   de una. Cada persona genera SU PROPIO archivo, porque así
+   los reconoce el script de la PC. Quien no tenga facturas
+   en el período se omite en silencio.
+   ═══════════════════════════════════════════════════════ */
+function facturasDe(col){
   const m = +$('#mes').value, a = +$('#ano').value;
+  return DB.items
+    .filter(i => i.colaborador === col && i.mes === m && i.ano === a)
+    .sort((x,y) => (x.data||'').localeCompare(y.data||'') || x.id - y.id);
+}
 
-  const editadas = arr.filter(i => i.tocadoTrasExport).length;
-
+/* Arma el paquete de una persona. Devuelve null si no tiene facturas. */
+function construirPaquete(col){
+  const arr = facturasDe(col);
+  if (!arr.length) return null;
+  const m = +$('#mes').value, a = +$('#ano').value;
   const paquete = {
     version: 1,
-    colaborador,
+    colaborador: col,
     empresa: 'Bahia Rica',
     moeda: 'PYG',
     periodo: { mes: m, ano: a, nombre: MESNOM[m-1] },
@@ -1476,18 +1606,116 @@ $('#bExport').onclick = () => {
       valor: i.valor, local: i.local, obs: i.obs
     }))
   };
+  return {
+    arr,
+    nombre: `${col.split(' ')[0]}_${MESNOM[m-1]}_${a}.json`,
+    texto: JSON.stringify(paquete, null, 2),
+    editadas: arr.filter(i => i.tocadoTrasExport).length
+  };
+}
 
-  const nombre = `${colaborador.split(' ')[0]}_${MESNOM[m-1]}_${a}.json`;
-  const url = URL.createObjectURL(new Blob([JSON.stringify(paquete,null,2)], {type:'application/json'}));
-  const a2 = document.createElement('a');
-  a2.href = url; a2.download = nombre; a2.click();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
-
-  arr.forEach(i => { i.exportado = true; i.tocadoTrasExport = false; });
+function marcarExportados(paquetes){
+  paquetes.forEach(p => p.arr.forEach(i => { i.exportado = true; i.tocadoTrasExport = false; }));
   guardarDB(); pintarHome();
+}
 
-  aviso('Archivo generado: ' + nombre +
-    (editadas ? ` · incluye ${editadas} factura${editadas>1?'s':''} editada${editadas>1?'s':''}` : ''));
+function resumenSalida(paquetes){
+  const editadas = paquetes.reduce((s,p) => s + p.editadas, 0);
+  const base = paquetes.length === 1
+    ? paquetes[0].nombre
+    : `${paquetes.length} archivos`;
+  return base + (editadas
+    ? ` · ${editadas} factura${editadas>1?'s':''} editada${editadas>1?'s':''}` : '');
+}
+
+/* Alcance elegido: solo el colaborador activo, o los tres */
+let alcanceExport = 'uno';
+
+function paquetesSegunAlcance(){
+  const cols = alcanceExport === 'todos' ? PERSONAS : [colaborador];
+  return cols.map(construirPaquete).filter(Boolean);   // sin facturas: se omite
+}
+
+function refrescarPanelExport(){
+  const m = +$('#mes').value, a = +$('#ano').value;
+  const paquetes = paquetesSegunAlcance();
+  const facturas = paquetes.reduce((s,p) => s + p.arr.length, 0);
+  const quienes = paquetes.length
+    ? paquetes.map(p => p.nombre.split('_')[0]).join(', ')
+    : 'sin facturas';
+  $('#expResumen').textContent =
+    `${MESNOM[m-1]} ${a} · ${quienes}` +
+    (facturas ? ` · ${facturas} factura${facturas>1?'s':''}` : '');
+  $('#expCompartir').disabled = !paquetes.length;
+  $('#expDescargar').disabled = !paquetes.length;
+}
+
+$('#bExport').onclick = () => {
+  alcanceExport = 'uno';
+  $$('#alcance button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.a === 'uno')));
+  $('#expNombre').textContent = colaborador.split(' ')[0].charAt(0) +
+                                colaborador.split(' ')[0].slice(1).toLowerCase();
+  refrescarPanelExport();
+  abrirPanel('#hojaExport');
+};
+
+$$('#alcance button').forEach(b => b.onclick = () => {
+  alcanceExport = b.dataset.a;
+  $$('#alcance button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  refrescarPanelExport();
+});
+
+$('#expCancelar').onclick = () => cerrarPanel('#hojaExport');
+
+/* Descargar: uno por uno y escalonado, porque si se disparan juntas
+   Chrome de Android bloquea todas menos la primera. */
+$('#expDescargar').onclick = () => {
+  const paquetes = paquetesSegunAlcance();
+  if (!paquetes.length) return;
+  cerrarPanel('#hojaExport');
+
+  paquetes.forEach((p, i) => setTimeout(() => {
+    const url = URL.createObjectURL(new Blob([p.texto], {type:'application/json'}));
+    const enlace = document.createElement('a');
+    enlace.href = url; enlace.download = p.nombre; enlace.click();
+    setTimeout(() => URL.revokeObjectURL(url), 6000);
+    if (i === paquetes.length - 1){
+      marcarExportados(paquetes);
+      aviso('Descargado: ' + resumenSalida(paquetes), 'ok');
+    }
+  }, i * 700));
+};
+
+/* Compartir: abre el menú de Android y evita el diálogo de descarga.
+   Si el celular no lo soporta, cae a descarga normal. */
+$('#expCompartir').onclick = async () => {
+  const paquetes = paquetesSegunAlcance();
+  if (!paquetes.length) return;
+
+  const archivos = paquetes.map(p =>
+    new File([p.texto], p.nombre, { type: 'application/json' }));
+
+  if (!navigator.canShare || !navigator.canShare({ files: archivos })){
+    cerrarPanel('#hojaExport');
+    aviso('Este celular no permite compartir archivos. Usá Descargar.', 'alerta');
+    return;
+  }
+
+  try {
+    await navigator.share({
+      files: archivos,
+      title: 'Prestação de Conta'
+    });
+    cerrarPanel('#hojaExport');
+    marcarExportados(paquetes);
+    aviso('Enviado: ' + resumenSalida(paquetes), 'ok');
+  } catch(e){
+    // El usuario canceló el menú: no se marca nada como exportado
+    if (e && e.name !== 'AbortError'){
+      cerrarPanel('#hojaExport');
+      aviso('No se pudo compartir. Probá con Descargar.', 'alerta');
+    }
+  }
 };
 
 pintarMonto();
