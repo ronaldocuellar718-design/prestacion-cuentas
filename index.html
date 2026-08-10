@@ -24,6 +24,7 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0;overscroll-behavior:none}
+html.sinScroll,html.sinScroll body{overflow:hidden;height:100%}
 body{
   background:var(--tinta);
   font-family:'Archivo',system-ui,-apple-system,sans-serif;
@@ -211,7 +212,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .selLocal svg{color:var(--tinta-3);flex:0 0 auto}
 
 .hojaLocal{position:fixed;inset:0;background:rgba(22,19,14,.55);display:none;
-  align-items:flex-end;z-index:110}
+  align-items:flex-end;z-index:100;touch-action:none}
 .hojaLocal.on{display:flex}
 .cajaLocal{background:var(--papel);width:100%;max-width:520px;margin:0 auto;
   border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;
@@ -223,7 +224,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   font-size:16px;color:var(--tinta);padding:0}
 .barraLocal input:focus{outline:0}
 .barraLocal button{flex:0 0 auto;font-size:13px;font-weight:700;color:var(--oro-osc)}
-.resLocal{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+.resLocal{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;
   padding-bottom:env(safe-area-inset-bottom)}
 .grupoLocal{padding:11px 16px 7px;font-size:9.5px;letter-spacing:.2em;font-weight:700;
   color:var(--tinta-3);text-transform:uppercase;background:var(--papel-2)}
@@ -272,7 +273,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .aviso.on{transform:translate(-50%,0)}
 
 .confirm{position:fixed;inset:0;background:rgba(22,19,14,.55);display:none;align-items:flex-end;
-  z-index:100}
+  z-index:120;touch-action:none}
 .confirm.on{display:flex}
 .confirm .caja{background:var(--papel);width:100%;max-width:520px;margin:0 auto;
   border-radius:18px 18px 0 0;padding:24px 20px calc(20px + env(safe-area-inset-bottom))}
@@ -286,7 +287,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .et2{font-size:9px;letter-spacing:.2em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
   display:block;margin-bottom:6px}
 .par .campo{font-size:15px;padding:12px}
-.listaPal{margin-top:16px;max-height:34vh;overflow-y:auto}
+.listaPal{margin-top:16px;max-height:34vh;overflow-y:auto;touch-action:pan-y}
 .pal{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--papel-2)}
 .pal .de{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--tinta-3);flex:1;min-width:0;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -705,6 +706,21 @@ function ir(id){
   const c = $('#vDetalle .cuerpo'); if (c) c.scrollTop = 0;
 }
 
+/* Mientras haya cualquier panel abierto (selector, editar, palabras,
+   confirmaciones), el fondo no debe scrollear. Se cuenta cuántos hay
+   abiertos por si uno se abre encima de otro (editar sobre el selector). */
+let panelesAbiertos = 0;
+function abrirPanel(id){
+  $(id).classList.add('on');
+  panelesAbiertos++;
+  document.documentElement.classList.add('sinScroll');
+}
+function cerrarPanel(id){
+  $(id).classList.remove('on');
+  panelesAbiertos = Math.max(0, panelesAbiertos - 1);
+  if (panelesAbiertos === 0) document.documentElement.classList.remove('sinScroll');
+}
+
 function aviso(msg, ms){
   const a = $('#aviso'); a.textContent = msg; a.classList.add('on');
   clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('on'), ms || 2300);
@@ -717,9 +733,9 @@ $('#aviso').addEventListener('click', () => {
 function preguntar(titulo, texto, alConfirmar){
   $('#cTit').textContent = titulo;
   $('#cTxt').textContent = texto;
-  $('#confirm').classList.add('on');
-  $('#cSi').onclick = () => { $('#confirm').classList.remove('on'); alConfirmar(); };
-  $('#cNo').onclick = () => $('#confirm').classList.remove('on');
+  abrirPanel('#confirm');
+  $('#cSi').onclick = () => { cerrarPanel('#confirm'); alConfirmar(); };
+  $('#cNo').onclick = () => cerrarPanel('#confirm');
 }
 
 /* ═══════════════════════════════════════════════════════
@@ -978,11 +994,11 @@ function pintarSelector(){
 function abrirEdicionLocal(nombre){
   $('#accLocal').dataset.original = nombre;
   $('#accInput').value = nombre;
-  $('#accLocal').classList.add('on');
+  abrirPanel('#accLocal');
   setTimeout(() => $('#accInput').focus(), 100);   // sin seleccionar: evita el menú de Android
 }
 
-$('#accCancelar').onclick = () => $('#accLocal').classList.remove('on');
+$('#accCancelar').onclick = () => cerrarPanel('#accLocal');
 
 $('#accGuardar').onclick = () => {
   const original = $('#accLocal').dataset.original;
@@ -990,7 +1006,7 @@ $('#accGuardar').onclick = () => {
   if (!nuevo) return;
   const lista = localesDe(colaborador);
   const iOriginal = lista.findIndex(x => x.n === original);
-  if (iOriginal < 0){ $('#accLocal').classList.remove('on'); return; }
+  if (iOriginal < 0){ cerrarPanel('#accLocal'); return; }
 
   const iIgual = lista.findIndex((x,i) => i !== iOriginal && normNom(x.n) === normNom(nuevo));
   if (iIgual >= 0){
@@ -1003,14 +1019,14 @@ $('#accGuardar').onclick = () => {
 
   if (localElegido === original) ponerLocal(nuevo);
   guardarDB();
-  $('#accLocal').classList.remove('on');
+  cerrarPanel('#accLocal');
   pintarSelector();
   aviso('Comercio actualizado');
 };
 
 $('#accEliminar').onclick = () => {
   const original = $('#accLocal').dataset.original;
-  $('#accLocal').classList.remove('on');
+  cerrarPanel('#accLocal');
   preguntar('Eliminar comercio',
     `Se va a quitar «${original}» de la lista de comercios guardados. Las facturas que ya cargaste con ese nombre no se modifican.`,
     () => {
@@ -1027,13 +1043,13 @@ $('#accEliminar').onclick = () => {
 function abrirSelector(){
   $('#qLocal').value = '';
   pintarSelector();
-  $('#hojaLocal').classList.add('on');
+  abrirPanel('#hojaLocal');
   ajustarAlturaPanelLocal();
   setTimeout(() => $('#qLocal').focus(), 120);
 }
 
 function cerrarSelector(){
-  $('#hojaLocal').classList.remove('on');
+  cerrarPanel('#hojaLocal');
   $('#qLocal').blur();
 }
 
@@ -1143,8 +1159,8 @@ function enseñarPalabra(de, a){
   return true;
 }
 
-$('#bPalabras').onclick = () => { pintarPalabras(); $('#hojaPal').classList.add('on'); };
-$('#bCerrarPal').onclick = () => $('#hojaPal').classList.remove('on');
+$('#bPalabras').onclick = () => { pintarPalabras(); abrirPanel('#hojaPal'); };
+$('#bCerrarPal').onclick = () => cerrarPanel('#hojaPal');
 $('#bAddPal').onclick = () => {
   if (enseñarPalabra($('#palDe').value, $('#palA').value)){
     $('#palDe').value = ''; $('#palA').value = '';
