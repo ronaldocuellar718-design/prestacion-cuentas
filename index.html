@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, interactive-widget=resizes-content">
 <meta name="theme-color" content="#16130E">
 <title>Prestação de Conta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,11 +66,13 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .periodo select option{color:#000}
 
 .resumen{padding:22px 16px 18px;display:flex;align-items:flex-end;justify-content:space-between;
-  gap:14px;background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
+  gap:10px;background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
+.resumen > div:first-child{min-width:0;flex:1 1 auto}
 .resumen .lbl{font-size:9.5px;letter-spacing:.22em;font-weight:600;color:var(--tinta-3);
   text-transform:uppercase;display:block}
 .resumen .big{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
-  font-size:38px;font-weight:600;line-height:1;letter-spacing:-.035em;margin-top:6px;color:var(--tinta)}
+  font-size:clamp(24px,7.2vw,38px);font-weight:600;line-height:1;letter-spacing:-.035em;
+  margin-top:6px;color:var(--tinta);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .resumen .big i{font-size:13px;font-style:normal;color:var(--tinta-3);margin-right:6px;
   letter-spacing:0;font-weight:500}
 .resumen .cant{text-align:right;flex:0 0 auto}
@@ -78,8 +80,8 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   line-height:1}
 .resumen .cant span{font-size:9px;letter-spacing:.18em;color:var(--tinta-3);font-weight:600;
   text-transform:uppercase}
-.hCantTxt{margin-top:5px;font-size:11.5px;color:var(--tinta-3);font-weight:600}
-.accionesTop{display:flex;gap:7px;flex:0 0 auto}
+.hCantTxt{margin-top:5px;font-size:11.5px;color:var(--tinta-3);font-weight:600;white-space:nowrap}
+.accionesTop{display:flex;gap:6px;flex:0 0 auto}
 .barraFiltro{display:none;align-items:center;gap:9px;padding:10px 16px;
   background:var(--papel-2);border-bottom:1px solid var(--linea)}
 .barraFiltro.on{display:flex}
@@ -90,12 +92,16 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .barraFiltro input::placeholder{font-family:'Archivo',sans-serif;color:#B5AC9C}
 .barraFiltro button{flex:0 0 auto;color:var(--tinta-3);display:flex}
 .bFiltro-activo{background:var(--oro);border-color:var(--oro)}
-.ibtn{display:flex;align-items:center;gap:6px;padding:11px 14px;border-radius:10px;
-  background:var(--papel-2);border:1px solid var(--linea);font-size:12.5px;font-weight:700;
-  color:var(--tinta)}
+.ibtn{display:flex;align-items:center;gap:5px;padding:10px 12px;border-radius:10px;
+  background:var(--papel-2);border:1px solid var(--linea);font-size:12px;font-weight:700;
+  color:var(--tinta);flex:0 0 auto;white-space:nowrap}
 .ibtn-oro{background:var(--oro);border-color:var(--oro);color:var(--tinta)}
 .ibtn:disabled{opacity:.4;pointer-events:none}
 .ibtn:active{transform:scale(.96)}
+@media (max-width:370px){
+  .ibtn-oro .txtNueva{display:none}
+  .ibtn{padding:10px}
+}
 
 .seccionTit{display:flex;align-items:center;gap:8px;padding:14px 16px 8px;font-size:10px;
   letter-spacing:.18em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
@@ -262,7 +268,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 .aviso{position:fixed;left:50%;bottom:26px;transform:translate(-50%,120px);background:var(--tinta);
   color:var(--papel);padding:14px 22px;border-radius:11px;font-size:14px;font-weight:600;
   transition:transform .3s cubic-bezier(.2,.9,.3,1);z-index:90;max-width:88%;text-align:center;
-  box-shadow:0 10px 30px rgba(22,19,14,.28)}
+  box-shadow:0 10px 30px rgba(22,19,14,.28);cursor:pointer}
 .aviso.on{transform:translate(-50%,0)}
 
 .confirm{position:fixed;inset:0;background:rgba(22,19,14,.55);display:none;align-items:flex-end;
@@ -325,7 +331,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
       <div class="accionesTop">
         <button class="ibtn ibtn-oro" id="bNueva" title="Nueva factura">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-          Nueva
+          <span class="txtNueva">Nueva</span>
         </button>
         <button class="ibtn" id="bFiltro" title="Buscar">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
@@ -454,7 +460,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
       </div>
     </div>
 
-    <div class="flota">
+    <div class="flota" style="position:static;background:var(--papel);border-top:1px solid var(--linea)">
       <button class="btn btn-2 btn-mini" id="bBorrar" style="display:none">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#A33327"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -703,6 +709,10 @@ function aviso(msg, ms){
   const a = $('#aviso'); a.textContent = msg; a.classList.add('on');
   clearTimeout(a._t); a._t = setTimeout(() => a.classList.remove('on'), ms || 2300);
 }
+$('#aviso').addEventListener('click', () => {
+  $('#aviso').classList.remove('on');
+  clearTimeout($('#aviso')._t);
+});
 
 function preguntar(titulo, texto, alConfirmar){
   $('#cTit').textContent = titulo;
