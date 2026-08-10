@@ -66,23 +66,19 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
   font-weight:500;appearance:none}
 .periodo select option{color:#000}
 
-.resumen{padding:22px 16px 18px;display:flex;align-items:flex-end;justify-content:space-between;
-  gap:10px;background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
-.resumen > div:first-child{min-width:0;flex:1 1 auto}
+.resumen{padding:20px 16px 16px;display:flex;flex-direction:column;gap:15px;
+  background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
+.resTotal{min-width:0}
 .resumen .lbl{font-size:9.5px;letter-spacing:.22em;font-weight:600;color:var(--tinta-3);
   text-transform:uppercase;display:block}
+/* El monto NUNCA se recorta: tiene toda la línea para sí solo. */
 .resumen .big{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
-  font-size:clamp(24px,7.2vw,38px);font-weight:600;line-height:1;letter-spacing:-.035em;
-  margin-top:6px;color:var(--tinta);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.resumen .big i{font-size:13px;font-style:normal;color:var(--tinta-3);margin-right:6px;
+  font-size:clamp(28px,9.4vw,40px);font-weight:600;line-height:1.05;letter-spacing:-.035em;
+  margin-top:7px;color:var(--tinta)}
+.resumen .big i{font-size:14px;font-style:normal;color:var(--tinta-3);margin-right:7px;
   letter-spacing:0;font-weight:500}
-.resumen .cant{text-align:right;flex:0 0 auto}
-.resumen .cant b{display:block;font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;
-  line-height:1}
-.resumen .cant span{font-size:9px;letter-spacing:.18em;color:var(--tinta-3);font-weight:600;
-  text-transform:uppercase}
-.hCantTxt{margin-top:5px;font-size:11.5px;color:var(--tinta-3);font-weight:600;white-space:nowrap}
-.accionesTop{display:flex;gap:6px;flex:0 0 auto}
+.hCantTxt{margin-top:6px;font-size:11.5px;color:var(--tinta-3);font-weight:600}
+.accionesTop{display:flex;gap:8px;align-items:stretch}
 .barraFiltro{display:none;align-items:center;gap:9px;padding:10px 16px;
   background:var(--papel-2);border-bottom:1px solid var(--linea)}
 .barraFiltro.on{display:flex}
@@ -93,16 +89,12 @@ button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit
 .barraFiltro input::placeholder{font-family:'Archivo',sans-serif;color:#B5AC9C}
 .barraFiltro button{flex:0 0 auto;color:var(--tinta-3);display:flex}
 .bFiltro-activo{background:var(--oro);border-color:var(--oro)}
-.ibtn{display:flex;align-items:center;gap:5px;padding:10px 12px;border-radius:10px;
-  background:var(--papel-2);border:1px solid var(--linea);font-size:12px;font-weight:700;
-  color:var(--tinta);flex:0 0 auto;white-space:nowrap}
-.ibtn-oro{background:var(--oro);border-color:var(--oro);color:var(--tinta)}
+.ibtn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 14px;
+  border-radius:11px;background:var(--papel-2);border:1px solid var(--linea);font-size:13.5px;
+  font-weight:700;color:var(--tinta);flex:0 0 auto;white-space:nowrap}
+.ibtn-oro{background:var(--oro);border-color:var(--oro);color:var(--tinta);flex:1 1 auto}
 .ibtn:disabled{opacity:.4;pointer-events:none}
-.ibtn:active{transform:scale(.96)}
-@media (max-width:370px){
-  .ibtn-oro .txtNueva{display:none}
-  .ibtn{padding:10px}
-}
+.ibtn:active{transform:scale(.97)}
 
 .seccionTit{display:flex;align-items:center;gap:8px;padding:14px 16px 8px;font-size:10px;
   letter-spacing:.18em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
@@ -324,7 +316,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
     </div>
 
     <div class="resumen">
-      <div>
+      <div class="resTotal">
         <span class="lbl">Total del período</span>
         <div class="big"><i>G$</i><span id="hTotal">0</span></div>
         <div class="hCantTxt"><span id="hCant">0</span> facturas</div>
@@ -332,7 +324,7 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
       <div class="accionesTop">
         <button class="ibtn ibtn-oro" id="bNueva" title="Nueva factura">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-          <span class="txtNueva">Nueva</span>
+          <span class="txtNueva">Nueva factura</span>
         </button>
         <button class="ibtn" id="bFiltro" title="Buscar">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
