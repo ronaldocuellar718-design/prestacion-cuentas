@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-tema="claro">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, interactive-widget=resizes-content">
-<meta name="theme-color" content="#16130E">
-<title>Prestação de Conta</title>
+<meta name="theme-color" content="#171714">
+<title>Prestação de Conta · Grupo Piveta</title>
 
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
@@ -13,529 +13,687 @@
 <meta name="apple-mobile-web-app-title" content="Prestação">
 <link rel="icon" href="icono-192.png">
 <link rel="apple-touch-icon" href="icono-192.png">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --tinta:#16130E;
-  --tinta-2:#2E281E;
-  --tinta-3:#5A5140;
-  --oro:#C08A2E;
-  --oro-osc:#8A6115;
-  --oro-luz:#F2E3C6;
-  --papel:#FBF9F5;
-  --papel-2:#F1ECE2;
-  --papel-3:#E4DCCB;
-  --linea:#DED5C4;
-  --rojo:#A33327;
-  --verde-ok:#2F6B4F;
+  --carbon:#171714; --superficie-oscura:#22211D; --marfil:#F7F6F2;
+  --oro:#C99532; --oro-claro:#E2B65A; --verde:#3F8A61; --rojo:#B94A48; --gris:#77746D;
+
+  --fondo:var(--marfil); --sup:#FFFFFF; --sup-2:#F1EFE9;
+  --texto:var(--carbon); --texto-2:var(--gris); --linea:#E4E1D8;
+
+  --e1:4px; --e2:8px; --e3:12px; --e4:16px; --e5:20px; --e6:24px; --e8:32px; --e10:40px;
+  --r-s:10px; --r-m:14px; --r-l:20px; --r-xl:28px;
+}
+html[data-tema="oscuro"]{
+  --fondo:#121210; --sup:#1C1B18; --sup-2:#232220;
+  --texto:#F2F1EC; --texto-2:#8E8A81; --linea:#2C2A26;
+  --oro:#D3A343; --oro-claro:#E2B65A;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;overscroll-behavior:none}
+html,body{margin:0;padding:0;height:100%;overscroll-behavior:none}
 html.sinScroll,html.sinScroll body{overflow:hidden;height:100%}
-body{
-  background:var(--tinta);
-  font-family:'Archivo',system-ui,-apple-system,sans-serif;
-  color:var(--tinta);font-size:16px;line-height:1.4;
-}
-button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+body{background:var(--carbon);font-family:'Inter',system-ui,sans-serif;color:var(--texto);
+  font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit;border:0;background:none;color:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit;font-size:16px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-.app{max-width:520px;margin:0 auto;min-height:100dvh;background:var(--papel);
+.app{max-width:440px;margin:0 auto;min-height:100dvh;background:var(--fondo);
   display:flex;flex-direction:column;position:relative;overflow:hidden}
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:96px}
+#pNueva .scroll,#pDetalle .scroll,#pBuscar .scroll{padding-bottom:var(--e6)}
 
-/* ══════ VISTAS ══════ */
-.vista{display:none;flex-direction:column;flex:1;min-height:0}
-.vista.on{display:flex}
+.pantalla{display:none;flex-direction:column;flex:1;min-height:0}
+.pantalla.on{display:flex;animation:entrar .25s cubic-bezier(.2,.8,.3,1)}
+@keyframes entrar{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-/* ══════ BARRA SUPERIOR ══════ */
-.top{background:var(--tinta);color:var(--papel);padding:12px 16px;flex:0 0 auto}
-.top .fila{display:flex;align-items:center;gap:12px}
-.volver{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.08);
-  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-.volver svg{stroke:var(--papel);fill:none}
-.top .tit{flex:1;min-width:0}
-.top .eyebrow{font-size:9px;letter-spacing:.22em;font-weight:600;color:var(--oro);
-  text-transform:uppercase;display:block}
-.top h1{margin:1px 0 0;font-size:15px;font-weight:700;font-stretch:106%;letter-spacing:-.01em}
+.cab{padding:var(--e6) var(--e5) var(--e4)}
+.cab-fila{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--e4)}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--oro);margin:0 0 var(--e1)}
+h1{margin:0;font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+.campana{width:44px;height:44px;border-radius:50%;background:var(--sup);border:1px solid var(--linea);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:var(--texto)}
+.etiq{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--texto-2);margin:0 0 var(--e3)}
 
-/* ══════ HOME ══════ */
-.quien{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:11px}
-.quien button{padding:10px 4px;border-radius:8px;background:rgba(255,255,255,.07);
-  color:rgba(251,249,245,.62);font-size:12px;font-weight:700;letter-spacing:.05em;
-  border:1px solid transparent;transition:.15s}
-.quien button[aria-pressed="true"]{background:var(--oro);color:var(--tinta);border-color:var(--oro)}
+.usuarios{display:flex;gap:var(--e2);padding:0 var(--e5) var(--e5);overflow-x:auto;scrollbar-width:none}
+.usuarios::-webkit-scrollbar{display:none}
+.pill{display:flex;align-items:center;gap:var(--e2);padding:var(--e2) var(--e4) var(--e2) var(--e2);
+  border-radius:999px;background:var(--sup);border:1px solid var(--linea);
+  font-size:14px;font-weight:500;flex:0 0 auto;transition:all .2s ease}
+.pill .ini{width:30px;height:30px;border-radius:50%;background:var(--sup-2);color:var(--texto-2);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;
+  transition:all .2s ease}
+.pill[aria-pressed="true"]{background:var(--oro);border-color:var(--oro);color:#1A1509;font-weight:600}
+.pill[aria-pressed="true"] .ini{background:rgba(26,21,9,.16);color:#1A1509}
+.pill:active{transform:scale(.97)}
 
 .selPeriodo{display:flex;gap:5px;flex:0 0 auto}
-.selPeriodo select{background:rgba(255,255,255,.08);color:var(--papel);
-  border:1px solid rgba(242,227,198,.22);border-radius:7px;padding:7px 8px;
-  font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:500;appearance:none}
-.selPeriodo select option{color:#000}
+.selPeriodo button{background:var(--sup);color:var(--texto);border:1px solid var(--linea);
+  border-radius:8px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+  font-weight:500}
 
-/* ── Pantalla de inicio: elegir colaborador ── */
-.elegir{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 20px 60px;
-  background:var(--papel)}
-.elegirTit{margin:0 0 22px;font-size:15.5px;font-weight:600;color:var(--tinta-3);text-align:center}
-.elegirLista{display:flex;flex-direction:column;gap:11px}
-.elegirLista button{padding:22px;border-radius:13px;background:var(--papel);
-  border:1.5px solid var(--linea);font-size:17px;font-weight:700;letter-spacing:.07em;
-  color:var(--tinta);transition:.15s}
-.elegirLista button:active{background:var(--oro);border-color:var(--oro);transform:scale(.98)}
+.total{margin:0 var(--e5) var(--e5);padding:var(--e6);border-radius:var(--r-xl);
+  background:var(--carbon);color:var(--marfil);position:relative;overflow:hidden}
+html[data-tema="oscuro"] .total{background:#1A1916;border:1px solid #2E2B25}
+.total::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 88% 0%, rgba(226,182,90,.16), transparent 60%)}
+.total .lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:rgba(247,246,242,.55);position:relative}
+.cifra{display:flex;align-items:baseline;gap:var(--e2);margin:var(--e3) 0 var(--e2);position:relative}
+.cifra .m{font-size:19px;font-weight:600;color:var(--oro)}
+.cifra .num{font-size:38px;font-weight:800;letter-spacing:-.03em;line-height:1;
+  font-variant-numeric:tabular-nums;word-break:break-all}
+.total .sub{font-size:14px;color:rgba(247,246,242,.62);position:relative}
+.total .estado{display:inline-flex;align-items:center;gap:var(--e2);margin-top:var(--e4);
+  padding:var(--e2) var(--e3);border-radius:999px;font-size:13px;font-weight:500;position:relative;
+  background:rgba(63,138,97,.16);color:#7FC79C}
+.total .estado.amb{background:rgba(201,149,50,.18);color:var(--oro-claro)}
 
-.resumen{padding:14px 16px 14px;display:flex;flex-direction:column;gap:13px;
-  background:var(--papel);flex:0 0 auto;border-bottom:1px solid var(--linea)}
-.resTotal{min-width:0;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-.resIzq{min-width:0}
-.resumen .lbl{font-size:9.5px;letter-spacing:.2em;font-weight:600;color:var(--tinta-3);
-  text-transform:uppercase;display:block}
-/* El monto NUNCA se recorta: tiene toda la línea para sí solo. */
-.resumen .big{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;
-  font-size:clamp(26px,8.4vw,34px);font-weight:600;line-height:1.05;letter-spacing:-.035em;
-  margin-top:5px;color:var(--tinta)}
-.resumen .big i{font-size:14px;font-style:normal;color:var(--tinta-3);margin-right:7px;
-  letter-spacing:0;font-weight:500}
-.hCantTxt{font-size:12.5px;color:var(--tinta-3);font-weight:600;white-space:nowrap;
-  flex:0 0 auto;padding-bottom:4px}
-.accionesTop{display:flex;gap:8px;align-items:stretch}
-.barraFiltro{display:none;align-items:center;gap:9px;padding:10px 16px;
-  background:var(--papel-2);border-bottom:1px solid var(--linea)}
-.barraFiltro.on{display:flex}
-.barraFiltro svg{color:var(--tinta-3);flex:0 0 auto}
-.barraFiltro input{flex:1;min-width:0;border:0;background:transparent;font-family:'IBM Plex Mono',monospace;
-  font-size:15px;color:var(--tinta);padding:0}
-.barraFiltro input:focus{outline:0}
-.barraFiltro input::placeholder{font-family:'Archivo',sans-serif;color:#B5AC9C}
-.barraFiltro button{flex:0 0 auto;color:var(--tinta-3);display:flex}
-.bFiltro-activo{background:var(--oro);border-color:var(--oro)}
-.ibtn{display:flex;align-items:center;justify-content:center;gap:7px;padding:13px 14px;
-  border-radius:11px;background:var(--papel-2);border:1px solid var(--linea);font-size:13.5px;
-  font-weight:700;color:var(--tinta);flex:0 0 auto;white-space:nowrap}
-.ibtn-oro{background:var(--oro);border-color:var(--oro);color:var(--tinta);flex:1 1 auto}
-.ibtn:disabled{opacity:.4;pointer-events:none}
-.ibtn:active{transform:scale(.97)}
+.acciones{padding:0 var(--e5) var(--e5)}
+.btn{display:flex;align-items:center;justify-content:center;gap:var(--e2);width:100%;
+  padding:var(--e4) var(--e5);border-radius:var(--r-m);font-size:16px;font-weight:600;
+  min-height:54px;transition:transform .12s ease}
+.btn:active{transform:scale(.985)}
+.btn-oro{background:var(--oro);color:#1A1509;box-shadow:0 4px 16px rgba(201,149,50,.22)}
+.btn-sec{background:var(--sup);color:var(--texto);border:1px solid var(--linea);font-weight:500}
+.btn-ter{background:transparent;color:var(--texto-2);font-weight:500;min-height:44px}
+.btn:disabled{opacity:.4;pointer-events:none}
+.par{display:grid;grid-template-columns:1fr 1fr;gap:var(--e2);margin-top:var(--e2)}
 
-.seccionTit{display:flex;align-items:center;gap:8px;padding:12px 16px 8px;font-size:10.5px;
-  letter-spacing:.16em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
-  background:var(--papel)}
-.seccionTit .pt{color:var(--oro-osc)}
-.seccionTit .pt2{color:var(--tinta-3);opacity:.65}
-.nadaChica{padding:4px 16px 14px;font-size:13px;color:var(--tinta-3)}
-.tagEdit{display:inline-block;margin-left:8px;padding:2px 8px;border-radius:20px;
-  background:var(--oro-luz);color:var(--oro-osc);font-size:9.5px;font-weight:700;
-  letter-spacing:.04em;text-transform:uppercase;vertical-align:middle}
-.reg.exportada{opacity:.68}
+.banda{display:flex;align-items:center;gap:var(--e3);margin:0 var(--e5) var(--e6);
+  padding:var(--e4);border-radius:var(--r-m);background:var(--sup);border:1px solid var(--linea)}
+.banda .ico{width:40px;height:40px;border-radius:var(--r-s);display:flex;align-items:center;
+  justify-content:center;flex:0 0 auto;background:rgba(63,138,97,.12);color:var(--verde)}
+.banda.amb .ico{background:rgba(201,149,50,.14);color:var(--oro)}
+.banda .t{font-size:15px;font-weight:600}
+.banda .d{font-size:13px;color:var(--texto-2);margin-top:1px}
 
-.lista{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 0 100px}
-.reg{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
-  padding:13px 16px;border-bottom:1px solid var(--papel-2);background:var(--papel)}
-.reg:active{background:var(--papel-2)}
-.reg .n{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--tinta-3);width:21px}
-.reg .cat{font-size:15.5px;font-weight:700;letter-spacing:-.005em}
-.reg .sub{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--tinta-3);margin-top:3px;
+.sec-tit{display:flex;align-items:baseline;justify-content:space-between;padding:0 var(--e5) var(--e3)}
+.sec-tit h2{margin:0;font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--texto-2)}
+.sec-tit .ver{font-size:14px;font-weight:500;color:var(--oro)}
+.lista{padding:0 var(--e5);display:flex;flex-direction:column;gap:var(--e3)}
+.card{background:var(--sup);border:1px solid var(--linea);border-radius:var(--r-l);
+  padding:var(--e4);text-align:left;width:100%;transition:transform .12s ease}
+.card:active{transform:scale(.99)}
+.card-top{display:flex;align-items:flex-start;gap:var(--e3);margin-bottom:var(--e3)}
+.card .cat-ico{width:42px;height:42px;border-radius:var(--r-s);flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;background:var(--sup-2);color:var(--oro)}
+.card .head{flex:1;min-width:0}
+.card .cat{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--texto-2)}
+.card .prov{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-top:1px;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.reg .det{font-size:13px;color:var(--tinta-3);margin-top:3px;overflow:hidden;
+.card .meta{font-size:13px;color:var(--texto-2);margin-top:2px}
+.card .desc{font-size:14px;color:var(--texto-2);line-height:1.45;margin-bottom:var(--e4);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card-pie{display:flex;align-items:center;justify-content:space-between;gap:var(--e3);
+  padding-top:var(--e3);border-top:1px solid var(--linea)}
+.card .monto{font-size:19px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.card .monto span{font-size:13px;font-weight:600;color:var(--oro);margin-right:var(--e1)}
+.badge{display:inline-flex;align-items:center;gap:var(--e1);padding:5px var(--e3);
+  border-radius:999px;font-size:12px;font-weight:600}
+.badge.ok{background:rgba(63,138,97,.12);color:var(--verde)}
+.badge.pend{background:rgba(201,149,50,.14);color:#8A6516}
+html[data-tema="oscuro"] .badge.pend{color:var(--oro-claro)}
+.tagEdit{margin-left:8px;padding:2px 8px;border-radius:20px;background:rgba(201,149,50,.16);
+  color:var(--oro);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  vertical-align:middle}
+
+.vacio{padding:var(--e10) var(--e6);text-align:center}
+.vacio .ico{width:64px;height:64px;border-radius:50%;background:var(--sup-2);color:var(--texto-2);
+  display:flex;align-items:center;justify-content:center;margin:0 auto var(--e4)}
+.vacio h3{margin:0 0 var(--e2);font-size:17px;font-weight:600}
+.vacio p{margin:0 0 var(--e5);font-size:14px;color:var(--texto-2);line-height:1.5}
+
+.barra{display:flex;align-items:center;gap:var(--e3);padding:var(--e5);
+  border-bottom:1px solid var(--linea);flex:0 0 auto;background:var(--fondo)}
+.volver{width:40px;height:40px;border-radius:var(--r-s);background:var(--sup);border:1px solid var(--linea);
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto;color:var(--texto)}
+.barra h2{flex:1;margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em}
+.barra .accion{font-size:14px;font-weight:500;color:var(--oro);flex:0 0 auto}
+
+.buscador{display:flex;align-items:center;gap:var(--e3);margin:var(--e5);padding:var(--e3) var(--e4);
+  border-radius:var(--r-m);background:var(--sup);border:1px solid var(--linea)}
+.buscador input{flex:1;min-width:0;border:0;background:none;color:var(--texto);outline:0;font-size:15px}
+.buscador input::placeholder{color:var(--texto-2)}
+.buscador svg{color:var(--texto-2);flex:0 0 auto}
+.chips{display:flex;gap:var(--e2);padding:0 var(--e5) var(--e5);overflow-x:auto;scrollbar-width:none;flex-wrap:wrap}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:var(--e2) var(--e4);border-radius:999px;background:var(--sup);
+  border:1px solid var(--linea);font-size:14px;font-weight:500;flex:0 0 auto;color:var(--texto-2)}
+.chip[aria-pressed="true"]{background:var(--carbon);border-color:var(--carbon);color:var(--marfil)}
+html[data-tema="oscuro"] .chip[aria-pressed="true"]{background:var(--oro);border-color:var(--oro);color:#1A1509}
+
+.pasos{display:flex;align-items:center;gap:var(--e2);padding:var(--e5) var(--e5) var(--e3)}
+.paso{display:flex;align-items:center;gap:var(--e2);flex:0 0 auto}
+.paso .n{width:28px;height:28px;border-radius:50%;background:var(--sup-2);color:var(--texto-2);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;
+  transition:all .25s ease}
+.paso.activo .n{background:var(--oro);color:#1A1509}
+.paso.hecho .n{background:var(--verde);color:#fff}
+.paso .t{font-size:13px;color:var(--texto-2);font-weight:500}
+.paso.activo .t{color:var(--texto);font-weight:600}
+.paso-linea{flex:1;height:1px;background:var(--linea)}
+
+.campo{padding:0 var(--e5) var(--e4)}
+.campo label{display:block;font-size:13px;font-weight:500;color:var(--texto-2);margin-bottom:var(--e2)}
+.entrada{width:100%;padding:var(--e4);border-radius:var(--r-m);background:var(--sup);
+  border:1px solid var(--linea);color:var(--texto);outline:0;font-size:16px;transition:border-color .2s ease}
+.entrada:focus{border-color:var(--oro)}
+textarea.entrada{min-height:96px;resize:vertical;line-height:1.5;font-family:'Inter',sans-serif}
+.rejilla{display:grid;grid-template-columns:1fr 1fr;gap:var(--e2);padding:0 var(--e5) var(--e4)}
+.tile{padding:var(--e4) var(--e3);border-radius:var(--r-m);background:var(--sup);
+  border:1.5px solid var(--linea);font-size:15px;font-weight:500;text-align:center;transition:all .18s ease}
+.tile[aria-pressed="true"]{background:var(--oro);border-color:var(--oro);color:#1A1509;font-weight:600}
+.contador{font-size:12px;color:var(--texto-2);text-align:right;margin-top:var(--e1)}
+.pie-form{padding:var(--e4) var(--e5) calc(var(--e6) + env(safe-area-inset-bottom));
+  border-top:1px solid var(--linea);background:var(--fondo);flex:0 0 auto}
+
+.fecha3{display:flex;align-items:center;gap:8px;padding:0 var(--e5) var(--e4)}
+.fecha3 input{flex:0 0 auto;width:52px;background:var(--sup);border:1.5px solid var(--linea);
+  border-radius:var(--r-m);padding:var(--e4) 4px;font-family:'IBM Plex Mono',monospace;
+  font-size:19px;font-weight:600;text-align:center;color:var(--texto)}
+.fecha3 input.anio{width:74px}
+.fecha3 b{color:var(--texto-2);font-size:17px;font-weight:500}
+.fecha3.mal input{border-color:var(--rojo)}
+.errFecha{display:none;padding:0 var(--e5) var(--e4);margin-top:-8px;font-size:12.5px;
+  font-weight:600;color:var(--rojo)}
+.errFecha.on{display:block}
+
+.campo-nf{width:auto;min-width:120px;max-width:100%;font-family:'IBM Plex Mono',monospace;
+  font-size:18px;font-weight:600;letter-spacing:.03em;text-align:center}
+
+.selLocal{display:flex;align-items:center;gap:11px;width:100%;background:var(--sup);
+  border:1px solid var(--linea);border-radius:var(--r-m);padding:var(--e3) var(--e4);text-align:left}
+.selLocal .mo{width:30px;height:30px;border-radius:50%;background:var(--sup-2);color:var(--texto-2);
+  display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;
+  font-size:11.5px;font-weight:600;flex:0 0 auto}
+.selLocal.puesto .mo{background:rgba(201,149,50,.16);color:var(--oro)}
+.selLocal .tx{flex:1;min-width:0;font-size:15.5px;color:var(--texto-2);overflow:hidden;
   text-overflow:ellipsis;white-space:nowrap}
-.reg .mto{font-family:'IBM Plex Mono',monospace;font-size:16.5px;font-weight:600;white-space:nowrap}
-.nada{padding:56px 32px;text-align:center;color:var(--tinta-3);font-size:14px;line-height:1.6}
-.nada svg{margin-bottom:14px;opacity:.35}
+.selLocal.puesto .tx{color:var(--texto);font-weight:600}
+.selLocal svg{color:var(--texto-2);flex:0 0 auto}
 
-.flota{position:absolute;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-  background:linear-gradient(to top,var(--papel) 68%,rgba(251,249,245,0));display:flex;gap:9px}
-.btn{flex:1;padding:17px;border-radius:13px;font-size:15.5px;font-weight:700;letter-spacing:.01em;
-  display:flex;align-items:center;justify-content:center;gap:9px;transition:transform .1s}
-.btn:active{transform:scale(.98)}
-.btn-1{background:var(--tinta);color:var(--papel)}
-.btn-2{background:var(--papel-2);color:var(--tinta);border:1px solid var(--linea)}
-.btn-oro{background:var(--oro);color:var(--tinta)}
-.btn:disabled{background:var(--papel-2);color:#B5AC9C;border-color:transparent;pointer-events:none}
-.btn-mini{flex:0 0 auto;padding:17px 20px}
-
-/* ══════ PASO 1 · VALOR ══════ */
-.monto{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:22px 20px;min-height:0}
-.monto .cur{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--tinta-3);
-  letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
-.monto .num{font-family:'Archivo',sans-serif;font-variant-numeric:tabular-nums;
-  font-size:clamp(36px,13vw,58px);font-weight:700;letter-spacing:-.045em;line-height:1;
-  color:var(--tinta);word-break:break-all;text-align:center}
-.monto .num.cero{color:#C6BDAC}
-.monto .pie{margin-top:13px;font-size:13px;color:var(--tinta-3);text-align:center}
-
-
-.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--linea);
-  flex:0 0 auto;border-top:1px solid var(--linea)}
-.pad button{background:var(--papel);padding:18px 0;font-family:'IBM Plex Mono',monospace;
-  font-size:25px;font-weight:500;color:var(--tinta);display:flex;align-items:center;
-  justify-content:center;transition:background .08s}
-.pad button:active{background:var(--oro-luz)}
-.pad .zero2{font-size:22px;letter-spacing:-.01em}
-.pad .del svg{stroke:var(--rojo);fill:none}
-
-/* ══════ PASO 2 · DETALLES ══════ */
-.cuerpo{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 108px}
-.bloque{padding:18px 16px 6px}
-.bloque + .bloque{border-top:1px solid var(--papel-2)}
-.et{font-size:10px;letter-spacing:.18em;font-weight:700;color:var(--tinta-3);
-  text-transform:uppercase;margin-bottom:11px;display:block}
-.et i{font-style:normal;color:var(--oro-osc)}
-
-.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.tile{padding:16px 10px;border-radius:11px;background:var(--papel);border:1.5px solid var(--linea);
-  font-size:15.5px;font-weight:600;text-align:center;transition:.13s}
-.tile[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:var(--papel)}
-
-.chips{display:flex;gap:7px;flex-wrap:wrap}
-.chip{padding:11px 16px;border-radius:22px;background:var(--papel);border:1.5px solid var(--linea);
-  font-size:13.5px;font-weight:600;transition:.13s}
-.chip[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:var(--papel)}
-.chip.sug{border-color:var(--oro);color:var(--oro-osc);background:#FCF6EA}
-
-.campo{width:100%;background:var(--papel);border:1.5px solid var(--linea);border-radius:11px;
-  padding:14px 15px;font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--tinta);
-  font-variant-numeric:tabular-nums}
-.campo::placeholder{color:#B5AC9C}
-.campo:focus{outline:0;border-color:var(--oro)}
-textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;resize:vertical;
-  line-height:1.5}
-.fecha3{display:flex;align-items:center;gap:7px}
-.fecha3 input{width:56px;flex:0 0 auto;background:var(--papel);border:1.5px solid var(--linea);
-  border-radius:11px;padding:14px 4px;font-family:'IBM Plex Mono',monospace;font-size:21px;
-  font-weight:600;text-align:center;color:var(--tinta);letter-spacing:.04em}
-.fecha3 input.ancho{width:78px}
-.fecha3 input::placeholder{color:#C6BDAC;font-size:17px;letter-spacing:.08em}
-.fecha3 input:focus{outline:0;border-color:var(--oro);background:#FFFDF8}
-.fecha3 b{color:var(--tinta-3);font-size:19px;font-weight:500}
-.fecha3.mal input{border-color:var(--rojo);background:#FDF4F3}
-.campo-nf{width:auto;min-width:130px;max-width:100%;font-size:20px;font-weight:600;letter-spacing:.06em;text-align:center}
-
-/* ── Selector de comercios ── */
-.selLocal{display:flex;align-items:center;gap:11px;width:100%;background:var(--papel);
-  border:1.5px solid var(--linea);border-radius:11px;padding:11px 13px;text-align:left}
-.selLocal:active{background:var(--papel-2)}
-.selLocal .mono{width:30px;height:30px;border-radius:50%;background:var(--papel-3);
-  color:var(--tinta-3);display:flex;align-items:center;justify-content:center;
-  font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;flex:0 0 auto}
-.selLocal.puesto .mono{background:var(--oro-luz);color:var(--oro-osc)}
-.selLocal .txt{flex:1;min-width:0;font-size:15.5px;color:#B5AC9C;overflow:hidden;
-  text-overflow:ellipsis;white-space:nowrap}
-.selLocal.puesto .txt{color:var(--tinta);font-weight:600}
-.selLocal svg{color:var(--tinta-3);flex:0 0 auto}
-
-.hojaLocal{position:fixed;inset:0;background:rgba(22,19,14,.55);display:none;
-  align-items:flex-end;z-index:100;touch-action:none}
-.hojaLocal.on{display:flex}
-.cajaLocal{background:var(--papel);width:100%;max-width:520px;margin:0 auto;
-  border-radius:18px 18px 0 0;overflow:hidden;display:flex;flex-direction:column;
-  max-height:82dvh}
-.barraLocal{display:flex;align-items:center;gap:10px;padding:15px 16px;
-  border-bottom:1px solid var(--linea);flex:0 0 auto}
-.barraLocal svg{color:var(--tinta-3);flex:0 0 auto}
-.barraLocal input{flex:1;min-width:0;border:0;background:transparent;font-family:inherit;
-  font-size:16.5px;color:var(--tinta);padding:0}
-.barraLocal input:focus{outline:0}
-.barraLocal button{flex:0 0 auto;font-size:13.5px;font-weight:700;color:var(--oro-osc)}
-.resLocal{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;
-  padding-bottom:env(safe-area-inset-bottom)}
-.grupoLocal{padding:11px 16px 7px;font-size:10px;letter-spacing:.18em;font-weight:700;
-  color:var(--tinta-3);text-transform:uppercase;background:var(--papel-2)}
-.filaLocal{display:flex;align-items:stretch;border-bottom:1px solid var(--papel-2)}
-.filaLocal:active{background:var(--papel-2)}
-.itemLocal{display:flex;align-items:center;gap:12px;padding:12px 4px 12px 16px;
-  flex:1;min-width:0;text-align:left}
-.itemLocal .mono{width:32px;height:32px;border-radius:50%;background:var(--papel-3);
-  color:var(--tinta-3);display:flex;align-items:center;justify-content:center;
-  font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;flex:0 0 auto}
-.itemLocal .nom{flex:1;min-width:0;font-size:15.5px;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap}
-.itemLocal .uso{flex:0 0 auto;font-family:'IBM Plex Mono',monospace;font-size:12px;
-  color:var(--tinta-3)}
-.itemLocal.crear{width:100%;padding:12px 16px}
-.itemLocal.crear{color:var(--oro-osc);font-weight:700}
-.itemLocal.crear .mono{background:var(--oro-luz);color:var(--oro-osc)}
-.kebab{flex:0 0 auto;width:42px;display:flex;align-items:center;justify-content:center;
-  color:var(--tinta-3);font-size:19px;letter-spacing:1px}
-.kebab:active{color:var(--tinta)}
-.sinRes{padding:22px 16px;font-size:13.5px;color:var(--tinta-3);text-align:center}
-.campo.mal{border-color:var(--rojo);background:#FDF4F3}
-.err{display:none;margin-top:7px;font-size:12.5px;font-weight:600;color:var(--rojo)}
-.err.on{display:block}
-
-.dictar{width:100%;margin-top:10px;padding:15px;border-radius:12px;background:var(--tinta);
-  color:var(--papel);font-size:14.5px;font-weight:700;display:flex;align-items:center;
-  justify-content:center;gap:10px}
+.dictar{width:calc(100% - var(--e5)*2);margin:0 var(--e5) var(--e4);padding:var(--e4);
+  border-radius:var(--r-m);background:var(--carbon);color:var(--marfil);font-size:14.5px;
+  font-weight:700;display:flex;align-items:center;justify-content:center;gap:var(--e2)}
+html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--linea)}
 .dictar[data-on="1"]{background:var(--rojo);animation:lat 1.3s ease-in-out infinite}
-@keyframes lat{0%,100%{box-shadow:0 0 0 0 rgba(163,51,39,.4)}50%{box-shadow:0 0 0 12px rgba(163,51,39,0)}}
+@keyframes lat{0%,100%{box-shadow:0 0 0 0 rgba(185,74,72,.4)}50%{box-shadow:0 0 0 12px rgba(185,74,72,0)}}
+.enlaceInline{display:block;width:100%;text-align:center;padding:0 var(--e5) var(--e5);
+  font-size:12.5px;font-weight:600;color:var(--oro)}
+.sugCat{padding:0 var(--e5) var(--e4)}
 
-.mini-monto{background:var(--papel-2);padding:13px 16px;display:flex;align-items:center;
-  justify-content:space-between;border-bottom:1px solid var(--linea);flex:0 0 auto}
-.mini-monto .l{font-size:10px;letter-spacing:.18em;font-weight:700;color:var(--tinta-3);
-  text-transform:uppercase}
-.mini-monto .v{font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:700}
-.mini-monto .v em{font-size:13px;font-style:normal;color:var(--tinta-3)}
-.mini-monto button{font-size:12.5px;font-weight:700;color:var(--oro-osc);text-decoration:underline;
-  text-underline-offset:3px}
+.det-monto{padding:var(--e6) var(--e5);text-align:center}
+.det-monto .m{font-size:34px;font-weight:800;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.det-monto .m span{font-size:17px;font-weight:600;color:var(--oro);margin-right:var(--e2)}
+.det-monto .p{font-size:17px;font-weight:600;margin-top:var(--e2)}
+.det-monto .badge{margin-top:var(--e3)}
+.filas{margin:0 var(--e5) var(--e5);background:var(--sup);border:1px solid var(--linea);
+  border-radius:var(--r-l);overflow:hidden}
+.fila{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--e4);
+  padding:var(--e4);border-bottom:1px solid var(--linea)}
+.fila:last-child{border-bottom:0}
+.fila .k{font-size:14px;color:var(--texto-2);flex:0 0 auto}
+.fila .v{font-size:15px;font-weight:500;text-align:right}
 
-/* ══════ AVISOS ══════ */
-/* ── Opciones del panel de exportar ── */
-.opcion{display:flex;align-items:center;gap:13px;width:100%;padding:14px;margin-bottom:9px;
-  border-radius:12px;background:var(--papel);border:1.5px solid var(--linea);text-align:left}
-.opcion:active{background:var(--papel-2)}
-.opcion.destacada{border-color:var(--oro);border-width:2px}
-.opcion svg{flex:0 0 auto;color:var(--tinta-3)}
-.opcion.destacada svg{color:var(--oro-osc)}
-.opcion .txt{flex:1;min-width:0}
-.opcion .txt b{display:block;font-size:15px;font-weight:700;color:var(--tinta)}
-.opcion .txt em{display:block;font-style:normal;font-size:12.5px;color:var(--tinta-3);margin-top:2px}
-.separador{height:1px;background:var(--linea);margin:14px 0 12px}
-.alcance{display:flex;gap:8px}
-.alcance button{flex:1;padding:11px 8px;border-radius:10px;background:var(--papel);
-  border:1.5px solid var(--linea);font-size:13px;font-weight:700;color:var(--tinta-3)}
-.alcance button[aria-pressed="true"]{background:var(--oro-luz);border-color:var(--oro);
-  color:var(--oro-osc)}
+.stat-card{margin:0 var(--e5) var(--e5);padding:var(--e5);border-radius:var(--r-l);
+  background:var(--sup);border:1px solid var(--linea)}
+.stat-card .lbl{font-size:12px;color:var(--texto-2);font-weight:500}
+.stat-card .big{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:var(--e2);
+  font-variant-numeric:tabular-nums}
+.stat-card .big span{font-size:16px;font-weight:600;color:var(--oro);margin-right:var(--e2)}
+.dona{display:flex;justify-content:center;padding:var(--e5) 0 var(--e6)}
+.dona-txt{font-size:12px;fill:var(--texto-2)}
+.dona-num{font-size:17px;font-weight:700;fill:var(--texto)}
+.cat-fila{display:flex;align-items:center;gap:var(--e3);padding:var(--e3) 0;border-top:1px solid var(--linea)}
+.cat-fila .pt{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+.cat-fila .n{flex:1;font-size:15px;font-weight:500}
+.cat-fila .v{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
+.cat-fila .p{font-size:13px;color:var(--texto-2);width:44px;text-align:right}
+.barra-mes{display:flex;align-items:flex-end;gap:var(--e2);height:120px;padding:var(--e4) 0 0}
+.barra-mes .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:var(--e2)}
+.barra-mes .b{width:100%;border-radius:6px 6px 0 0;background:var(--sup-2);transition:height .5s ease;min-height:3px}
+.barra-mes .col.act .b{background:var(--oro)}
+.barra-mes .m{font-size:11px;color:var(--texto-2);font-weight:500}
 
-/* ── Aviso: misma lógica visual que los paneles ── */
-.aviso{position:fixed;left:16px;right:16px;bottom:24px;max-width:488px;margin:0 auto;
-  transform:translateY(140px);background:var(--papel);border:1px solid var(--linea);
-  border-left:4px solid var(--tinta-3);border-radius:12px;padding:13px 15px;
-  display:flex;align-items:flex-start;gap:11px;text-align:left;
-  transition:transform .3s cubic-bezier(.2,.9,.3,1);z-index:130;cursor:pointer;
-  box-shadow:0 10px 32px rgba(22,19,14,.22)}
-.aviso.on{transform:translateY(0)}
-.aviso svg{flex:0 0 auto;margin-top:1px;color:var(--tinta-3)}
-.aviso span{flex:1;min-width:0;font-size:14px;font-weight:600;color:var(--tinta);line-height:1.45}
-.aviso.ok{border-left-color:var(--verde-ok)}
-.aviso.ok svg{color:var(--verde-ok)}
-.aviso.alerta{border-left-color:var(--oro)}
-.aviso.alerta svg{color:var(--oro-osc)}
+.grupo{margin:0 var(--e5) var(--e5);background:var(--sup);border:1px solid var(--linea);
+  border-radius:var(--r-l);overflow:hidden}
+.opcion{display:flex;align-items:center;gap:var(--e4);width:100%;padding:var(--e4);
+  border-bottom:1px solid var(--linea);text-align:left}
+.opcion:last-child{border-bottom:0}
+.opcion .ico{width:36px;height:36px;border-radius:var(--r-s);background:var(--sup-2);
+  color:var(--texto-2);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.opcion .t{flex:1;font-size:16px;font-weight:500}
+.opcion .d{display:block;font-size:13px;color:var(--texto-2);font-weight:400;margin-top:1px}
+.switch{width:48px;height:28px;border-radius:999px;background:var(--sup-2);position:relative;
+  flex:0 0 auto;transition:background .25s ease;border:1px solid var(--linea)}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;
+  background:var(--sup);box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .25s cubic-bezier(.3,1.4,.5,1)}
+.switch[aria-pressed="true"]{background:var(--oro);border-color:var(--oro)}
+.switch[aria-pressed="true"]::after{transform:translateX(20px);background:#fff}
 
-.confirm{position:fixed;inset:0;background:rgba(22,19,14,.55);display:none;align-items:flex-end;
-  z-index:120;touch-action:none}
+.nav{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--sup);border-top:1px solid var(--linea);
+  padding:var(--e2) var(--e2) calc(var(--e2) + env(safe-area-inset-bottom));z-index:20}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:var(--e2) 0;
+  color:var(--texto-2);font-size:10.5px;font-weight:500}
+.nav button[aria-current="page"]{color:var(--oro);font-weight:600}
+
+.velo{position:fixed;inset:0;background:rgba(23,23,20,.5);display:none;align-items:flex-end;
+  justify-content:center;z-index:60;touch-action:none}
+.velo.on{display:flex;animation:aparecer .2s ease}
+@keyframes aparecer{from{opacity:0}to{opacity:1}}
+.hoja{background:var(--fondo);width:100%;max-width:440px;border-radius:var(--r-xl) var(--r-xl) 0 0;
+  padding:var(--e5) var(--e5) calc(var(--e6) + env(safe-area-inset-bottom));
+  max-height:88dvh;overflow-y:auto;animation:subir .3s cubic-bezier(.2,.9,.3,1);touch-action:pan-y}
+@keyframes subir{from{transform:translateY(100%)}to{transform:none}}
+.hoja-tirador{width:38px;height:4px;border-radius:2px;background:var(--linea);margin:0 auto var(--e5)}
+.hoja h3{margin:0 0 var(--e2);font-size:19px;font-weight:700;letter-spacing:-.01em}
+.hoja .sub{margin:0 0 var(--e5);font-size:14px;color:var(--texto-2)}
+.opt-lista{display:flex;flex-direction:column;gap:var(--e2);margin-bottom:var(--e5)}
+.opt{display:flex;align-items:center;gap:var(--e3);padding:var(--e4);border-radius:var(--r-m);
+  background:var(--sup);border:1.5px solid var(--linea);text-align:left;width:100%}
+.opt[aria-pressed="true"]{border-color:var(--oro);background:rgba(201,149,50,.06)}
+.opt .t{flex:1;font-size:16px;font-weight:500}
+.check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--linea);flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;color:transparent}
+.opt[aria-pressed="true"] .check{background:var(--oro);border-color:var(--oro);color:#1A1509}
+
+.hojaLocal{position:fixed;inset:0;background:rgba(23,23,20,.5);display:none;align-items:flex-end;
+  z-index:65;touch-action:none}
+.hojaLocal.on{display:flex}
+.cajaLocal{background:var(--fondo);width:100%;max-width:440px;margin:0 auto;
+  border-radius:var(--r-xl) var(--r-xl) 0 0;overflow:hidden;display:flex;flex-direction:column;max-height:85dvh}
+.barraLocal{display:flex;align-items:center;gap:10px;padding:var(--e5);border-bottom:1px solid var(--linea);flex:0 0 auto}
+.barraLocal svg{color:var(--texto-2);flex:0 0 auto}
+.barraLocal input{flex:1;min-width:0;border:0;background:transparent;font-family:inherit;
+  font-size:16px;color:var(--texto);padding:0}
+.barraLocal button{flex:0 0 auto;font-size:13.5px;font-weight:700;color:var(--oro)}
+.resLocal{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.grupoLocal{padding:11px var(--e5) 7px;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:var(--oro);background:var(--sup-2)}
+.filaLocal{display:flex;align-items:stretch;border-bottom:1px solid var(--sup-2)}
+.itemLocal{display:flex;align-items:center;gap:12px;padding:12px 4px 12px var(--e5);flex:1;min-width:0;text-align:left}
+.itemLocal .mo{width:32px;height:32px;border-radius:50%;background:var(--sup-2);color:var(--texto-2);
+  display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;
+  font-size:12px;font-weight:600;flex:0 0 auto}
+.itemLocal .nom{flex:1;min-width:0;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.itemLocal .uso{flex:0 0 auto;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--texto-2)}
+.itemLocal.crear{width:100%;padding:12px var(--e5);color:var(--oro);font-weight:700}
+.kebab{flex:0 0 auto;width:42px;display:flex;align-items:center;justify-content:center;
+  color:var(--texto-2);font-size:19px}
+
+.confirm{position:fixed;inset:0;background:rgba(23,23,20,.5);display:none;align-items:center;
+  justify-content:center;z-index:75;padding:var(--e5)}
 .confirm.on{display:flex}
-.confirm .caja{background:var(--papel);width:100%;max-width:520px;margin:0 auto;
-  border-radius:18px 18px 0 0;padding:24px 20px calc(20px + env(safe-area-inset-bottom))}
-.confirm h3{margin:0 0 6px;font-size:18px;font-weight:700}
-.confirm p{margin:0 0 18px;font-size:14px;color:var(--tinta-3);line-height:1.5}
-.confirm .fila{display:flex;gap:9px}
-.confirm .caja{max-height:88dvh;overflow-y:auto}
-.enlace{display:block;width:100%;margin-top:11px;padding:11px;font-size:13px;font-weight:700;
-  color:var(--oro-osc);text-align:center;letter-spacing:.02em}
-.par{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.et2{font-size:9px;letter-spacing:.2em;font-weight:700;color:var(--tinta-3);text-transform:uppercase;
-  display:block;margin-bottom:6px}
-.par .campo{font-size:15px;padding:12px}
-.listaPal{margin-top:16px;max-height:34vh;overflow-y:auto;touch-action:pan-y}
-.pal{display:flex;align-items:center;gap:10px;padding:11px 2px;border-bottom:1px solid var(--papel-2)}
-.pal .de{font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--tinta-3);flex:1;min-width:0;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pal .fl{color:var(--oro);font-weight:700;flex:0 0 auto}
-.pal .a{font-size:14px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;
-  white-space:nowrap}
-.pal .x{flex:0 0 auto;color:var(--rojo);font-size:19px;font-weight:600;padding:0 6px;line-height:1}
-.vacioPal{padding:20px 4px;text-align:center;color:var(--tinta-3);font-size:13px}
+.confirm .caja{background:var(--fondo);border-radius:var(--r-l);padding:var(--e5);max-width:380px;width:100%}
+.confirm h3{margin:0 0 8px;font-size:17px;font-weight:700}
+.confirm p{margin:0 0 var(--e5);font-size:14px;color:var(--texto-2);line-height:1.5}
+.confirm .fila{display:flex;gap:var(--e2)}
+.confirm input.entrada{margin-bottom:var(--e4)}
+
+.resumen-exp{padding:var(--e5);border-radius:var(--r-l);background:var(--sup);
+  border:1px solid var(--linea);text-align:center;margin-bottom:var(--e5)}
+.resumen-exp .ico{width:56px;height:56px;border-radius:var(--r-m);background:rgba(201,149,50,.12);
+  color:var(--oro);display:flex;align-items:center;justify-content:center;margin:0 auto var(--e3)}
+.resumen-exp .p{font-size:17px;font-weight:600}
+.resumen-exp .d{font-size:14px;color:var(--texto-2);margin-top:var(--e1)}
+.resumen-exp .m{font-size:24px;font-weight:800;letter-spacing:-.02em;margin-top:var(--e2)}
+.resumen-exp .m span{font-size:15px;color:var(--oro);margin-right:var(--e1)}
+
+.exito{text-align:center;padding:var(--e6) 0 0}
+.exito .circ{width:76px;height:76px;border-radius:50%;background:var(--verde);color:#fff;
+  display:flex;align-items:center;justify-content:center;margin:0 auto var(--e5);
+  animation:pop .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.exito h3{font-size:21px;margin-bottom:var(--e2)}
+.exito p{font-size:15px;color:var(--texto-2);margin:0 0 var(--e6);line-height:1.5}
+
+.aviso{position:fixed;left:16px;right:16px;bottom:24px;max-width:408px;margin:0 auto;
+  transform:translateY(150px);background:var(--sup);border:1px solid var(--linea);
+  border-left:4px solid var(--texto-2);border-radius:var(--r-m);padding:13px 15px;
+  display:flex;align-items:flex-start;gap:11px;text-align:left;
+  transition:transform .3s cubic-bezier(.2,.9,.3,1);z-index:90;cursor:pointer;
+  box-shadow:0 10px 32px rgba(23,23,20,.18)}
+.aviso.on{transform:translateY(0)}
+.aviso svg{flex:0 0 auto;margin-top:1px;color:var(--texto-2)}
+.aviso span{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:var(--texto);line-height:1.45}
+.aviso.ok{border-left-color:var(--verde)}
+.aviso.ok svg{color:var(--verde)}
+.aviso.alerta{border-left-color:var(--oro)}
+.aviso.alerta svg{color:var(--oro)}
+
+.elegir{flex:1;display:flex;flex-direction:column;justify-content:center;padding:var(--e8) var(--e5) 60px}
+.elegirTit{margin:0 0 var(--e6);font-size:15px;font-weight:600;color:var(--texto-2);text-align:center}
+.elegirLista{display:flex;flex-direction:column;gap:var(--e3)}
+.elegirLista button{padding:var(--e5);border-radius:var(--r-m);background:var(--sup);
+  border:1.5px solid var(--linea);font-size:17px;font-weight:700;letter-spacing:.02em;
+  color:var(--texto);transition:.15s}
+.elegirLista button:active{background:var(--oro);border-color:var(--oro);color:#1A1509;transform:scale(.98)}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- ══════════ HOME ══════════ -->
-  <!-- ══════════ INICIO · elegir colaborador ══════════ -->
-  <section class="vista on" id="vInicio">
-    <div class="top">
-      <div class="fila">
-        <div class="tit">
-          <span class="eyebrow">Cartão Coorporativo</span>
-          <h1>Prestação de Conta</h1>
-        </div>
-      </div>
+<section class="pantalla on" id="pElegir">
+  <div class="cab">
+    <p class="eyebrow">Cartão Coorporativo</p>
+    <h1>Prestação de Conta</h1>
+  </div>
+  <div class="elegir">
+    <p class="elegirTit">¿Con qué usuario querés trabajar?</p>
+    <div class="elegirLista" id="elegirLista">
+      <button type="button" data-p="LAURO ZIMMER">LAURO</button>
+      <button type="button" data-p="RENATO MOURA">RENATO</button>
+      <button type="button" data-p="GUTTO BROETTO">GUTTO</button>
     </div>
-    <div class="elegir">
-      <p class="elegirTit">¿Con qué usuario querés trabajar?</p>
-      <div class="elegirLista" id="elegirLista">
-        <button type="button" data-p="LAURO ZIMMER">LAURO</button>
-        <button type="button" data-p="RENATO MOURA">RENATO</button>
-        <button type="button" data-p="GUTTO BROETTO">GUTTO</button>
-      </div>
-    </div>
-  </section>
+  </div>
+</section>
 
-  <section class="vista" id="vHome">
-    <div class="top">
-      <div class="fila">
-        <div class="tit">
-          <span class="eyebrow">Cartão Coorporativo</span>
-          <h1>Prestação de Conta</h1>
+<section class="pantalla" id="pInicio">
+  <div class="scroll">
+    <div class="cab">
+      <div class="cab-fila">
+        <div><p class="eyebrow">Cartão Coorporativo</p><h1>Prestação<br>de Conta</h1></div>
+        <div class="selPeriodo" id="selPeriodo">
+          <button id="btnMes"></button>
+          <button id="btnAno"></button>
         </div>
-        <div class="selPeriodo">
-          <select id="mes" aria-label="Mes"></select>
-          <select id="ano" aria-label="Año"></select>
-        </div>
-      </div>
-      <div class="quien" id="quien">
-        <button type="button" data-p="LAURO ZIMMER" aria-pressed="false">LAURO</button>
-        <button type="button" data-p="RENATO MOURA" aria-pressed="false">RENATO</button>
-        <button type="button" data-p="GUTTO BROETTO" aria-pressed="false">GUTTO</button>
       </div>
     </div>
 
-    <div class="resumen">
-      <div class="resTotal">
-        <div class="resIzq">
-          <span class="lbl">Total del período</span>
-          <div class="big"><i>G$</i><span id="hTotal">0</span></div>
-        </div>
-        <div class="hCantTxt"><span id="hCant">0</span> facturas</div>
+    <p class="etiq" style="padding:0 var(--e5)">Usuario</p>
+    <div class="usuarios" id="usuarios"></div>
+
+    <div class="total">
+      <p class="lbl">Total del período</p>
+      <div class="cifra"><span class="m">G$</span><span class="num" id="totalNum">0</span></div>
+      <p class="sub" id="totalSub">0 comprobantes</p>
+      <div class="estado" id="totalEstado">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span id="totalEstadoTxt">Todo registrado</span>
       </div>
-      <div class="accionesTop">
-        <button class="ibtn ibtn-oro" id="bNueva" title="Nueva factura">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
-          <span class="txtNueva">Nueva factura</span>
+    </div>
+
+    <div class="acciones">
+      <button class="btn btn-oro" id="btnNueva">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nueva factura
+      </button>
+      <div class="par">
+        <button class="btn btn-sec" id="btnBuscar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          Buscar
         </button>
-        <button class="ibtn" id="bFiltro" title="Buscar">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
-        </button>
-        <button class="ibtn" id="bExport" title="Exportar">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <button class="btn btn-sec" id="btnExportar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          Exportar
         </button>
       </div>
     </div>
 
-    <div class="barraFiltro" id="barraFiltro">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
-      <input type="text" id="qFiltro" inputmode="numeric" placeholder="Buscar por NF o monto…" autocomplete="off">
-      <button type="button" id="bLimpiarFiltro" title="Limpiar">
-        <svg width="15" height="15" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-width="2.2" stroke-linecap="round"/></svg>
+    <div class="banda" id="banda">
+      <div class="ico" id="bandaIco"></div>
+      <div><div class="t" id="bandaT">Pendientes · 0</div><div class="d" id="bandaD">Todo está al día</div></div>
+    </div>
+
+    <div class="sec-tit">
+      <h2 id="tituloLista">Comprobantes</h2>
+      <button class="ver" id="verTodos">Ver todos</button>
+    </div>
+    <div class="lista" id="listaInicio"></div>
+  </div>
+</section>
+
+<section class="pantalla" id="pComprobantes">
+  <div class="barra"><h2>Comprobantes</h2><button class="accion" id="abrirBuscador">Filtros</button></div>
+  <div class="scroll">
+    <div class="buscador">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="text" id="qLista" placeholder="Buscar comercio, NF o detalle">
+    </div>
+    <div class="chips" id="chipsEstado">
+      <button class="chip" data-f="todas" aria-pressed="true">Todas</button>
+      <button class="chip" data-f="pendiente" aria-pressed="false">Pendientes</button>
+      <button class="chip" data-f="exportada" aria-pressed="false">Exportadas</button>
+    </div>
+    <div class="lista" id="listaComprobantes"></div>
+  </div>
+</section>
+
+<section class="pantalla" id="pEstadisticas">
+  <div class="barra"><h2>Estadísticas</h2></div>
+  <div class="scroll">
+    <div class="stat-card">
+      <p class="lbl">Total del período · <span id="statPeriodo">—</span></p>
+      <div class="big"><span>G$</span><span id="statTotal">0</span></div>
+      <div class="etiq" id="statCant" style="margin-top:8px">0 comprobantes</div>
+    </div>
+    <div class="stat-card">
+      <p class="lbl">Distribución por despesa</p>
+      <div class="dona" id="dona"></div>
+      <div id="catLista"></div>
+    </div>
+    <div class="stat-card">
+      <p class="lbl">Evolución mensual</p>
+      <div class="barra-mes" id="barrasMes"></div>
+    </div>
+  </div>
+</section>
+
+<section class="pantalla" id="pMas">
+  <div class="barra"><h2>Más</h2></div>
+  <div class="scroll">
+    <div class="grupo">
+      <button class="opcion" id="cambiarUsuario">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+        <span class="t">Colaborador activo<span class="d" id="perfilNombre">—</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--texto-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <button class="opcion" id="abrirPalabras">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg></span>
+        <span class="t">Palabras enseñadas<span class="d" id="palLabel">0 registradas</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--texto-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
       </button>
     </div>
-
-    <div class="lista" id="hLista"></div>
-  </section>
-
-  <!-- ══════════ PASO 1 · VALOR ══════════ -->
-  <section class="vista" id="vValor">
-    <div class="top">
-      <div class="fila">
-        <button class="volver" id="bSalir1">
-          <svg width="19" height="19" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" stroke-width="2.3" stroke-linecap="round"/></svg>
-        </button>
-        <div class="tit">
-          <span class="eyebrow">Paso 1 de 2</span>
-          <h1>¿Cuánto fue?</h1>
-        </div>
-      </div>
-    </div>
-
-    <div class="monto">
-      <div class="cur">Guaraníes</div>
-      <div class="num cero" id="pantalla">0</div>
-      <div class="pie">Escribí el monto de la factura</div>
-    </div>
-
-    <div class="pad" id="pad">
-      <button type="button" data-k="1">1</button>
-      <button type="button" data-k="2">2</button>
-      <button type="button" data-k="3">3</button>
-      <button type="button" data-k="4">4</button>
-      <button type="button" data-k="5">5</button>
-      <button type="button" data-k="6">6</button>
-      <button type="button" data-k="7">7</button>
-      <button type="button" data-k="8">8</button>
-      <button type="button" data-k="9">9</button>
-      <button type="button" data-k="0">0</button>
-      <button type="button" data-k="00" class="zero2">00</button>
-      <button type="button" data-k="del" class="del">
-        <svg width="26" height="26" viewBox="0 0 24 24"><path d="M20 6H9l-5 6 5 6h11a1 1 0 001-1V7a1 1 0 00-1-1z" stroke-width="1.9" stroke-linejoin="round"/><path d="M17 10l-4 4M13 10l4 4" stroke-width="1.9" stroke-linecap="round"/></svg>
+    <div class="grupo">
+      <button class="opcion" id="swTema">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"/></svg></span>
+        <span class="t">Modo oscuro<span class="d" id="temaEstado">Desactivado</span></span>
+        <span class="switch" id="switchTema" aria-pressed="false"></span>
       </button>
     </div>
-
-    <div class="flota" style="position:static;background:var(--papel);border-top:1px solid var(--linea)">
-      <button class="btn btn-oro" id="bPaso2" disabled>Continuar</button>
+    <div class="grupo">
+      <button class="opcion">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+        <span class="t">Información<span class="d">Grupo Piveta · demo funcional</span></span>
+      </button>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ══════════ PASO 2 · DETALLES ══════════ -->
-  <section class="vista" id="vDetalle">
-    <div class="top">
-      <div class="fila">
-        <button class="volver" id="bVolver2">
-          <svg width="19" height="19" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="tit">
-          <span class="eyebrow">Paso 2 de 2</span>
-          <h1 id="tit2">Detalles</h1>
-        </div>
-      </div>
-    </div>
-
-    <div class="mini-monto">
-      <span class="l">Monto</span>
-      <span class="v"><em>G$ </em><span id="dMonto">0</span></span>
-      <button type="button" id="bEditMonto">cambiar</button>
-    </div>
-
-    <div class="cuerpo">
-      <div class="bloque">
-        <span class="et">Despesa <i>· obligatorio</i></span>
-        <div class="tiles" id="tiles"></div>
-      </div>
-
-      <div class="bloque">
-        <span class="et">Data</span>
-        <div class="fecha3" id="fecha3">
-          <input type="text" id="fD" inputmode="numeric" maxlength="2" placeholder="dd" autocomplete="off">
-          <b>/</b>
-          <input type="text" id="fM" inputmode="numeric" maxlength="2" placeholder="mm" autocomplete="off">
-          <b>/</b>
-          <input type="text" id="fA" inputmode="numeric" maxlength="4" placeholder="aaaa" class="ancho" autocomplete="off">
-        </div>
-        <div class="err" id="errFecha">Esa fecha no existe</div>
-      </div>
-
-      <div class="bloque">
-        <span class="et">Número da NF</span>
-        <input type="text" class="campo campo-nf" id="nf" inputmode="numeric" maxlength="13" placeholder="000000">
-      </div>
-
-      <div class="bloque">
-        <span class="et">Local · comercio</span>
+<section class="pantalla" id="pNueva">
+  <div class="barra">
+    <button class="volver" id="salirNueva" aria-label="Cerrar"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    <h2 id="tituloNueva">Nueva factura</h2>
+  </div>
+  <div class="pasos" id="pasos">
+    <div class="paso activo" data-p="1"><span class="n">1</span><span class="t">Datos</span></div>
+    <div class="paso-linea"></div>
+    <div class="paso" data-p="2"><span class="n">2</span><span class="t">Detalle</span></div>
+    <div class="paso-linea"></div>
+    <div class="paso" data-p="3"><span class="n">3</span><span class="t">Confirmar</span></div>
+  </div>
+  <div class="scroll" style="padding-bottom:var(--e4)">
+    <div class="sub-paso" data-paso="1">
+      <p class="etiq" style="padding:var(--e3) var(--e5) 0">Despesa</p>
+      <div class="rejilla" id="tilesCat"></div>
+      <div class="campo">
+        <label>Local · comercio</label>
         <button type="button" class="selLocal" id="bLocal">
-          <span class="mono" id="lMono">—</span>
-          <span class="txt" id="lTxt">Elegir comercio</span>
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="mo" id="lMono">—</span><span class="tx" id="lTxt">Elegir comercio</span>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
         </button>
       </div>
-
-      <div class="bloque">
-        <span class="et">Observação · detalle de la compra</span>
-        <textarea class="campo" id="obs" placeholder="Qué se compró"></textarea>
-        <div id="sugCat"></div>
-        <div id="sugPal"></div>
-        <button class="dictar" id="bDictar" type="button" data-on="0">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z" fill="currentColor"/><path d="M5 11a7 7 0 0014 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <span id="lblDictar">Dictar el detalle</span>
-        </button>
-        <button class="enlace" id="bPalabras" type="button">Palabras enseñadas · <span id="nPal">0</span></button>
+      <div class="campo">
+        <label>Número da NF</label>
+        <input class="entrada campo-nf" type="text" id="fNF" inputmode="numeric" maxlength="13" placeholder="000000">
       </div>
+      <p class="etiq" style="padding:0 var(--e5) var(--e2)">Data</p>
+      <div class="fecha3" id="fecha3">
+        <input type="text" id="fD" inputmode="numeric" maxlength="2" placeholder="dd">
+        <b>/</b>
+        <input type="text" id="fM" inputmode="numeric" maxlength="2" placeholder="mm">
+        <b>/</b>
+        <input type="text" id="fA" inputmode="numeric" maxlength="4" placeholder="aaaa" class="anio">
+      </div>
+      <div class="errFecha" id="errFecha">Esa fecha no existe</div>
     </div>
 
-    <div class="flota" style="position:static;background:var(--papel);border-top:1px solid var(--linea)">
-      <button class="btn btn-2 btn-mini" id="bBorrar" style="display:none">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#A33327"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="sub-paso" data-paso="2" style="display:none">
+      <div class="campo">
+        <label>Valor</label>
+        <input class="entrada" type="text" id="fValor" inputmode="numeric"
+               style="font-size:24px;font-weight:700;letter-spacing:-.02em" placeholder="G$ 0">
+      </div>
+      <div class="campo">
+        <label>Observação · detalle de la compra</label>
+        <textarea class="entrada" id="fObs" maxlength="160" placeholder="Qué se compró"></textarea>
+        <div class="contador"><span id="cuenta">0</span>/160</div>
+      </div>
+      <div class="sugCat" id="sugCat"></div>
+      <button class="dictar" id="bDictar" type="button" data-on="0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a3 3 0 013 3v6a3 3 0 01-6 0V6a3 3 0 013-3z" fill="currentColor"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>
+        <span id="lblDictar">Dictar el detalle</span>
       </button>
-      <button class="btn btn-oro" id="bGuardar" disabled>Guardar factura</button>
     </div>
-  </section>
 
+    <div class="sub-paso" data-paso="3" style="display:none">
+      <div class="det-monto" style="padding-top:var(--e5)">
+        <div class="m"><span>G$</span><span id="cfValor">0</span></div>
+        <div class="p" id="cfProv">—</div>
+      </div>
+      <div class="filas">
+        <div class="fila"><span class="k">Despesa</span><span class="v" id="cfCat">—</span></div>
+        <div class="fila"><span class="k">Número da NF</span><span class="v" id="cfNF">—</span></div>
+        <div class="fila"><span class="k">Data</span><span class="v" id="cfData">—</span></div>
+        <div class="fila"><span class="k">Observação</span><span class="v" id="cfObs" style="max-width:60%">—</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="pie-form">
+    <button class="btn btn-oro" id="btnPasoSig">Continuar
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </button>
+    <button class="btn btn-ter" id="btnPasoAtras" style="display:none">Volver atrás</button>
+  </div>
+</section>
+
+<section class="pantalla" id="pDetalle">
+  <div class="barra">
+    <button class="volver" id="salirDetalle" aria-label="Volver"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h2>Comprobante</h2>
+  </div>
+  <div class="scroll">
+    <div class="det-monto">
+      <div class="m"><span>G$</span><span id="dMonto">0</span></div>
+      <div class="p" id="dProv">—</div>
+      <span class="badge ok" id="dBadge">Exportada</span>
+    </div>
+    <div class="filas">
+      <div class="fila"><span class="k">Despesa</span><span class="v" id="dCat">—</span></div>
+      <div class="fila"><span class="k">Número da NF</span><span class="v" id="dNF">—</span></div>
+      <div class="fila"><span class="k">Data</span><span class="v" id="dData">—</span></div>
+      <div class="fila"><span class="k">Observação</span><span class="v" id="dObs" style="max-width:62%">—</span></div>
+    </div>
+    <div style="padding:0 var(--e5) var(--e6)">
+      <div class="par" style="margin:0">
+        <button class="btn btn-sec" id="btnEditarDet">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+          Editar
+        </button>
+        <button class="btn btn-sec" id="btnEliminarDet" style="color:var(--rojo)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></svg>
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pantalla" id="pBuscar">
+  <div class="barra">
+    <button class="volver" id="salirBuscar" aria-label="Volver"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <h2>Buscar comprobantes</h2>
+    <button class="accion" id="limpiarBusq">Limpiar</button>
+  </div>
+  <div class="scroll">
+    <div class="campo" style="padding-top:var(--e5)">
+      <label>Comercio, NF o detalle</label>
+      <input class="entrada" type="text" id="bTexto" placeholder="Ej: Taller Industrial">
+    </div>
+    <div class="campo">
+      <label>Despesa</label>
+      <div class="chips" style="padding:0" id="bCats"></div>
+    </div>
+    <div class="campo">
+      <label>Monto</label>
+      <div style="display:flex;gap:var(--e2);align-items:center">
+        <input class="entrada" type="text" id="bMin" inputmode="numeric" placeholder="Mínimo">
+        <span style="color:var(--texto-2)">a</span>
+        <input class="entrada" type="text" id="bMax" inputmode="numeric" placeholder="Máximo">
+      </div>
+    </div>
+    <div class="campo">
+      <label>Estado</label>
+      <div class="chips" style="padding:0" id="bEstados">
+        <button class="chip" data-e="todas" aria-pressed="true">Todos</button>
+        <button class="chip" data-e="pendiente" aria-pressed="false">Pendientes</button>
+        <button class="chip" data-e="exportada" aria-pressed="false">Exportadas</button>
+      </div>
+    </div>
+    <p class="etiq" style="padding:0 var(--e5) var(--e2)">Busca en todos los períodos guardados</p>
+    <div style="padding:var(--e2) var(--e5) var(--e5)">
+      <button class="btn btn-oro" id="btnHacerBusq">Buscar</button>
+    </div>
+    <div class="sec-tit" id="tituloRes" style="display:none"><h2>Resultados</h2></div>
+    <div class="lista" id="listaBusq"></div>
+  </div>
+</section>
+
+<nav class="nav" id="nav">
+  <button data-nav="pInicio" aria-current="page"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Inicio</button>
+  <button data-nav="pComprobantes"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h7M9 17h5"/></svg>Comprobantes</button>
+  <button data-nav="pEstadisticas"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V11M12 21V4M19 21v-6"/></svg>Estadísticas</button>
+  <button data-nav="pMas"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>Más</button>
+</nav>
 </div>
 
-<div class="aviso" id="aviso">
-  <svg id="avisoIcono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
-  <span id="avisoTxt"></span>
+<div class="velo" id="velaMes">
+  <div class="hoja"><div class="hoja-tirador"></div><h3>Elegir mes</h3>
+    <div class="opt-lista" id="listaMeses"></div>
+    <button class="btn btn-ter" data-cerrar>Cancelar</button>
+  </div>
+</div>
+<div class="velo" id="velaAno">
+  <div class="hoja"><div class="hoja-tirador"></div><h3>Elegir año</h3>
+    <div class="opt-lista" id="listaAnios"></div>
+    <button class="btn btn-ter" data-cerrar>Cancelar</button>
+  </div>
 </div>
 
 <div class="hojaLocal" id="hojaLocal">
   <div class="cajaLocal" id="cajaLocal">
     <div class="barraLocal">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7" stroke-width="2"/><path d="M20 20l-3.5-3.5" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input type="text" id="qLocal" placeholder="Buscar comercio" autocomplete="off">
       <button type="button" id="bCerrarLocal">Cerrar</button>
     </div>
@@ -546,66 +704,12 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
 <div class="confirm" id="accLocal">
   <div class="caja">
     <h3>Editar comercio</h3>
-    <input type="text" class="campo" id="accInput" style="margin-bottom:14px" autocomplete="off">
+    <input type="text" class="entrada" id="accInput" autocomplete="off">
     <div class="fila">
-      <button class="btn btn-2" id="accEliminar" style="color:var(--rojo)">Eliminar</button>
-      <button class="btn btn-1" id="accGuardar">Guardar</button>
+      <button class="btn btn-sec" id="accEliminar" style="color:var(--rojo)">Eliminar</button>
+      <button class="btn btn-oro" id="accGuardar">Guardar</button>
     </div>
-    <button class="btn btn-2" id="accCancelar" style="width:100%;margin-top:9px">Cancelar</button>
-  </div>
-</div>
-
-<div class="confirm" id="hojaExport">
-  <div class="caja">
-    <h3>Exportar</h3>
-    <p id="expResumen">—</p>
-
-    <button class="opcion destacada" type="button" id="expCompartir">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
-      <span class="txt">
-        <b>Compartir</b>
-        <em>WhatsApp, Drive, correo…</em>
-      </span>
-    </button>
-
-    <button class="opcion" type="button" id="expDescargar">
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-      <span class="txt">
-        <b>Descargar al teléfono</b>
-        <em>Queda en la carpeta Descargas</em>
-      </span>
-    </button>
-
-    <div class="separador"></div>
-
-    <div class="alcance" id="alcance">
-      <button type="button" data-a="uno" aria-pressed="true">Solo <span id="expNombre">Lauro</span></button>
-      <button type="button" data-a="todos" aria-pressed="false">Los 3</button>
-    </div>
-
-    <button class="btn btn-2" id="expCancelar" style="width:100%;margin-top:14px">Cancelar</button>
-  </div>
-</div>
-
-<div class="confirm" id="hojaPal">
-  <div class="caja">
-    <h3 id="tituloPal">Palabras enseñadas</h3>
-    <p>Cuando el dictado escuche mal una palabra, enseñale acá cómo se escribe. La próxima vez la va a corregir sola.</p>
-    <div class="par">
-      <div>
-        <span class="et2">Cuando escuche</span>
-        <input type="text" class="campo" id="palDe" placeholder="husverna" autocomplete="off">
-      </div>
-      <div>
-        <span class="et2">Escribir</span>
-        <input type="text" class="campo" id="palA" placeholder="Husqvarna" autocomplete="off">
-      </div>
-    </div>
-    <button class="btn btn-1" id="bAddPal" style="margin-top:12px;width:100%">Guardar palabra</button>
-    <div class="listaPal" id="listaPal"></div>
-    <div class="fila" style="margin-top:16px">
-      <button class="btn btn-2" id="bCerrarPal">Cerrar</button>
-    </div>
+    <button class="btn btn-ter" id="accCancelar" style="width:100%;margin-top:9px">Cancelar</button>
   </div>
 </div>
 
@@ -613,17 +717,58 @@ textarea.campo{font-family:'Archivo',sans-serif;font-size:15px;min-height:96px;r
   <div class="caja">
     <h3 id="cTit">¿Seguro?</h3>
     <p id="cTxt"></p>
-    <div class="fila">
-      <button class="btn btn-2" id="cNo">Cancelar</button>
-      <button class="btn btn-1" id="cSi">Sí</button>
-    </div>
+    <div class="fila"><button class="btn btn-sec" id="cNo">Cancelar</button><button class="btn btn-oro" id="cSi" style="background:var(--rojo);color:#fff">Sí</button></div>
   </div>
 </div>
 
+<div class="velo" id="hojaPal">
+  <div class="hoja">
+    <div class="hoja-tirador"></div>
+    <h3 id="tituloPal">Palabras enseñadas</h3>
+    <p class="sub">Cuando el dictado escuche mal una palabra, enseñale acá cómo se escribe.</p>
+    <div class="campo" style="padding:0 0 var(--e3)"><label>Cuando escuche</label><input class="entrada" id="palDe" placeholder="husverna"></div>
+    <div class="campo" style="padding:0 0 var(--e4)"><label>Escribir</label><input class="entrada" id="palA" placeholder="Husqvarna"></div>
+    <button class="btn btn-oro" id="bAddPal" style="margin-bottom:var(--e4)">Guardar palabra</button>
+    <div id="listaPal"></div>
+    <button class="btn btn-ter" data-cerrar>Cerrar</button>
+  </div>
+</div>
+
+<div class="velo" id="hojaExport">
+  <div class="hoja">
+    <div class="hoja-tirador"></div>
+    <h3>Exportar prestação</h3>
+    <p class="sub" id="expResumen">—</p>
+    <button class="opt" id="expCompartir" style="border-color:var(--oro);border-width:2px;margin-bottom:9px">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--oro)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+      <span class="t">Compartir<br><span style="font-size:12px;font-weight:400;color:var(--texto-2)">WhatsApp, Drive, correo…</span></span>
+    </button>
+    <button class="opt" id="expDescargar" style="margin-bottom:var(--e4)">
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+      <span class="t">Descargar al teléfono<br><span style="font-size:12px;font-weight:400;color:var(--texto-2)">Queda en la carpeta Descargas</span></span>
+    </button>
+    <div class="chips" style="padding:0" id="alcance">
+      <button class="chip" data-a="uno" aria-pressed="true" style="flex:1;text-align:center">Solo <span id="expNombre">Lauro</span></button>
+      <button class="chip" data-a="todos" aria-pressed="false" style="flex:1;text-align:center">Los 3</button>
+    </div>
+    <button class="btn btn-ter" data-cerrar style="margin-top:var(--e4)">Cancelar</button>
+  </div>
+</div>
+
+<div class="aviso" id="aviso">
+  <svg id="avisoIcono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+  <span id="avisoTxt"></span>
+</div>
+
 <script>
-/* ═══════════════════════════════════════════════════════
-   ALMACENAMIENTO — todo queda en este teléfono
-   ═══════════════════════════════════════════════════════ */
+const PERSONAS = ['LAURO ZIMMER','RENATO MOURA','GUTTO BROETTO'];
+const CATEGORIAS = ['Combustível','Refeição','Manutenção','Hotel','Passagem','Outros'];
+const COLORES_CAT = {'Combustível':'#C99532','Refeição':'#3F8A61','Manutenção':'#E2B65A',
+  'Hotel':'#77746D','Passagem':'#B94A48','Outros':'#8A7E64'};
+const MESNOM = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto',
+  'Septiembre','Octubre','Noviembre','Diciembre'];
+const MESCORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
 const Store = (() => {
   let mem = {}, ok = false;
   try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); ok = true; } catch(e){}
@@ -632,112 +777,53 @@ const Store = (() => {
     set(k,v){ try { ok ? localStorage.setItem(k,v) : (mem[k]=v); } catch(e){ mem[k]=v; } }
   };
 })();
-
 const KEY = 'piveta_pc_v1';
 let DB = { items: [], locales: {}, palabras: {} };
 try { const raw = Store.get(KEY); if (raw) DB = JSON.parse(raw); } catch(e){}
 if (!Array.isArray(DB.items)) DB.items = [];
 
-// Migración: en versiones anteriores, locales y palabras eran una sola
-// lista compartida entre los 3. Ahora cada colaborador tiene la suya.
-// Lo que ya estaba guardado se copia como punto de partida para los 3,
-// así nadie pierde lo que ya se había cargado.
-const PERSONAS = ['LAURO ZIMMER','RENATO MOURA','GUTTO BROETTO'];
+const normNom = s => (s||'').toLowerCase().normalize('NFD')
+  .replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}\s]/gu,'')
+  .replace(/\s+/g,' ').trim();
 
-if (Array.isArray(DB.locales)){
-  const previos = DB.locales; DB.locales = {};
-  PERSONAS.forEach(p => DB.locales[p] = [...previos]);
-} else if (!DB.locales || typeof DB.locales !== 'object'){
-  DB.locales = {};
-}
-if (Array.isArray(DB.palabras)){
-  const previas = DB.palabras; DB.palabras = {};
-  PERSONAS.forEach(p => DB.palabras[p] = previas.map(x => ({...x})));
-} else if (!DB.palabras || typeof DB.palabras !== 'object'){
-  DB.palabras = {};
-}
-
-// Facturas ya guardadas antes de este cambio: quedan como "pendientes".
+PERSONAS.forEach(p => {
+  const lista = Array.isArray(DB.locales[p]) ? DB.locales[p] : [];
+  DB.locales[p] = lista.map(x => (typeof x === 'string' ? { n: x, u: 0 } : x)).filter(x => x && x.n);
+});
+DB.items.forEach(it => {
+  if (!it.local) return;
+  const lista = Array.isArray(DB.locales[it.colaborador]) ? DB.locales[it.colaborador] : (DB.locales[it.colaborador] = []);
+  const h = lista.find(x => normNom(x.n) === normNom(it.local));
+  if (h) h.u = (h.u || 0) + 1; else lista.push({ n: it.local, u: 1 });
+});
+PERSONAS.forEach(p => {
+  const lista = DB.locales[p]; const vistos = new Map();
+  DB.locales[p] = lista.filter(item => {
+    const clave = normNom(item.n);
+    if (vistos.has(clave)){ vistos.get(clave).u = (vistos.get(clave).u||0) + (item.u||0); return false; }
+    vistos.set(clave, item); return true;
+  });
+});
+PERSONAS.forEach(p => { if (!Array.isArray(DB.palabras[p])) DB.palabras[p] = []; });
 DB.items.forEach(it => {
   if (typeof it.exportado !== 'boolean') it.exportado = false;
   if (typeof it.tocadoTrasExport !== 'boolean') it.tocadoTrasExport = false;
 });
 
-// Ignora mayúsculas, acentos Y puntuación. Así "COOP." y "COOP" (o
-// "S.A." y "SA") se reconocen como el mismo comercio y no se duplican.
-const normNom = s => (s||'').toLowerCase().normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}\s]/gu,'')
-  .replace(/\s+/g,' ').trim();
-
-// Los comercios pasan de ser una lista de nombres a llevar contador de uso,
-// para poder mostrar los frecuentes primero. Si venían como texto suelto,
-// se reconstruye el contador leyendo las facturas ya cargadas.
-PERSONAS.forEach(p => {
-  const lista = Array.isArray(DB.locales[p]) ? DB.locales[p] : [];
-  DB.locales[p] = lista.map(x => (typeof x === 'string' ? { n: x, u: 0 } : x))
-                       .filter(x => x && x.n);
-});
-DB.items.forEach(it => {
-  if (!it.local) return;
-  const lista = Array.isArray(DB.locales[it.colaborador]) ? DB.locales[it.colaborador] : (DB.locales[it.colaborador] = []);
-  const hallado = lista.find(x => normNom(x.n) === normNom(it.local));
-  if (hallado) hallado.u = (hallado.u || 0) + 1;
-  else lista.push({ n: it.local, u: 1 });
-});
-
-// Fusiona duplicados que ya existan por diferencias de puntuación
-// (ej: "COOP CHORTIZER LTDA" y "COOP. CHORTIZER LTDA"), sumando sus usos.
-PERSONAS.forEach(p => {
-  const lista = DB.locales[p];
-  const vistos = new Map();
-  DB.locales[p] = lista.filter(item => {
-    const clave = normNom(item.n);
-    if (vistos.has(clave)){
-      vistos.get(clave).u = (vistos.get(clave).u || 0) + (item.u || 0);
-      return false;
-    }
-    vistos.set(clave, item);
-    return true;
-  });
-});
-
 const guardarDB = () => Store.set(KEY, JSON.stringify(DB));
-
-function localesDe(col){
-  if (!Array.isArray(DB.locales[col])) DB.locales[col] = [];
-  return DB.locales[col];
-}
-function palabrasDe(col){
-  if (!Array.isArray(DB.palabras[col])) DB.palabras[col] = [];
-  return DB.palabras[col];
-}
-
-// Suma un uso al comercio, o lo crea si es nuevo.
-// Si ya existe, se conserva la grafía guardada: escribir "gomeria chaco"
-// no debe pisar el "Gomería Chaco" que ya estaba bien escrito.
+function localesDe(col){ if (!Array.isArray(DB.locales[col])) DB.locales[col] = []; return DB.locales[col]; }
+function palabrasDe(col){ if (!Array.isArray(DB.palabras[col])) DB.palabras[col] = []; return DB.palabras[col]; }
 function registrarLocal(col, nombre){
-  nombre = (nombre||'').trim();
-  if (!nombre) return;
+  nombre = (nombre||'').trim(); if (!nombre) return;
   const lista = localesDe(col);
-  const hallado = lista.find(x => normNom(x.n) === normNom(nombre));
-  if (hallado) hallado.u = (hallado.u || 0) + 1;
-  else lista.push({ n: nombre, u: 1 });
+  const h = lista.find(x => normNom(x.n) === normNom(nombre));
+  if (h) h.u = (h.u||0)+1; else lista.push({n:nombre, u:1});
 }
-
-// Iniciales para el monograma: "Coop. Fernheim" → "CF"
 function iniciales(nombre){
-  const palabras = (nombre||'').replace(/[^\p{L}\p{N}\s]/gu,' ')
-    .split(/\s+/).filter(w => w.length > 1);
-  if (!palabras.length) return (nombre||'?').slice(0,2).toUpperCase();
-  return palabras.slice(0,2).map(w => w[0]).join('').toUpperCase();
+  const p = (nombre||'').replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(w=>w.length>1);
+  if (!p.length) return (nombre||'?').slice(0,2).toUpperCase();
+  return p.slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
-
-/* ═══════════════════════════════════════════════════════
-   CATEGORÍAS Y SUGERENCIA
-   El diccionario ya no maneja la carga: solo sugiere una
-   categoría cuando reconoce una palabra en el detalle.
-   ═══════════════════════════════════════════════════════ */
-const CATEGORIAS = ['Combustível','Refeição','Manutenção','Hotel','Passagem','Outros'];
 
 const DICC = {
   'Combustível':['gasoil','gas oil','gasoíl','diesel','diésel','nafta','gasolina','combustible',
@@ -759,988 +845,768 @@ const DICC = {
   'Outros':['farmacia','remedio','medicamento','papeleria','papelería','oficina','limpieza',
     'celular','recarga','internet']
 };
-
-const norm = s => (s||'').toLowerCase().normalize('NFD')
-  .replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
-
+const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
 function sugerirCategoria(txt){
-  const t = ' ' + norm(txt) + ' ';
-  let mejor = null, largo = 0;
-  for (const cat in DICC)
-    for (const p of DICC[cat]){
-      const np = norm(p);
-      if (t.includes(' ' + np) && np.length > largo){ mejor = cat; largo = np.length; }
-    }
+  const t = ' ' + norm(txt) + ' '; let mejor=null, largo=0;
+  for (const cat in DICC) for (const p of DICC[cat]){
+    const np = norm(p);
+    if (t.includes(' '+np) && np.length>largo){ mejor=cat; largo=np.length; }
+  }
   return mejor;
 }
+function icoCat(cat){
+  const p = {
+    'Combustível':'<path d="M14 20V6a2 2 0 00-2-2H6a2 2 0 00-2 2v14M3 20h12M7 9h4"/><path d="M17 9l2.5 2.5V17a1.5 1.5 0 003 0v-6l-3-3"/>',
+    'Refeição':'<path d="M6 3v8a2 2 0 004 0V3M8 11v10"/><path d="M17 3c-1.5 1.5-2 3-2 5s.5 3 2 3v10"/>',
+    'Manutenção':'<path d="M14.7 6.3a4 4 0 01-5.3 5.3L4 17v3h3l5.4-5.4a4 4 0 015.3-5.3l-2.6 2.6-1.4-1.4z"/>',
+    'Hotel':'<path d="M3 20V8l9-5 9 5v12"/><path d="M9 20v-6h6v6"/>',
+    'Passagem':'<path d="M2 12a3 3 0 013-3h14a3 3 0 010 6H5a3 3 0 01-3-3z"/><path d="M9 9v6M15 9v6"/>',
+    'Outros':'<circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/><circle cx="6" cy="12" r="1.6"/>'
+  };
+  return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+(p[cat]||p['Outros'])+'</svg>';
+}
 
-/* ═══════════════════════════════════════════════════════
-   ESTADO
-   ═══════════════════════════════════════════════════════ */
-const $  = s => document.querySelector(s);
+const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
-const MESNOM = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto',
-  'Septiembre','Octubre','Noviembre','Diciembre'];
-// Abreviados solo para el desplegable del encabezado, donde el espacio es corto
-const MESCORTO = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
 const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n||0));
-const isoHoy = () => new Date().toISOString().slice(0,10);
 
-let colaborador = 'LAURO ZIMMER';
-let digitos = '';
-let categoria = null;
-let editandoId = null;
-
-/* ═══════════════════════════════════════════════════════
-   NAVEGACIÓN Y AVISOS
-   ═══════════════════════════════════════════════════════ */
-function ir(id){
-  $$('.vista').forEach(v => v.classList.toggle('on', v.id === id));
-  const c = $('#vDetalle .cuerpo'); if (c) c.scrollTop = 0;
+let colaborador = null;
+let mesActual = 8, anoActual = 2026;
+{
+  const hoy = new Date();
+  mesActual = hoy.getMonth()+1; anoActual = hoy.getFullYear();
 }
 
-/* Mientras haya cualquier panel abierto (selector, editar, palabras,
-   confirmaciones), el fondo no debe scrollear. Se cuenta cuántos hay
-   abiertos por si uno se abre encima de otro (editar sobre el selector). */
-let panelesAbiertos = 0;
-function abrirPanel(id){
-  $(id).classList.add('on');
-  panelesAbiertos++;
-  document.documentElement.classList.add('sinScroll');
+function fechaCorta(iso){
+  if (!iso) return '—';
+  const [a,m,d] = iso.split('-');
+  return d+' '+MESCORTO[+m-1]+' '+a;
 }
-function cerrarPanel(id){
-  $(id).classList.remove('on');
-  panelesAbiertos = Math.max(0, panelesAbiertos - 1);
-  if (panelesAbiertos === 0) document.documentElement.classList.remove('sinScroll');
-}
+function periodoTxt(){ return MESNOM[mesActual-1]+' '+anoActual; }
 
-/* Tres tipos de aviso, con el mismo lenguaje visual que los paneles:
-   ok (confirmación), alerta (algo para revisar), info (neutro). */
 const ICONOS = {
-  ok:     '<path d="M20 6L9 17l-5-5"/>',
-  alerta: '<path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/>',
-  info:   '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>'
+  ok:'<path d="M20 6L9 17l-5-5"/>',
+  alerta:'<path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L14.7 3.9a2 2 0 00-3.4 0z"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/>'
 };
-
 function aviso(msg, tipo, ms){
   tipo = tipo || 'info';
   const a = $('#aviso');
   $('#avisoIcono').innerHTML = ICONOS[tipo] || ICONOS.info;
   $('#avisoTxt').textContent = msg;
-  a.classList.remove('ok','alerta');
-  if (tipo !== 'info') a.classList.add(tipo);
+  a.classList.remove('ok','alerta'); if (tipo!=='info') a.classList.add(tipo);
   a.classList.add('on');
-  clearTimeout(a._t);
-  a._t = setTimeout(() => a.classList.remove('on'), ms || (tipo === 'alerta' ? 4500 : 2400));
+  clearTimeout(a._t); a._t = setTimeout(()=>a.classList.remove('on'), ms || (tipo==='alerta'?4500:2400));
 }
-$('#aviso').addEventListener('click', () => {
-  $('#aviso').classList.remove('on');
-  clearTimeout($('#aviso')._t);
-});
+$('#aviso').addEventListener('click', () => { $('#aviso').classList.remove('on'); clearTimeout($('#aviso')._t); });
+
+let panelesAbiertos = 0;
+function abrirPanel(id){ $(id).classList.add('on'); panelesAbiertos++; document.documentElement.classList.add('sinScroll'); }
+function cerrarPanel(id){ $(id).classList.remove('on'); panelesAbiertos=Math.max(0,panelesAbiertos-1);
+  if (panelesAbiertos===0) document.documentElement.classList.remove('sinScroll'); }
 
 function preguntar(titulo, texto, alConfirmar){
-  $('#cTit').textContent = titulo;
-  $('#cTxt').textContent = texto;
+  $('#cTit').textContent = titulo; $('#cTxt').textContent = texto;
   abrirPanel('#confirm');
   $('#cSi').onclick = () => { cerrarPanel('#confirm'); alConfirmar(); };
   $('#cNo').onclick = () => cerrarPanel('#confirm');
 }
 
-/* ═══════════════════════════════════════════════════════
-   ARRANQUE
-   ═══════════════════════════════════════════════════════ */
-(function(){
-  const hoy = new Date();
-  MESCORTO.forEach((m,i) => $('#mes').add(new Option(m, i+1)));
-  for (let y = hoy.getFullYear()-1; y <= hoy.getFullYear()+1; y++) $('#ano').add(new Option(y,y));
-  $('#mes').value = hoy.getMonth()+1;
-  $('#ano').value = hoy.getFullYear();
+const PANTALLAS_NAV = ['pInicio','pComprobantes','pEstadisticas','pMas'];
+function ir(id, marcarNav){
+  $$('.pantalla').forEach(p => p.classList.toggle('on', p.id===id));
+  const esPrincipal = PANTALLAS_NAV.includes(id);
+  $('#nav').style.display = esPrincipal ? 'grid' : 'none';
+  const objetivo = marcarNav || id;
+  $$('#nav button').forEach(b => b.setAttribute('aria-current', b.dataset.nav===objetivo ? 'page' : 'false'));
+  const sc = document.querySelector('#'+id+' .scroll'); if (sc) sc.scrollTop = 0;
+}
+$$('#nav button').forEach(b => b.onclick = () => ir(b.dataset.nav));
 
-  $('#tiles').innerHTML = CATEGORIAS.map(c =>
-    `<button type="button" class="tile" data-c="${c}" aria-pressed="false">${c}</button>`).join('');
-  $$('.tile').forEach(b => b.onclick = () => elegirCategoria(b.dataset.c));
-})();
-
-/* La app arranca SIEMPRE preguntando quién la va a usar. Sin valor por
-   defecto: así nadie carga facturas a nombre de otro sin darse cuenta. */
 function elegirColaborador(p){
   colaborador = p;
-  $$('#quien button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.p === p)));
-  $('#qFiltro').value = '';
-  $('#barraFiltro').classList.remove('on');
-  $('#bFiltro').classList.remove('bFiltro-activo');
-  pintarHome();
-  pintarPalabras();
-  ir('vHome');
+  $$('#usuarios .pill').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.u===p)));
+  pintarTodo(); pintarPalabras();
+  $('#perfilNombre').textContent = p;
 }
+$$('#elegirLista button').forEach(b => b.onclick = () => {
+  elegirColaborador(b.dataset.p);
+  ir('pInicio');
+});
+$('#cambiarUsuario').onclick = () => ir('pElegir');
 
-$$('#elegirLista button').forEach(b => b.onclick = () => elegirColaborador(b.dataset.p));
-
-$$('#quien button').forEach(b => b.onclick = () => elegirColaborador(b.dataset.p));
-$('#mes').onchange = $('#ano').onchange = pintarHome;
-
-/* ═══════════════════════════════════════════════════════
-   PASO 1 · TECLADO DEL MONTO
-   ═══════════════════════════════════════════════════════ */
-function pintarMonto(){
-  const v = parseInt(digitos || '0', 10);
-  const p = $('#pantalla');
-  p.textContent = fmt(v);
-  p.classList.toggle('cero', v === 0);
-  $('#bPaso2').disabled = v <= 0;
+function pintarSelPeriodo(){
+  $('#btnMes').textContent = MESCORTO[mesActual-1];
+  $('#btnAno').textContent = anoActual;
 }
-
-/* Toque corto en borrar quita un dígito; mantenerlo presionado limpia todo. */
-(function borrado(){
-  const bDel = $('#pad').querySelector('[data-k="del"]');
-  let temporizador = null, seLimpioTodo = false;
-
-  const limpiarTodo = () => {
-    seLimpioTodo = true;
-    digitos = '';
-    pintarMonto();
-    if (navigator.vibrate) navigator.vibrate(35);
-  };
-
-  const empezar = () => {
-    seLimpioTodo = false;
-    clearTimeout(temporizador);
-    temporizador = setTimeout(limpiarTodo, 550);
-  };
-  const soltar = () => clearTimeout(temporizador);
-
-  bDel.addEventListener('touchstart', empezar, {passive:true});
-  bDel.addEventListener('touchend', soltar);
-  bDel.addEventListener('touchcancel', soltar);
-  bDel.addEventListener('mousedown', empezar);
-  bDel.addEventListener('mouseup', soltar);
-  bDel.addEventListener('mouseleave', soltar);
-
-  bDel.dataset.limpioTodo = '0';
-  bDel._fueLimpieza = () => seLimpioTodo;
-})();
-
-$('#pad').onclick = e => {
-  const b = e.target.closest('button'); if (!b) return;
-  const k = b.dataset.k;
-  // si el toque largo ya limpió todo, este clic no debe borrar de nuevo
-  if (k === 'del' && b._fueLimpieza && b._fueLimpieza()) return;
-  if (k === 'del')     digitos = digitos.slice(0, -1);
-  else if (k === '00') digitos = digitos ? (digitos + '00').slice(0,12) : '';
-  else                 digitos = (digitos + k).replace(/^0+/,'').slice(0,12);
-  pintarMonto();
+$('#btnMes').onclick = () => {
+  $('#listaMeses').innerHTML = MESNOM.map((m,i) =>
+    '<button class="opt" data-m="'+(i+1)+'" aria-pressed="'+(i+1===mesActual)+'">'+
+      '<span class="t">'+m+'</span>'+
+      '<span class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>'+
+    '</button>').join('');
+  $$('#listaMeses .opt').forEach(b => b.onclick = () => {
+    mesActual = +b.dataset.m; cerrarVelo('#velaMes'); pintarSelPeriodo(); pintarTodo();
+  });
+  abrirVelo('#velaMes');
+};
+$('#btnAno').onclick = () => {
+  const hoy = new Date().getFullYear();
+  const anios = [hoy-1, hoy, hoy+1];
+  $('#listaAnios').innerHTML = anios.map(a =>
+    '<button class="opt" data-a="'+a+'" aria-pressed="'+(a===anoActual)+'">'+
+      '<span class="t">'+a+'</span>'+
+      '<span class="check"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span>'+
+    '</button>').join('');
+  $$('#listaAnios .opt').forEach(b => b.onclick = () => {
+    anoActual = +b.dataset.a; cerrarVelo('#velaAno'); pintarSelPeriodo(); pintarTodo();
+  });
+  abrirVelo('#velaAno');
 };
 
-/* ═══════════════════════════════════════════════════════
-   PASO 2 · DETALLES
-   ═══════════════════════════════════════════════════════ */
-function elegirCategoria(c){
-  categoria = c;
-  $$('.tile').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === c)));
-  $('#sugCat').innerHTML = '';
-  revisarGuardar();
+function pintarUsuarios(){
+  $('#usuarios').innerHTML = PERSONAS.map(p =>
+    '<button class="pill" data-u="'+p+'" aria-pressed="'+(p===colaborador)+'">'+
+      '<span class="ini">'+iniciales(p)+'</span>'+p.split(' ')[0]+
+    '</button>').join('');
+  $$('#usuarios .pill').forEach(b => b.onclick = () => {
+    if (b.dataset.u === colaborador) return;
+    elegirColaborador(b.dataset.u);
+    aviso('Ahora estás en '+b.dataset.u.split(' ')[0]);
+  });
 }
 
-/* ── Fecha en tres casillas: se salta sola de una a otra ── */
-const CD = () => $('#fD'), CM = () => $('#fM'), CA = () => $('#fA');
+function delPeriodo(){
+  return DB.items.filter(i => i.colaborador===colaborador && i.mes===mesActual && i.ano===anoActual)
+    .sort((a,b) => (b.data||'').localeCompare(a.data||'') || b.id-a.id);
+}
 
-function ponerFecha(iso){
-  if (!iso){ CD().value = CM().value = CA().value = ''; }
-  else {
-    const [y,m,d] = iso.split('-');
-    CD().value = d; CM().value = m; CA().value = y;
+function tarjeta(f){
+  const dup = f.tagDup ? '<span class="tagEdit">Posible duplicado</span>' : '';
+  return '<button class="card" data-id="'+f.id+'">'+
+    '<div class="card-top"><span class="cat-ico">'+icoCat(f.despesa)+'</span>'+
+      '<span class="head"><span class="cat">'+f.despesa+dup+'</span>'+
+      '<div class="prov">'+(f.local||'—')+'</div>'+
+      '<div class="meta">'+(f.nf?'NF '+f.nf+' · ':'')+fechaCorta(f.data)+'</div></span></div>'+
+    (f.obs ? '<p class="desc">'+f.obs.replace(/</g,'&lt;')+'</p>' : '')+
+    '<div class="card-pie"><span class="badge '+(f.exportado?'ok':'pend')+'">'+
+      (f.exportado ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Exportada' : 'Pendiente')+
+    '</span><span class="monto"><span>G$</span>'+fmt(f.valor)+'</span></div></button>';
+}
+function engancharTarjetas(sel){ $$(sel+' .card').forEach(c => c.onclick = () => abrirDetalle(+c.dataset.id)); }
+
+let totalPrevio = 0;
+function animarNumero(el, desde, hasta, ms){
+  ms = ms || 480;
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches){ el.textContent = fmt(hasta); return; }
+  const t0 = performance.now();
+  (function paso(t){
+    const p = Math.min((t-t0)/ms,1); const s = 1-Math.pow(1-p,3);
+    el.textContent = fmt(desde+(hasta-desde)*s);
+    if (p<1) requestAnimationFrame(paso);
+  })(t0);
+}
+
+function pintarInicio(){
+  const arr = delPeriodo();
+  const total = arr.reduce((s,f)=>s+f.valor,0);
+  const pend = arr.filter(f=>!f.exportado).length;
+  animarNumero($('#totalNum'), totalPrevio, total); totalPrevio = total;
+  $('#totalSub').textContent = arr.length+' comprobante'+(arr.length===1?'':'s');
+  pintarSelPeriodo();
+
+  const est = $('#totalEstado');
+  est.classList.toggle('amb', pend>0);
+  $('#totalEstadoTxt').textContent = pend>0 ? (pend+' sin exportar') : (arr.length?'Todo registrado':'Sin movimientos');
+
+  const banda = $('#banda'); banda.classList.remove('amb');
+  if (pend>0){
+    banda.classList.add('amb');
+    $('#bandaIco').innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5l3 2"/></svg>';
+    $('#bandaT').textContent = 'Pendientes · '+pend; $('#bandaD').textContent = 'Esperando exportación';
+  } else {
+    $('#bandaIco').innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    $('#bandaT').textContent = 'Pendientes · 0'; $('#bandaD').textContent = arr.length?'Todo está al día':'Todavía no cargaste nada';
   }
+
+  $('#tituloLista').textContent = pend>0 ? 'Últimos comprobantes' : 'Comprobantes exportados';
+  $('#listaInicio').innerHTML = arr.length ? arr.slice(0,4).map(tarjeta).join('') :
+    '<div class="vacio"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h7M9 17h5"/></svg></div>'+
+      '<h3>Sin comprobantes</h3><p>Cargá la primera factura de '+periodoTxt()+' y va a aparecer acá.</p>'+
+      '<button class="btn btn-oro" id="btnNuevaVacio">Nueva factura</button></div>';
+  $('#verTodos').style.display = arr.length ? 'block' : 'none';
+  engancharTarjetas('#listaInicio');
+  const bVacio = $('#btnNuevaVacio'); if (bVacio) bVacio.onclick = abrirFormularioNuevo;
+}
+
+let filtroLista = 'todas';
+function pintarComprobantes(){
+  const q = norm(($('#qLista')?$('#qLista').value:'').trim());
+  let arr = delPeriodo();
+  if (filtroLista==='pendiente') arr = arr.filter(f=>!f.exportado);
+  if (filtroLista==='exportada') arr = arr.filter(f=>f.exportado);
+  if (q) arr = arr.filter(f => norm(f.local).includes(q) || (f.nf||'').includes(q) || norm(f.obs).includes(q));
+  $('#listaComprobantes').innerHTML = arr.length ? arr.map(tarjeta).join('') :
+    '<div class="vacio"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>'+
+    '<h3>Nada por acá</h3><p>Probá con otro texto o cambiá el filtro.</p></div>';
+  engancharTarjetas('#listaComprobantes');
+}
+$('#qLista').addEventListener('input', pintarComprobantes);
+$$('#chipsEstado .chip').forEach(c => c.onclick = () => {
+  filtroLista = c.dataset.f;
+  $$('#chipsEstado .chip').forEach(x => x.setAttribute('aria-pressed', String(x===c)));
+  pintarComprobantes();
+});
+$('#verTodos').onclick = () => ir('pComprobantes');
+$('#btnBuscar').onclick = function(){ ir('pBuscar','pComprobantes'); };
+$('#abrirBuscador').onclick = function(){ ir('pBuscar','pComprobantes'); };
+
+let detalleId = null;
+function abrirDetalle(id){
+  const f = DB.items.find(x=>x.id===id); if (!f) return;
+  detalleId = id;
+  $('#dMonto').textContent = fmt(f.valor);
+  $('#dProv').textContent = f.local || '—';
+  $('#dCat').textContent = f.despesa;
+  $('#dNF').textContent = f.nf || '—';
+  $('#dData').textContent = fechaCorta(f.data);
+  $('#dObs').textContent = f.obs || '—';
+  const b = $('#dBadge'); b.className = 'badge '+(f.exportado?'ok':'pend');
+  b.textContent = f.exportado ? 'Exportada' : 'Pendiente';
+  ir('pDetalle','pComprobantes');
+}
+$('#salirDetalle').onclick = () => ir('pComprobantes');
+$('#btnEliminarDet').onclick = () => {
+  preguntar('Eliminar factura', 'Esta acción no se puede deshacer.', () => {
+    DB.items = DB.items.filter(x => x.id !== detalleId);
+    guardarDB(); pintarTodo(); ir('pComprobantes'); aviso('Factura eliminada','ok');
+  });
+};
+$('#btnEditarDet').onclick = () => { abrirFormulario(DB.items.find(x=>x.id===detalleId)); };
+
+let pasoActual = 1, editandoId = null;
+let borrador = {despesa:null, local:'', nf:'', data:'', valor:0, obs:''};
+
+$('#tilesCat').innerHTML = CATEGORIAS.map(c => '<button class="tile" data-c="'+c+'" aria-pressed="false">'+c+'</button>').join('');
+$$('#tilesCat .tile').forEach(t => t.onclick = () => {
+  borrador.despesa = t.dataset.c;
+  $$('#tilesCat .tile').forEach(x => x.setAttribute('aria-pressed', String(x===t)));
+  $('#sugCat').innerHTML = '';
+  revisarPaso();
+});
+
+$('#fValor').addEventListener('input', e => {
+  const n = e.target.value.replace(/\D/g,'');
+  e.target.value = n ? 'G$ ' + fmt(parseInt(n,10)) : '';
+  borrador.valor = parseInt(n||'0',10);
+  revisarPaso();
+});
+$('#fNF').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g,'').slice(0,13); borrador.nf = e.target.value; });
+$('#fObs').addEventListener('input', e => {
+  borrador.obs = e.target.value; $('#cuenta').textContent = e.target.value.length;
+  if (!borrador.despesa){
+    const s = sugerirCategoria(e.target.value);
+    $('#sugCat').innerHTML = s ? '<div class="chips" style="padding:0"><button class="chip sug" type="button" style="border-color:var(--oro);color:var(--oro)">¿Es '+s+'? · tocá para aplicar</button></div>' : '';
+    const b = $('#sugCat .chip'); if (b) b.onclick = () => {
+      borrador.despesa = s;
+      $$('#tilesCat .tile').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.c===s)));
+      $('#sugCat').innerHTML = ''; revisarPaso();
+    };
+  }
+});
+
+const CD=function(){return $('#fD');}, CM=function(){return $('#fM');}, CA=function(){return $('#fA');};
+function fechaISO(){
+  const dd=+CD().value, mm=+CM().value, yy=+CA().value;
+  if (!CD().value || !CM().value || CA().value.length!==4) return null;
+  if (mm<1||mm>12||dd<1||yy<2000||yy>2100) return null;
+  const f = new Date(yy,mm-1,dd);
+  if (f.getFullYear()!==yy||f.getMonth()!==mm-1||f.getDate()!==dd) return null;
+  return yy+'-'+String(mm).padStart(2,'0')+'-'+String(dd).padStart(2,'0');
+}
+function ponerFecha(iso){
+  if (!iso){ CD().value=CM().value=CA().value=''; }
+  else { const p=iso.split('-'); CD().value=p[2]; CM().value=p[1]; CA().value=p[0]; }
   marcarFecha();
 }
-
-function fechaISO(){
-  const dd = +CD().value, mm = +CM().value, yy = +CA().value;
-  if (!CD().value || !CM().value || CA().value.length !== 4) return null;
-  if (mm < 1 || mm > 12 || dd < 1 || yy < 2000 || yy > 2100) return null;
-  const f = new Date(yy, mm-1, dd);
-  if (f.getFullYear() !== yy || f.getMonth() !== mm-1 || f.getDate() !== dd) return null;
-  return `${yy}-${String(mm).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
-}
-
 function marcarFecha(){
-  const completa = CD().value.length >= 1 && CM().value.length >= 1 && CA().value.length === 4;
+  const completa = CD().value.length>=1 && CM().value.length>=1 && CA().value.length===4;
   const mala = completa && !fechaISO();
   $('#fecha3').classList.toggle('mal', mala);
   $('#errFecha').classList.toggle('on', mala);
 }
-
-function limpiarErrorFecha(){
-  $('#fecha3').classList.remove('mal');
-  $('#errFecha').classList.remove('on');
-}
-
 (function armarFecha(){
-  const cajas = [CD(), CM(), CA()];
-
-  // El cursor va al final sin seleccionar texto. Seleccionar dispara la
-  // barra de Cortar/Copiar/Pegar de Android, que tapa la pantalla.
-  const alFinal = c => {
-    try { c.setSelectionRange(c.value.length, c.value.length); } catch(e){}
-  };
-
-  cajas.forEach((c, i) => {
-    c.addEventListener('focus', () => {
-      c.dataset.recienEntro = '1';   // el próximo dígito reemplaza lo que había
-      alFinal(c);
+  const cajas=[CD(),CM(),CA()];
+  const alFinal = function(c){ try{ c.setSelectionRange(c.value.length,c.value.length);}catch(e){} };
+  cajas.forEach((c,i) => {
+    c.addEventListener('focus', function(){ c.dataset.recienEntro='1'; alFinal(c); });
+    c.addEventListener('keydown', function(e){
+      if (/^[0-9]$/.test(e.key) && c.dataset.recienEntro==='1'){ c.value=''; c.dataset.recienEntro='0'; }
+      if (e.key==='Backspace'){ c.dataset.recienEntro='0';
+        if (!c.value && cajas[i-1]){ cajas[i-1].focus(); alFinal(cajas[i-1]); } }
     });
-
-    c.addEventListener('keydown', e => {
-      // Sin selección visible, pero se comporta como si estuviera todo elegido:
-      // al escribir el primer dígito se limpia lo anterior.
-      if (/^[0-9]$/.test(e.key) && c.dataset.recienEntro === '1'){
-        c.value = '';
-        c.dataset.recienEntro = '0';
-      }
-      if (e.key === 'Backspace'){
-        c.dataset.recienEntro = '0';
-        if (!c.value && cajas[i-1]){
-          cajas[i-1].focus();
-          alFinal(cajas[i-1]);
-        }
-      }
+    c.addEventListener('input', function(){
+      c.dataset.recienEntro='0';
+      c.value = c.value.replace(/\D/g,'').slice(0,+c.maxLength);
+      if (c.value.length===+c.maxLength && cajas[i+1]){ cajas[i+1].focus(); alFinal(cajas[i+1]); }
+      marcarFecha(); revisarPaso();
     });
-
-    c.addEventListener('input', () => {
-      c.dataset.recienEntro = '0';
-      c.value = c.value.replace(/\D/g,'').slice(0, +c.maxLength);
-      if (c.value.length === +c.maxLength && cajas[i+1]){
-        cajas[i+1].focus();
-        alFinal(cajas[i+1]);
-      }
-      marcarFecha(); revisarGuardar();
+    c.addEventListener('blur', function(){
+      c.dataset.recienEntro='0';
+      if (c!==CA() && c.value.length===1) c.value='0'+c.value;
+      marcarFecha(); revisarPaso();
     });
-
-    c.addEventListener('blur', () => {
-      c.dataset.recienEntro = '0';
-      // completa a dos dígitos: si escribió 7, queda 07
-      if (c !== CA() && c.value.length === 1) c.value = '0' + c.value;
-      marcarFecha(); revisarGuardar();
-    });
-
-    // Evita el menú contextual de Android sobre las casillas
-    c.addEventListener('contextmenu', e => e.preventDefault());
+    c.addEventListener('contextmenu', function(e){ e.preventDefault(); });
   });
 })();
 
-function revisarGuardar(){
-  $('#bGuardar').disabled = !(categoria && parseInt(digitos||'0',10) > 0 && fechaISO());
+function verPaso(n){
+  pasoActual = n;
+  $$('.sub-paso').forEach(s => s.style.display = (+s.dataset.paso===n) ? 'block' : 'none');
+  $$('#pasos .paso').forEach(p => {
+    const i=+p.dataset.p;
+    p.classList.toggle('activo', i===n); p.classList.toggle('hecho', i<n);
+    p.querySelector('.n').textContent = i<n ? '✓' : i;
+  });
+  $('#btnPasoAtras').style.display = n>1 ? 'flex' : 'none';
+  $('#btnPasoSig').childNodes[0].textContent = n===3 ? 'Guardar factura ' : 'Continuar ';
+  if (n===3){
+    $('#cfValor').textContent = fmt(borrador.valor);
+    $('#cfProv').textContent = borrador.local || '—';
+    $('#cfCat').textContent = borrador.despesa || '—';
+    $('#cfNF').textContent = borrador.nf || '—';
+    $('#cfData').textContent = fechaCorta(fechaISO());
+    $('#cfObs').textContent = borrador.obs || '—';
+  }
+  revisarPaso();
+}
+function revisarPaso(){
+  let ok = true;
+  if (pasoActual===1) ok = !!(borrador.despesa && borrador.local.trim() && fechaISO());
+  if (pasoActual===2) ok = borrador.valor > 0;
+  $('#btnPasoSig').disabled = !ok;
 }
 
-/* ═══════════════════════════════════════════════════════
-   SELECTOR DE COMERCIOS
-   Un solo lugar: el mismo panel busca, muestra los
-   frecuentes y permite crear uno nuevo. Sin acentos ni
-   mayúsculas para buscar, y ordenado por uso real.
-   ═══════════════════════════════════════════════════════ */
-let localElegido = '';
+function abrirFormularioNuevo(){
+  editandoId = null;
+  borrador = {despesa:null, local:'', nf:'', data:'', valor:0, obs:''};
+  $('#tituloNueva').textContent = 'Nueva factura';
+  $('#fNF').value=''; $('#fValor').value=''; $('#fObs').value=''; $('#cuenta').textContent='0';
+  ponerLocal('');
+  ponerFecha(new Date().toISOString().slice(0,10));
+  $$('#tilesCat .tile').forEach(x => x.setAttribute('aria-pressed','false'));
+  $('#sugCat').innerHTML='';
+  verPaso(1);
+  ir('pNueva','pInicio');
+}
+function abrirFormulario(f){
+  if (!f) return;
+  editandoId = f.id;
+  borrador = {despesa:f.despesa, local:f.local||'', nf:f.nf||'', data:f.data, valor:f.valor, obs:f.obs||''};
+  $('#tituloNueva').textContent = 'Editar factura';
+  $('#fNF').value = borrador.nf;
+  $('#fValor').value = borrador.valor ? 'G$ '+fmt(borrador.valor) : '';
+  $('#fObs').value = borrador.obs; $('#cuenta').textContent = borrador.obs.length;
+  ponerLocal(borrador.local);
+  ponerFecha(borrador.data);
+  $$('#tilesCat .tile').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.c===borrador.despesa)));
+  $('#sugCat').innerHTML='';
+  verPaso(1);
+  ir('pNueva','pComprobantes');
+}
+$('#btnNueva').onclick = abrirFormularioNuevo;
+$('#salirNueva').onclick = () => ir(editandoId ? 'pComprobantes' : 'pInicio');
+$('#btnPasoAtras').onclick = () => verPaso(pasoActual-1);
 
+function buscarPosibleDuplicada(datos, idExcluir){
+  if (!datos.nf || !datos.local || !datos.valor) return null;
+  return DB.items.find(function(it){ return it.id!==idExcluir && it.colaborador===colaborador &&
+    it.mes===mesActual && it.ano===anoActual &&
+    it.nf===datos.nf && normNom(it.local)===normNom(datos.local) && it.valor===datos.valor; }) || null;
+}
+
+$('#btnPasoSig').onclick = () => {
+  if (pasoActual < 3){ verPaso(pasoActual+1); return; }
+  const datos = {
+    colaborador: colaborador, mes:mesActual, ano:anoActual,
+    despesa: borrador.despesa, local: localElegido.trim(), nf: borrador.nf,
+    data: fechaISO(), valor: borrador.valor, obs: borrador.obs.trim()
+  };
+  const duplicada = buscarPosibleDuplicada(datos, editandoId);
+
+  if (editandoId){
+    const i = DB.items.findIndex(function(x){return x.id===editandoId;});
+    if (i>=0){
+      const previo = DB.items[i];
+      const actualizado = Object.assign({}, previo, datos);
+      if (previo.exportado){ actualizado.exportado=true; actualizado.tocadoTrasExport=true; }
+      DB.items[i]=actualizado;
+    }
+    aviso('Factura modificada','ok');
+  } else {
+    DB.items.push(Object.assign({id:Date.now(), exportado:false, tocadoTrasExport:false}, datos));
+    aviso('Factura guardada','ok');
+  }
+  registrarLocal(colaborador, datos.local);
+  guardarDB(); pintarTodo();
+  ir(editandoId ? 'pComprobantes':'pInicio');
+
+  if (duplicada){
+    const fechaTxt = (duplicada.data||'').split('-').reverse().join('/');
+    setTimeout(function(){ aviso(
+      'Parece repetida: ya hay una factura NF '+duplicada.nf+' en '+duplicada.local+', '+fechaTxt+', por G$ '+fmt(duplicada.valor),
+      'alerta', 5000); }, 900);
+  }
+};
+
+let localElegido = '';
 function ponerLocal(nombre){
   localElegido = (nombre||'').trim();
   const b = $('#bLocal');
   b.classList.toggle('puesto', !!localElegido);
   $('#lMono').textContent = localElegido ? iniciales(localElegido) : '—';
-  $('#lTxt').textContent  = localElegido || 'Elegir comercio';
+  $('#lTxt').textContent = localElegido || 'Elegir comercio';
+  borrador.local = localElegido;
+  revisarPaso();
 }
-
 function filaLocal(item){
   const val = item.n.replace(/"/g,'&quot;');
-  return `<div class="filaLocal">
-      <button class="itemLocal" type="button" data-n="${val}">
-        <span class="mono">${iniciales(item.n)}</span>
-        <span class="nom">${item.n.replace(/</g,'&lt;')}</span>
-        ${item.u ? `<span class="uso">${item.u}</span>` : ''}
-      </button>
-      <button class="kebab" type="button" data-editar="${val}" aria-label="Editar comercio">⋮</button>
-    </div>`;
+  return '<div class="filaLocal"><button class="itemLocal" type="button" data-n="'+val+'">'+
+    '<span class="mo">'+iniciales(item.n)+'</span><span class="nom">'+item.n.replace(/</g,'&lt;')+'</span>'+
+    (item.u ? '<span class="uso">'+item.u+'</span>' : '')+
+    '</button><button class="kebab" type="button" data-editar="'+val+'">⋮</button></div>';
 }
-
 function pintarSelector(){
-  const escrito = $('#qLocal').value.trim();
-  const q = normNom(escrito);
-  const todos = localesDe(colaborador);
-  let html = '';
-
+  const escrito = $('#qLocal').value.trim(); const q = normNom(escrito);
+  const todos = localesDe(colaborador); let html='';
   if (!q){
-    const orden = [...todos].sort((a,b) => (b.u||0) - (a.u||0));
-    const frecuentes = orden.slice(0, 4).filter(x => (x.u||0) > 0);
-    const resto = orden.slice(frecuentes.length).sort((a,b) => a.n.localeCompare(b.n,'es'));
-
-    if (frecuentes.length){
-      html += `<div class="grupoLocal">Frecuentes</div>`;
-      html += frecuentes.map(filaLocal).join('');
-    }
-    if (resto.length){
-      html += `<div class="grupoLocal">Todos</div>`;
-      html += resto.map(filaLocal).join('');
-    }
-    if (!todos.length){
-      html = `<div class="sinRes">Todavía no cargaste ningún comercio.<br>Escribí el nombre acá arriba para crear el primero.</div>`;
-    }
+    const orden = todos.slice().sort(function(a,b){return (b.u||0)-(a.u||0);});
+    const frecuentes = orden.slice(0,4).filter(function(x){return (x.u||0)>0;});
+    const resto = orden.slice(frecuentes.length).sort(function(a,b){return a.n.localeCompare(b.n,'es');});
+    if (frecuentes.length){ html+='<div class="grupoLocal">Frecuentes</div>'+frecuentes.map(filaLocal).join(''); }
+    if (resto.length){ html+='<div class="grupoLocal">Todos</div>'+resto.map(filaLocal).join(''); }
+    if (!todos.length) html = '<div class="vacio"><p>Todavía no cargaste ningún comercio.<br>Escribí el nombre arriba para crear el primero.</p></div>';
   } else {
-    const hallados = todos.filter(x => normNom(x.n).includes(q))
-                          .sort((a,b) => (b.u||0) - (a.u||0));
+    const hallados = todos.filter(function(x){return normNom(x.n).includes(q);}).sort(function(a,b){return (b.u||0)-(a.u||0);});
     html += hallados.map(filaLocal).join('');
-
-    const exacto = todos.some(x => normNom(x.n) === q);
-    if (!exacto){
-      html += `<button class="itemLocal crear" type="button" data-nuevo="1">
-          <span class="mono">+</span>
-          <span class="nom">Crear «${escrito.replace(/</g,'&lt;')}»</span>
-        </button>`;
-    }
-    if (!hallados.length && exacto) html = `<div class="sinRes">Sin resultados</div>`;
+    const exacto = todos.some(function(x){return normNom(x.n)===q;});
+    if (!exacto) html += '<button class="itemLocal crear" type="button" data-nuevo="1"><span class="mo">+</span><span class="nom">Crear «'+escrito.replace(/</g,'&lt;')+'»</span></button>';
+    if (!hallados.length && exacto) html = '<div class="vacio"><p>Sin resultados</p></div>';
   }
-
   $('#resLocal').innerHTML = html;
-
-  $$('#resLocal .itemLocal').forEach(b => b.onclick = () => {
-    ponerLocal(b.dataset.nuevo ? $('#qLocal').value.trim() : b.dataset.n);
-    cerrarSelector();
-  });
-  $$('#resLocal .kebab').forEach(b => b.onclick = e => {
-    e.stopPropagation();
-    abrirEdicionLocal(b.dataset.editar);
-  });
+  $$('#resLocal .itemLocal').forEach(function(b){ b.onclick = function(){ ponerLocal(b.dataset.nuevo ? $('#qLocal').value.trim() : b.dataset.n); cerrarSelector(); }; });
+  $$('#resLocal .kebab').forEach(function(b){ b.onclick = function(e){ e.stopPropagation(); abrirEdicionLocal(b.dataset.editar); }; });
 }
-
-/* Editar o eliminar un comercio ya guardado. Renombrar no toca las
-   facturas ya cargadas con ese texto — solo cambia la sugerencia futura. */
 function abrirEdicionLocal(nombre){
   $('#accLocal').dataset.original = nombre;
   $('#accInput').value = nombre;
   abrirPanel('#accLocal');
-  setTimeout(() => $('#accInput').focus(), 100);   // sin seleccionar: evita el menú de Android
+  setTimeout(function(){ $('#accInput').focus(); }, 100);
 }
-
 $('#accCancelar').onclick = () => cerrarPanel('#accLocal');
-
 $('#accGuardar').onclick = () => {
   const original = $('#accLocal').dataset.original;
-  const nuevo = $('#accInput').value.trim();
-  if (!nuevo) return;
+  const nuevo = $('#accInput').value.trim(); if (!nuevo) return;
   const lista = localesDe(colaborador);
-  const iOriginal = lista.findIndex(x => x.n === original);
-  if (iOriginal < 0){ cerrarPanel('#accLocal'); return; }
-
-  const iIgual = lista.findIndex((x,i) => i !== iOriginal && normNom(x.n) === normNom(nuevo));
-  if (iIgual >= 0){
-    // El nuevo nombre coincide con otro que ya existía: se fusionan
-    lista[iIgual].u = (lista[iIgual].u || 0) + (lista[iOriginal].u || 0);
-    lista.splice(iOriginal, 1);
-  } else {
-    lista[iOriginal].n = nuevo;
-  }
-
-  if (localElegido === original) ponerLocal(nuevo);
-  guardarDB();
-  cerrarPanel('#accLocal');
-  pintarSelector();
-  aviso('Comercio actualizado', 'ok');
+  const iOriginal = lista.findIndex(function(x){return x.n===original;});
+  if (iOriginal<0){ cerrarPanel('#accLocal'); return; }
+  const iIgual = lista.findIndex(function(x,i){return i!==iOriginal && normNom(x.n)===normNom(nuevo);});
+  if (iIgual>=0){ lista[iIgual].u=(lista[iIgual].u||0)+(lista[iOriginal].u||0); lista.splice(iOriginal,1); }
+  else lista[iOriginal].n = nuevo;
+  if (localElegido===original) ponerLocal(nuevo);
+  guardarDB(); cerrarPanel('#accLocal'); pintarSelector(); aviso('Comercio actualizado','ok');
 };
-
 $('#accEliminar').onclick = () => {
   const original = $('#accLocal').dataset.original;
   cerrarPanel('#accLocal');
-  preguntar('Eliminar comercio',
-    `Se va a quitar «${original}» de la lista de comercios guardados. Las facturas que ya cargaste con ese nombre no se modifican.`,
-    () => {
-      const lista = localesDe(colaborador);
-      const i = lista.findIndex(x => x.n === original);
-      if (i >= 0) lista.splice(i, 1);
-      if (localElegido === original) ponerLocal('');
-      guardarDB();
-      pintarSelector();
-      aviso('Comercio eliminado', 'ok');
-    });
+  preguntar('Eliminar comercio', 'Se va a quitar «'+original+'» de la lista. Las facturas ya cargadas no se modifican.', function(){
+    const lista = localesDe(colaborador);
+    const i = lista.findIndex(function(x){return x.n===original;});
+    if (i>=0) lista.splice(i,1);
+    if (localElegido===original) ponerLocal('');
+    guardarDB(); pintarSelector(); aviso('Comercio eliminado','ok');
+  });
 };
-
-function abrirSelector(){
-  $('#qLocal').value = '';
-  pintarSelector();
-  abrirPanel('#hojaLocal');
-  ajustarAlturaPanelLocal();
-  setTimeout(() => $('#qLocal').focus(), 120);
-}
-
-function cerrarSelector(){
-  cerrarPanel('#hojaLocal');
-  $('#qLocal').blur();
-}
-
-// El teclado de Android reduce el área visible de la pantalla. Sin esto,
-// la lista de comercios quedaba tapada por el teclado en vez de mostrar
-// su propio scroll. Se ajusta la altura del panel a lo que realmente
-// queda visible por encima del teclado.
+function abrirSelector(){ $('#qLocal').value=''; pintarSelector(); abrirPanel('#hojaLocal'); ajustarAlturaPanelLocal();
+  setTimeout(function(){$('#qLocal').focus();}, 120); }
+function cerrarSelector(){ cerrarPanel('#hojaLocal'); $('#qLocal').blur(); }
 function ajustarAlturaPanelLocal(){
-  const vv = window.visualViewport;
-  const caja = $('#cajaLocal');
-  if (!vv || !caja) return;
-  caja.style.maxHeight = Math.round(vv.height * 0.94) + 'px';
+  const vv = window.visualViewport; const caja = $('#cajaLocal'); if (!vv||!caja) return;
+  caja.style.maxHeight = Math.round(vv.height*0.9)+'px';
 }
-if (window.visualViewport){
-  window.visualViewport.addEventListener('resize', ajustarAlturaPanelLocal);
-}
-
-$('#bLocal').onclick        = abrirSelector;
-$('#bCerrarLocal').onclick  = cerrarSelector;
+if (window.visualViewport) window.visualViewport.addEventListener('resize', ajustarAlturaPanelLocal);
+$('#bLocal').onclick = abrirSelector;
+$('#bCerrarLocal').onclick = cerrarSelector;
 $('#qLocal').addEventListener('input', pintarSelector);
-$('#hojaLocal').addEventListener('click', e => {
-  if (e.target === $('#hojaLocal')) cerrarSelector();
-});
+$('#hojaLocal').addEventListener('click', function(e){ if (e.target===$('#hojaLocal')) cerrarSelector(); });
 
-$('#obs').addEventListener('input', () => {
-  if (categoria){ $('#sugCat').innerHTML = ''; return; }
-  const s = sugerirCategoria($('#obs').value);
-  $('#sugCat').innerHTML = s
-    ? `<div class="chips" style="margin-top:10px"><button class="chip sug" type="button">¿Es ${s}?  ·  tocá para aplicar</button></div>`
-    : '';
-  const b = $('#sugCat .chip');
-  if (b) b.onclick = () => elegirCategoria(s);
-});
-
-/* ═══════════════════════════════════════════════════════
-   VOZ — solo para el detalle de la compra
-
-   La repetición se producía porque el texto se iba SUMANDO
-   en cada aviso del motor, y Android reenvía resultados ya
-   entregados. Ahora el texto de cada tanda se RECONSTRUYE
-   entero desde cero en cada aviso, así reenviar lo mismo no
-   agrega nada. Solo al cerrarse una tanda se pasa el texto
-   a firme y se arranca la siguiente.
-   ═══════════════════════════════════════════════════════ */
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, escuchando = false;
-let base = '';      // lo que ya había escrito antes de dictar
-let firme = '';     // tandas anteriores ya cerradas
-let tanda = '';     // tanda en curso
-
-/* ── Palabras enseñadas ──────────────────────────────────
-   El motor de voz de Chrome no aprende. Pero podemos
-   corregir su salida: cada vez que el usuario enseña que
-   "lo que escuchaste como X en realidad es Y", guardamos
-   el par y lo aplicamos a todo dictado posterior.
-   La comparación ignora mayúsculas y acentos.
-   ─────────────────────────────────────────────────────── */
 const VOCAL = {a:'aáàäâ', e:'eéèëê', i:'iíìïî', o:'oóòöô', u:'uúùüû', n:'nñ', c:'cç'};
-
 function patronTolerante(txt){
-  return txt.trim().split(/\s+/).map(palabra =>
-    [...palabra].map(ch => {
+  return txt.trim().split(/\s+/).map(function(palabra){
+    return [...palabra].map(function(ch){
       const b = ch.toLowerCase();
-      if (VOCAL[b]) return '[' + VOCAL[b] + VOCAL[b].toUpperCase() + ']';
-      return ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }).join('')
-  ).join('\\s+');
+      if (VOCAL[b]) return '['+VOCAL[b]+VOCAL[b].toUpperCase()+']';
+      return ch.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    }).join('');
+  }).join('\\s+');
 }
-
 function aplicarPalabras(txt){
   let s = txt;
-  for (const par of palabrasDe(colaborador)){
-    if (!par.de || !par.a) continue;
-    try {
-      const re = new RegExp('(^|[^\\p{L}\\p{N}])(' + patronTolerante(par.de) + ')(?![\\p{L}\\p{N}])', 'giu');
-      s = s.replace(re, (m, antes) => antes + par.a);
-    } catch(e){}
-  }
+  palabrasDe(colaborador).forEach(function(par){
+    if (!par.de||!par.a) return;
+    try{
+      const re = new RegExp('(^|[^\\p{L}\\p{N}])('+patronTolerante(par.de)+')(?![\\p{L}\\p{N}])','giu');
+      s = s.replace(re, function(m,antes){ return antes+par.a; });
+    }catch(e){}
+  });
   return s;
 }
-
 function pintarPalabras(){
   const lista = palabrasDe(colaborador);
-  $('#nPal').textContent = lista.length;
-  $('#tituloPal').textContent = 'Palabras de ' + colaborador.split(' ')[0];
-  $('#listaPal').innerHTML = lista.length
-    ? lista.map((par,i) => `
-        <div class="pal">
-          <span class="de">${par.de.replace(/</g,'&lt;')}</span>
-          <span class="fl">→</span>
-          <span class="a">${par.a.replace(/</g,'&lt;')}</span>
-          <button class="x" type="button" data-i="${i}">×</button>
-        </div>`).join('')
-    : '<div class="vacioPal">Todavía no enseñaste ninguna palabra.</div>';
-  $$('#listaPal .x').forEach(b => b.onclick = () => {
-    lista.splice(+b.dataset.i, 1); guardarDB(); pintarPalabras();
-  });
+  $('#palLabel').textContent = lista.length + ' registrada' + (lista.length===1?'':'s');
+  $('#tituloPal').textContent = 'Palabras de ' + (colaborador ? colaborador.split(' ')[0] : '—');
+  $('#listaPal').innerHTML = lista.length ? lista.map(function(par,i){
+    return '<div class="fila"><span class="k">'+par.de.replace(/</g,'&lt;')+' → '+par.a.replace(/</g,'&lt;')+'</span>'+
+    '<button style="color:var(--rojo);font-weight:700" data-i="'+i+'">Quitar</button></div>';
+  }).join('') : '<p style="color:var(--texto-2);font-size:13.5px">Todavía no enseñaste ninguna palabra.</p>';
+  $$('#listaPal [data-i]').forEach(function(b){ b.onclick = function(){ lista.splice(+b.dataset.i,1); guardarDB(); pintarPalabras(); }; });
 }
-
-function enseñarPalabra(de, a){
-  de = (de||'').trim(); a = (a||'').trim();
-  if (!de || !a) return false;
+function enseñarPalabra(de,a){
+  de=(de||'').trim(); a=(a||'').trim(); if (!de||!a) return false;
   const lista = palabrasDe(colaborador);
-  const i = lista.findIndex(x => norm(x.de) === norm(de));
-  if (i >= 0) lista[i].a = a; else lista.push({ de, a });
-  guardarDB(); pintarPalabras();
-  return true;
+  const i = lista.findIndex(function(x){return norm(x.de)===norm(de);});
+  if (i>=0) lista[i].a=a; else lista.push({de:de,a:a});
+  guardarDB(); pintarPalabras(); return true;
 }
-
-$('#bPalabras').onclick = () => { pintarPalabras(); abrirPanel('#hojaPal'); };
-$('#bCerrarPal').onclick = () => cerrarPanel('#hojaPal');
+$('#abrirPalabras').onclick = () => { pintarPalabras(); abrirPanel('#hojaPal'); };
 $('#bAddPal').onclick = () => {
-  if (enseñarPalabra($('#palDe').value, $('#palA').value)){
-    $('#palDe').value = ''; $('#palA').value = '';
-    aviso('Palabra guardada', 'ok');
-  } else aviso('Completá los dos campos', 'alerta');
+  if (enseñarPalabra($('#palDe').value, $('#palA').value)){ $('#palDe').value=''; $('#palA').value=''; aviso('Palabra guardada','ok'); }
+  else aviso('Completá los dos campos','alerta');
 };
 
-/* Detecta si el usuario corrigió a mano una palabra recién dictada
-   y le ofrece recordarla para la próxima vez. */
 let textoDictado = '';
-
-$('#obs').addEventListener('blur', () => {
-  const ahora = $('#obs').value.trim();
-  if (!textoDictado || ahora === textoDictado){ $('#sugPal').innerHTML = ''; return; }
+$('#fObs').addEventListener('blur', () => {
+  const ahora = $('#fObs').value.trim();
+  if (!textoDictado || ahora===textoDictado) return;
   const antes = textoDictado.split(/\s+/), luego = ahora.split(/\s+/);
-  if (antes.length !== luego.length){ $('#sugPal').innerHTML = ''; return; }
-  const cambios = antes.map((w,i) => [w, luego[i]]).filter(([a,b]) => norm(a) !== norm(b));
-  if (cambios.length !== 1){ $('#sugPal').innerHTML = ''; return; }
-  const [de, a] = cambios[0];
-  $('#sugPal').innerHTML = `<div class="chips" style="margin-top:10px">
-      <button class="chip sug" type="button">¿Recordar que «${de}» es «${a}»?</button></div>`;
-  $('#sugPal .chip').onclick = () => {
-    enseñarPalabra(de, a);
-    $('#sugPal').innerHTML = ''; textoDictado = '';
-    aviso('Aprendido: ' + a, 'ok');
-  };
+  if (antes.length!==luego.length) return;
+  const cambios = antes.map(function(w,i){return [w,luego[i]];}).filter(function(p){return norm(p[0])!==norm(p[1]);});
+  if (cambios.length!==1) return;
+  const de=cambios[0][0], a=cambios[0][1];
+  const cont = $('#sugCat');
+  cont.innerHTML += '<div class="chips" style="padding:8px 0 0"><button class="chip sug" type="button" style="border-color:var(--oro);color:var(--oro)">¿Recordar que «'+de+'» es «'+a+'»?</button></div>';
+  const b = cont.querySelector('.chip.sug:last-child');
+  if (b) b.onclick = function(){ enseñarPalabra(de,a); cont.innerHTML=''; textoDictado=''; aviso('Aprendido: '+a,'ok'); };
 });
 
-// Quita repeticiones seguidas de 1 a 6 palabras y deja la primera letra en mayúscula
 function limpiarDictado(t){
   let s = (t||'').replace(/\s+/g,' ').trim();
-  for (let n = 6; n >= 1; n--){
-    const re = new RegExp('\\b((?:\\S+\\s+){' + (n-1) + '}\\S+)(?:\\s+\\1\\b)+', 'gi');
-    let antes;
-    do { antes = s; s = s.replace(re, '$1'); } while (s !== antes);
+  for (let n=6;n>=1;n--){
+    const re = new RegExp('\\b((?:\\S+\\s+){'+(n-1)+'}\\S+)(?:\\s+\\1\\b)+','gi');
+    let antes; do { antes=s; s=s.replace(re,'$1'); } while (s!==antes);
   }
   s = aplicarPalabras(s);
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+  return s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
 }
 
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec=null, escuchando=false, baseTxt='', firme='', tanda='';
 function pintarDictado(parcial){
-  const todo = [base, firme, tanda, parcial].filter(Boolean).join(' ');
-  $('#obs').value = limpiarDictado(todo);
+  const todo = [baseTxt, firme, tanda, parcial].filter(Boolean).join(' ');
+  $('#fObs').value = limpiarDictado(todo);
+  $('#cuenta').textContent = $('#fObs').value.length;
+  borrador.obs = $('#fObs').value;
 }
-
 $('#bDictar').onclick = () => {
-  if (!SR){ aviso('Este navegador no permite dictado', 'alerta'); return; }
-  if (escuchando){ escuchando = false; try{ rec.stop(); }catch(e){} return; }
-
-  escuchando = true;
-  base = $('#obs').value.trim();
-  firme = ''; tanda = '';
-  $('#bDictar').dataset.on = '1';
-  $('#lblDictar').textContent = 'Escuchando… tocá para terminar';
-
-  const terminar = () => {
-    escuchando = false;
-    $('#bDictar').dataset.on = '0';
-    $('#lblDictar').textContent = 'Dictar el detalle';
-    pintarDictado('');
-    textoDictado = $('#obs').value.trim();
-    $('#obs').dispatchEvent(new Event('input'));
+  if (!SR){ aviso('Este navegador no permite dictado','alerta'); return; }
+  if (escuchando){ escuchando=false; try{rec.stop();}catch(e){} return; }
+  escuchando=true; baseTxt=$('#fObs').value.trim(); firme=''; tanda='';
+  $('#bDictar').dataset.on='1'; $('#lblDictar').textContent='Escuchando… tocá para terminar';
+  const terminar = function(){
+    escuchando=false; $('#bDictar').dataset.on='0'; $('#lblDictar').textContent='Dictar el detalle';
+    pintarDictado(''); textoDictado=$('#fObs').value.trim();
   };
-
-  const arrancar = () => {
-    rec = new SR();
-    rec.lang = 'es-PY'; rec.continuous = true; rec.interimResults = true;
-
-    rec.onresult = e => {
-      // se reconstruye TODA la tanda en cada aviso: reenviar no duplica
-      let cerrado = '', parcial = '';
-      for (let i = 0; i < e.results.length; i++){
-        const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) cerrado += t + ' '; else parcial += t + ' ';
+  (function arrancar(){
+    rec = new SR(); rec.lang='es-PY'; rec.continuous=true; rec.interimResults=true;
+    rec.onresult = function(e){
+      let cerrado='', parcial='';
+      for (let i=0;i<e.results.length;i++){
+        const t=e.results[i][0].transcript;
+        if (e.results[i].isFinal) cerrado+=t+' '; else parcial+=t+' ';
       }
-      tanda = cerrado.trim();
-      pintarDictado(parcial.trim());
+      tanda = cerrado.trim(); pintarDictado(parcial.trim());
     };
-
-    rec.onerror = e => {
-      if (e.error !== 'no-speech' && e.error !== 'aborted') aviso('No se escuchó bien', 'alerta');
+    rec.onerror = function(e){ if (e.error!=='no-speech' && e.error!=='aborted') aviso('No se escuchó bien','alerta'); };
+    rec.onend = function(){
+      if (tanda) firme=(firme+' '+tanda).trim(); tanda='';
+      if (escuchando){ try{rec.start();}catch(e){terminar();} } else terminar();
     };
-
-    rec.onend = () => {
-      // la tanda se cierra: pasa a firme y se limpia para la siguiente
-      if (tanda) firme = (firme + ' ' + tanda).trim();
-      tanda = '';
-      if (escuchando){ try { rec.start(); } catch(e){ terminar(); } }
-      else terminar();
-    };
-
-    try { rec.start(); } catch(e){ terminar(); }
-  };
-
-  arrancar();
+    try{ rec.start(); }catch(e){ terminar(); }
+  })();
 };
 
-/* ═══════════════════════════════════════════════════════
-   ABRIR · GUARDAR · BORRAR
-   ═══════════════════════════════════════════════════════ */
-function nuevaFactura(){
-  editandoId = null; digitos = ''; categoria = null;
-  ponerFecha(isoHoy());
-  $('#nf').value = ''; $('#obs').value = '';
-  ponerLocal('');
-  $('#sugCat').innerHTML = '';
-  $$('.tile').forEach(b => b.setAttribute('aria-pressed','false'));
-  $('#tit2').textContent = 'Detalles';
-  $('#bBorrar').style.display = 'none';
-  limpiarErrorFecha(); pintarMonto();
-  ir('vValor');
-}
+function abrirVelo(id){ abrirPanel(id); }
+function cerrarVelo(id){ cerrarPanel(id); }
+$$('[data-cerrar]').forEach(function(b){ b.onclick = function(){ $$('.velo').forEach(function(v){cerrarPanel('#'+v.id);}); }; });
+$$('.velo').forEach(function(v){ v.onclick = function(e){ if (e.target===v) cerrarPanel('#'+v.id); }; });
 
-function abrirFactura(it){
-  editandoId = it.id; digitos = String(it.valor); categoria = it.despesa;
-  ponerFecha(it.data);
-  $('#nf').value = it.nf || '';
-  ponerLocal(it.local || '');
-  $('#obs').value = it.obs || '';
-  $('#sugCat').innerHTML = '';
-  $$('.tile').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.c === it.despesa)));
-  $('#tit2').textContent = 'Modificar';
-  $('#bBorrar').style.display = 'flex';
-  limpiarErrorFecha(); pintarMonto();
-  $('#dMonto').textContent = fmt(it.valor);
-  revisarGuardar();
-  ir('vDetalle');
-}
-
-$('#bNueva').onclick    = nuevaFactura;
-$('#bSalir1').onclick   = () => ir('vHome');
-$('#bVolver2').onclick  = () => editandoId ? ir('vHome') : ir('vValor');
-$('#bEditMonto').onclick= () => ir('vValor');
-
-$('#bPaso2').onclick = () => {
-  $('#dMonto').textContent = fmt(parseInt(digitos||'0',10));
-  revisarGuardar();
-  ir('vDetalle');
+let filtroBusqCat='todas', filtroBusqEstado='todas';
+$('#bCats').innerHTML = ['todas'].concat(CATEGORIAS).map(function(c){
+  return '<button class="chip" data-c="'+c+'" aria-pressed="'+(c==='todas')+'">'+(c==='todas'?'Todas':c)+'</button>';
+}).join('');
+$$('#bCats .chip').forEach(function(c){ c.onclick = function(){ filtroBusqCat=c.dataset.c; $$('#bCats .chip').forEach(function(x){x.setAttribute('aria-pressed',String(x===c));}); }; });
+$$('#bEstados .chip').forEach(function(c){ c.onclick = function(){ filtroBusqEstado=c.dataset.e; $$('#bEstados .chip').forEach(function(x){x.setAttribute('aria-pressed',String(x===c));}); }; });
+$('#salirBuscar').onclick = () => ir('pComprobantes');
+$('#limpiarBusq').onclick = () => {
+  $('#bTexto').value=''; $('#bMin').value=''; $('#bMax').value='';
+  filtroBusqCat='todas'; filtroBusqEstado='todas';
+  $$('#bCats .chip').forEach(function(x){x.setAttribute('aria-pressed',String(x.dataset.c==='todas'));});
+  $$('#bEstados .chip').forEach(function(x){x.setAttribute('aria-pressed',String(x.dataset.e==='todas'));});
+  $('#listaBusq').innerHTML=''; $('#tituloRes').style.display='none';
+};
+$('#btnHacerBusq').onclick = () => {
+  const q=norm($('#bTexto').value.trim());
+  const min=parseInt(($('#bMin').value||'').replace(/\D/g,''),10)||0;
+  const max=parseInt(($('#bMax').value||'').replace(/\D/g,''),10)||Infinity;
+  let arr = DB.items.filter(function(f){return f.colaborador===colaborador;});
+  if (q) arr = arr.filter(function(f){return norm(f.local).includes(q)||(f.nf||'').includes(q)||norm(f.obs).includes(q);});
+  if (filtroBusqCat!=='todas') arr = arr.filter(function(f){return f.despesa===filtroBusqCat;});
+  if (filtroBusqEstado==='pendiente') arr = arr.filter(function(f){return !f.exportado;});
+  if (filtroBusqEstado==='exportada') arr = arr.filter(function(f){return f.exportado;});
+  arr = arr.filter(function(f){return f.valor>=min && f.valor<=max;}).sort(function(a,b){return (b.data||'').localeCompare(a.data||'');});
+  $('#tituloRes').style.display='flex';
+  $('#tituloRes h2').textContent = arr.length+' resultado'+(arr.length===1?'':'s');
+  $('#listaBusq').innerHTML = arr.length ? arr.map(tarjeta).join('') : '<div class="vacio"><h3>Sin coincidencias</h3><p>Probá aflojando algún filtro.</p></div>';
+  engancharTarjetas('#listaBusq');
 };
 
-// Busca otra factura del mismo período con el mismo NF + comercio + monto.
-// Solo avisa — nunca impide guardar, la decisión final es de la persona.
-function buscarPosibleDuplicada(datos, idExcluir){
-  if (!datos.nf || !datos.local || !datos.valor) return null;
-  return delPeriodo().find(it =>
-    it.id !== idExcluir &&
-    it.nf === datos.nf &&
-    normNom(it.local) === normNom(datos.local) &&
-    it.valor === datos.valor
-  ) || null;
-}
-
-$('#bGuardar').onclick = () => {
-  const local = localElegido.trim();
-  const datos = {
-    colaborador,
-    mes:  +$('#mes').value,
-    ano:  +$('#ano').value,
-    despesa: categoria,
-    nf:   $('#nf').value.trim(),
-    data: fechaISO(),
-    valor: parseInt(digitos||'0',10),
-    local,
-    obs:  $('#obs').value.trim()
-  };
-
-  const duplicada = buscarPosibleDuplicada(datos, editandoId);
-
-  if (editandoId){
-    const i = DB.items.findIndex(x => x.id === editandoId);
-    if (i >= 0){
-      const previo = DB.items[i];
-      const actualizado = { ...previo, ...datos };
-      // Si ya se había exportado, se queda en "Ya exportadas" pero
-      // marcada como tocada, para avisar en la próxima exportación.
-      if (previo.exportado){ actualizado.exportado = true; actualizado.tocadoTrasExport = true; }
-      DB.items[i] = actualizado;
-    }
-    aviso('Factura modificada', 'ok');
-  } else {
-    DB.items.push({ id: Date.now(), exportado: false, tocadoTrasExport: false, ...datos });
-    aviso('Factura guardada', 'ok');
-  }
-
-  registrarLocal(colaborador, local);
-
-  guardarDB(); pintarHome(); ir('vHome');
-
-  if (duplicada){
-    const fechaTxt = (duplicada.data||'').split('-').reverse().join('/');
-    setTimeout(() => aviso(
-      `Parece repetida: ya hay una factura NF ${duplicada.nf} en ${duplicada.local}, ${fechaTxt}, por G$ ${fmt(duplicada.valor)}`,
-      'alerta', 5000
-    ), 1600);
-  }
-};
-
-$('#bBorrar').onclick = () => preguntar(
-  'Borrar factura',
-  'Se va a quitar de la planilla de este mes. No se puede deshacer.',
-  () => {
-    DB.items = DB.items.filter(x => x.id !== editandoId);
-    guardarDB(); pintarHome(); ir('vHome'); aviso('Factura borrada', 'ok');
-  });
-
-/* ═══════════════════════════════════════════════════════
-   HOME
-   ═══════════════════════════════════════════════════════ */
-function delPeriodo(){
-  const m = +$('#mes').value, a = +$('#ano').value;
-  return DB.items
-    .filter(i => i.colaborador === colaborador && i.mes === m && i.ano === a)
-    .sort((x,y) => (x.data||'').localeCompare(y.data||'') || x.id - y.id);
-}
-
-// Filtro por NF o por monto. Sin separadores: "4521" encuentra NF 4521,
-// y también encuentra un monto que contenga esos dígitos (ej: 450.000).
-function coincideFiltro(it, textoFiltro){
-  const q = textoFiltro.replace(/\D/g,'');
-  if (!q) return true;
-  return (it.nf||'').includes(q) || String(it.valor).includes(q);
-}
-
-function filaHTML(i, n, exportada){
-  const tag = exportada && i.tocadoTrasExport ? '<span class="tagEdit">Editada</span>' : '';
-  return `
-    <div class="reg${exportada ? ' exportada' : ''}" data-id="${i.id}">
-      <span class="n">${String(n+1).padStart(2,'0')}</span>
-      <div style="min-width:0">
-        <div class="cat">${i.despesa}${tag}</div>
-        <div class="sub">${i.data.split('-').reverse().join('/')}${i.nf ? ' · NF ' + i.nf : ''}${i.local ? ' · ' + i.local : ''}</div>
-        ${i.obs ? `<div class="det">${i.obs.replace(/</g,'&lt;')}</div>` : ''}
-      </div>
-      <span class="mto">${fmt(i.valor)}</span>
-    </div>`;
-}
-
-function pintarHome(){
+function pintarEstadisticas(){
   const arr = delPeriodo();
-  const total = arr.reduce((s,i) => s + i.valor, 0);
-  $('#hTotal').textContent = fmt(total);
-  $('#hCant').textContent  = arr.length;
-  $('#bExport').disabled   = PERSONAS.every(p => facturasDe(p).length === 0);
+  const total = arr.reduce(function(s,f){return s+f.valor;},0);
+  $('#statPeriodo').textContent = periodoTxt();
+  $('#statTotal').textContent = fmt(total);
+  $('#statCant').textContent = arr.length+' comprobante'+(arr.length===1?'':'s');
 
-  const textoFiltro = $('#qFiltro').value.trim();
-  const visibles = textoFiltro ? arr.filter(i => coincideFiltro(i, textoFiltro)) : arr;
+  const porCat = {}; arr.forEach(function(f){ porCat[f.despesa]=(porCat[f.despesa]||0)+f.valor; });
+  const cats = Object.entries(porCat).sort(function(a,b){return b[1]-a[1];});
+  const R=54, C=2*Math.PI*R; let offset=0;
+  const arcos = cats.map(function(par){
+    const c=par[0], v=par[1];
+    const frac = total?v/total:0;
+    const seg = '<circle cx="70" cy="70" r="'+R+'" fill="none" stroke="'+(COLORES_CAT[c]||'#8A7E64')+'" '+
+      'stroke-width="18" stroke-dasharray="'+(frac*C).toFixed(2)+' '+C+'" '+
+      'stroke-dashoffset="'+(-offset*C).toFixed(2)+'" transform="rotate(-90 70 70)"/>';
+    offset += frac; return seg;
+  }).join('');
+  $('#dona').innerHTML = total ? '<svg width="140" height="140" viewBox="0 0 140 140">'+
+      '<circle cx="70" cy="70" r="'+R+'" fill="none" stroke="var(--sup-2)" stroke-width="18"/>'+arcos+
+      '<text x="70" y="66" text-anchor="middle" class="dona-num">G$ '+fmt(total)+'</text>'+
+      '<text x="70" y="84" text-anchor="middle" class="dona-txt">Total</text></svg>'
+    : '<p style="color:var(--texto-2);font-size:14px">Sin datos en este período</p>';
+  $('#catLista').innerHTML = cats.map(function(par){
+    const c=par[0], v=par[1];
+    return '<div class="cat-fila"><span class="pt" style="background:'+(COLORES_CAT[c]||'#8A7E64')+'"></span>'+
+    '<span class="n">'+c+'</span><span class="v">'+fmt(v)+'</span>'+
+    '<span class="p">'+(total?Math.round(v/total*100):0)+'%</span></div>';
+  }).join('');
 
-  if (!arr.length){
-    $('#hLista').innerHTML = `
-      <div class="nada">
-        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M6 2h9l5 5v15H6z" stroke-linejoin="round"/><path d="M15 2v5h5" stroke-linejoin="round"/>
-          <path d="M9 13h7M9 17h5" stroke-linecap="round"/>
-        </svg>
-        Todavía no cargaste facturas<br>para este período.
-      </div>`;
-  } else if (textoFiltro && !visibles.length){
-    $('#hLista').innerHTML = `<div class="nadaChica" style="padding:22px 16px">
-      Ninguna factura coincide con «${textoFiltro.replace(/</g,'&lt;')}».</div>`;
-  } else {
-    const pendientes = visibles.filter(i => !i.exportado);
-    const exportadas = visibles.filter(i => i.exportado);
-    let html = '';
-
-    if (!textoFiltro || pendientes.length){
-      html += `<div class="seccionTit"><span class="pt">Pendientes</span> · ${pendientes.length}</div>`;
-      html += pendientes.length
-        ? pendientes.map((i,n) => filaHTML(i,n,false)).join('')
-        : `<div class="nadaChica">Todo lo cargado ya se exportó ✓</div>`;
-    }
-
-    if (exportadas.length){
-      html += `<div class="seccionTit"><span class="pt2">Ya exportadas</span> · ${exportadas.length}</div>`;
-      html += exportadas.map((i,n) => filaHTML(i,n,true)).join('');
-    }
-
-    $('#hLista').innerHTML = html;
+  const serie = [];
+  for (let i=5;i>=0;i--){
+    let m=mesActual-i, a=anoActual; while (m<1){ m+=12; a--; }
+    const suma = DB.items.filter(function(f){return f.colaborador===colaborador&&f.mes===m&&f.ano===a;}).reduce(function(s,f){return s+f.valor;},0);
+    serie.push({m:m, v:suma});
   }
-
-  $$('.reg').forEach(r => r.onclick = () => {
-    const it = DB.items.find(x => x.id === +r.dataset.id);
-    if (it) abrirFactura(it);
-  });
+  const tope = Math.max.apply(null, serie.map(function(s){return s.v;}).concat([1]));
+  $('#barrasMes').innerHTML = serie.map(function(s,i){
+    return '<div class="col '+(i===serie.length-1?'act':'')+'">'+
+      '<div class="b" style="height:'+(s.v?Math.max(6,s.v/tope*88):3)+'px"></div>'+
+      '<span class="m">'+MESCORTO[s.m-1]+'</span></div>';
+  }).join('');
 }
 
-$('#bFiltro').onclick = () => {
-  const b = $('#barraFiltro');
-  b.classList.toggle('on');
-  $('#bFiltro').classList.toggle('bFiltro-activo', b.classList.contains('on'));
-  if (b.classList.contains('on')) setTimeout(() => $('#qFiltro').focus(), 100);
-  else { $('#qFiltro').value = ''; pintarHome(); }
-};
-$('#qFiltro').addEventListener('input', pintarHome);
-$('#bLimpiarFiltro').onclick = () => { $('#qFiltro').value = ''; pintarHome(); $('#qFiltro').focus(); };
-
-/* ═══════════════════════════════════════════════════════
-   EXPORTAR — mismo formato que ya lee el script de la PC
-   Se manda siempre el mes completo (pendientes + ya
-   exportadas), para que el Excel de la PC nunca quede a
-   medias. Al terminar, todo lo incluido pasa a "Ya
-   exportadas"; si algo ya exportado había sido editado,
-   el aviso lo menciona.
-   ═══════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════
-   EXPORTAR
-   Se puede exportar solo el colaborador activo, o los tres
-   de una. Cada persona genera SU PROPIO archivo, porque así
-   los reconoce el script de la PC. Quien no tenga facturas
-   en el período se omite en silencio.
-   ═══════════════════════════════════════════════════════ */
 function facturasDe(col){
-  const m = +$('#mes').value, a = +$('#ano').value;
-  return DB.items
-    .filter(i => i.colaborador === col && i.mes === m && i.ano === a)
-    .sort((x,y) => (x.data||'').localeCompare(y.data||'') || x.id - y.id);
+  return DB.items.filter(function(i){return i.colaborador===col&&i.mes===mesActual&&i.ano===anoActual;})
+    .sort(function(a,b){return (a.data||'').localeCompare(b.data||'')||a.id-b.id;});
 }
-
-/* Arma el paquete de una persona. Devuelve null si no tiene facturas. */
 function construirPaquete(col){
-  const arr = facturasDe(col);
-  if (!arr.length) return null;
-  const m = +$('#mes').value, a = +$('#ano').value;
+  const arr = facturasDe(col); if (!arr.length) return null;
   const paquete = {
-    version: 1,
-    colaborador: col,
-    empresa: 'Bahia Rica',
-    moeda: 'PYG',
-    periodo: { mes: m, ano: a, nombre: MESNOM[m-1] },
-    generado_en: new Date().toISOString(),
-    total: arr.reduce((s,i) => s + i.valor, 0),
-    itens: arr.map(i => ({
-      despesa: i.despesa, nf: i.nf, data: i.data,
-      valor: i.valor, local: i.local, obs: i.obs
-    }))
+    version:1, colaborador:col, empresa:'Bahia Rica', moeda:'PYG',
+    periodo:{mes:mesActual, ano:anoActual, nombre:MESNOM[mesActual-1]},
+    generado_en:new Date().toISOString(), total:arr.reduce(function(s,i){return s+i.valor;},0),
+    itens:arr.map(function(i){return {despesa:i.despesa, nf:i.nf, data:i.data, valor:i.valor, local:i.local, obs:i.obs};})
   };
-  return {
-    arr,
-    nombre: `${col.split(' ')[0]}_${MESNOM[m-1]}_${a}.json`,
-    texto: JSON.stringify(paquete, null, 2),
-    editadas: arr.filter(i => i.tocadoTrasExport).length
-  };
+  return { arr:arr, nombre:col.split(' ')[0]+'_'+MESNOM[mesActual-1]+'_'+anoActual+'.json',
+    texto:JSON.stringify(paquete,null,2), editadas:arr.filter(function(i){return i.tocadoTrasExport;}).length };
 }
-
-function marcarExportados(paquetes){
-  paquetes.forEach(p => p.arr.forEach(i => { i.exportado = true; i.tocadoTrasExport = false; }));
-  guardarDB(); pintarHome();
-}
-
+function marcarExportados(paquetes){ paquetes.forEach(function(p){p.arr.forEach(function(i){i.exportado=true;i.tocadoTrasExport=false;});}); guardarDB(); pintarTodo(); }
 function resumenSalida(paquetes){
-  const editadas = paquetes.reduce((s,p) => s + p.editadas, 0);
-  const base = paquetes.length === 1
-    ? paquetes[0].nombre
-    : `${paquetes.length} archivos`;
-  return base + (editadas
-    ? ` · ${editadas} factura${editadas>1?'s':''} editada${editadas>1?'s':''}` : '');
+  const ed = paquetes.reduce(function(s,p){return s+p.editadas;},0);
+  const base = paquetes.length===1 ? paquetes[0].nombre : paquetes.length+' archivos';
+  return base + (ed?' · '+ed+' factura'+(ed>1?'s':'')+' editada'+(ed>1?'s':''):'');
 }
-
-/* Alcance elegido: solo el colaborador activo, o los tres */
-let alcanceExport = 'uno';
-
+let alcanceExport='uno';
 function paquetesSegunAlcance(){
-  const cols = alcanceExport === 'todos' ? PERSONAS : [colaborador];
-  return cols.map(construirPaquete).filter(Boolean);   // sin facturas: se omite
+  const cols = alcanceExport==='todos' ? PERSONAS : [colaborador];
+  return cols.map(construirPaquete).filter(Boolean);
 }
-
 function refrescarPanelExport(){
-  const m = +$('#mes').value, a = +$('#ano').value;
   const paquetes = paquetesSegunAlcance();
-  const facturas = paquetes.reduce((s,p) => s + p.arr.length, 0);
-  const quienes = paquetes.length
-    ? paquetes.map(p => p.nombre.split('_')[0]).join(', ')
-    : 'sin facturas';
-  $('#expResumen').textContent =
-    `${MESNOM[m-1]} ${a} · ${quienes}` +
-    (facturas ? ` · ${facturas} factura${facturas>1?'s':''}` : '');
-  $('#expCompartir').disabled = !paquetes.length;
-  $('#expDescargar').disabled = !paquetes.length;
+  const facturas = paquetes.reduce(function(s,p){return s+p.arr.length;},0);
+  const quienes = paquetes.length ? paquetes.map(function(p){return p.nombre.split('_')[0];}).join(', ') : 'sin facturas';
+  $('#expResumen').textContent = periodoTxt()+' · '+quienes + (facturas?' · '+facturas+' factura'+(facturas>1?'s':''):'');
+  $('#expCompartir').disabled = !paquetes.length; $('#expDescargar').disabled = !paquetes.length;
 }
-
-$('#bExport').onclick = () => {
-  alcanceExport = 'uno';
-  $$('#alcance button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.a === 'uno')));
-  $('#expNombre').textContent = colaborador.split(' ')[0].charAt(0) +
-                                colaborador.split(' ')[0].slice(1).toLowerCase();
+$('#btnExportar').onclick = () => {
+  const todosVacios = PERSONAS.every(function(p){ return facturasDe(p).length===0; });
+  if (todosVacios){ aviso('No hay comprobantes en este período','alerta'); return; }
+  alcanceExport='uno';
+  $$('#alcance .chip').forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.a==='uno')); });
+  $('#expNombre').textContent = colaborador.split(' ')[0];
   refrescarPanelExport();
   abrirPanel('#hojaExport');
 };
-
-$$('#alcance button').forEach(b => b.onclick = () => {
+$$('#alcance .chip').forEach(function(b){ b.onclick = function(){
   alcanceExport = b.dataset.a;
-  $$('#alcance button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  $$('#alcance .chip').forEach(function(x){ x.setAttribute('aria-pressed', String(x===b)); });
   refrescarPanelExport();
-});
-
-$('#expCancelar').onclick = () => cerrarPanel('#hojaExport');
-
-/* Descargar: uno por uno y escalonado, porque si se disparan juntas
-   Chrome de Android bloquea todas menos la primera. */
-/* Descarga escalonada: si se disparan juntas, Chrome de Android
-   bloquea todas menos la primera. */
+}; });
 function descargarPaquetes(paquetes, mensaje){
-  paquetes.forEach((p, i) => setTimeout(() => {
-    const url = URL.createObjectURL(new Blob([p.texto], {type:'application/json'}));
-    const enlace = document.createElement('a');
-    enlace.href = url; enlace.download = p.nombre; enlace.click();
-    setTimeout(() => URL.revokeObjectURL(url), 6000);
-    if (i === paquetes.length - 1){
-      marcarExportados(paquetes);
-      aviso(mensaje || ('Descargado: ' + resumenSalida(paquetes)), 'ok');
-    }
-  }, i * 700));
+  paquetes.forEach(function(p,i){ setTimeout(function(){
+    const url = URL.createObjectURL(new Blob([p.texto],{type:'application/json'}));
+    const enlace = document.createElement('a'); enlace.href=url; enlace.download=p.nombre; enlace.click();
+    setTimeout(function(){URL.revokeObjectURL(url);}, 6000);
+    if (i===paquetes.length-1){ marcarExportados(paquetes); aviso(mensaje || ('Descargado: '+resumenSalida(paquetes)), 'ok'); }
+  }, i*700); });
 }
-
 $('#expDescargar').onclick = () => {
-  const paquetes = paquetesSegunAlcance();
-  if (!paquetes.length) return;
-  cerrarPanel('#hojaExport');
-  descargarPaquetes(paquetes);
+  const paquetes = paquetesSegunAlcance(); if (!paquetes.length) return;
+  cerrarPanel('#hojaExport'); descargarPaquetes(paquetes);
 };
-
-/* Compartir: abre el menú de Android y evita el diálogo de descarga.
-
-   Se manda como .txt y no como .json a propósito: Android solo permite
-   compartir ciertos tipos de archivo, y JSON no está en esa lista — por
-   eso WhatsApp rechazaba el envío. El contenido es exactamente el mismo,
-   y el script de la PC reconoce las facturas por su contenido, así que
-   la extensión no cambia nada del lado de la computadora.
-
-   Si algo falla igual, se descarga automáticamente: nunca queda sin salida. */
 $('#expCompartir').onclick = async () => {
-  const paquetes = paquetesSegunAlcance();
-  if (!paquetes.length) return;
-
-  const archivos = paquetes.map(p => new File(
-    [p.texto],
-    p.nombre.replace(/\.json$/i, '.txt'),
-    { type: 'text/plain' }
-  ));
-
-  if (!navigator.canShare || !navigator.canShare({ files: archivos })){
-    cerrarPanel('#hojaExport');
-    descargarPaquetes(paquetes, 'Este celular no permite compartir. Se descargó en su lugar.');
-    return;
+  const paquetes = paquetesSegunAlcance(); if (!paquetes.length) return;
+  const archivos = paquetes.map(function(p){ return new File([p.texto], p.nombre.replace(/\.json$/i,'.txt'), {type:'text/plain'}); });
+  if (!navigator.canShare || !navigator.canShare({files:archivos})){
+    cerrarPanel('#hojaExport'); descargarPaquetes(paquetes, 'Este celular no permite compartir. Se descargó en su lugar.'); return;
   }
-
-  try {
-    await navigator.share({ files: archivos });
-    cerrarPanel('#hojaExport');
-    marcarExportados(paquetes);
-    aviso('Enviado: ' + resumenSalida(paquetes), 'ok');
-  } catch(e){
-    if (e && e.name === 'AbortError') return;   // canceló: no se marca nada
-    cerrarPanel('#hojaExport');
-    descargarPaquetes(paquetes,
-      `No se pudo compartir (${e && e.name ? e.name : 'error'}). Se descargó en su lugar.`);
+  try{
+    await navigator.share({files:archivos});
+    cerrarPanel('#hojaExport'); marcarExportados(paquetes); aviso('Enviado: '+resumenSalida(paquetes),'ok');
+  }catch(e){
+    if (e && e.name==='AbortError') return;
+    cerrarPanel('#hojaExport'); descargarPaquetes(paquetes, 'No se pudo compartir ('+(e&&e.name?e.name:'error')+'). Se descargó en su lugar.');
   }
 };
 
-pintarMonto();
-pintarHome();
-pintarPalabras();
+$('#swTema').onclick = () => {
+  const oscuro = document.documentElement.dataset.tema==='oscuro';
+  document.documentElement.dataset.tema = oscuro ? 'claro':'oscuro';
+  $('#switchTema').setAttribute('aria-pressed', String(!oscuro));
+  $('#temaEstado').textContent = oscuro ? 'Desactivado':'Activado';
+};
+
+function pintarTodo(){ pintarUsuarios(); pintarInicio(); pintarComprobantes(); pintarEstadisticas(); }
+pintarSelPeriodo();
 </script>
 </body>
 </html>
