@@ -146,6 +146,24 @@ html[data-tema="oscuro"] .badge.pend{color:var(--oro-claro)}
   color:var(--oro);font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
   vertical-align:middle}
 
+.secDosCol{display:flex;align-items:center;gap:8px;padding:18px var(--e5) 10px}
+.secDosCol .punto{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+.secDosCol h3{margin:0;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--texto-2)}
+.secDosCol .n{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--texto-2)}
+.avisoTodo{margin:0 var(--e5) var(--e3);padding:var(--e3) var(--e4);border-radius:var(--r-m);
+  background:rgba(63,138,97,.1);color:var(--verde);font-size:13.5px;font-weight:600;
+  display:flex;align-items:center;gap:8px}
+.card.card-pend{border-left:3px solid var(--oro)}
+.card.card-exp{border-left:3px solid var(--verde);opacity:.9}
+.vacioChico{padding:4px var(--e5) var(--e4);font-size:13px;color:var(--texto-2)}
+
+.volverFlot{position:fixed;left:20px;bottom:calc(20px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:7px;padding:13px 20px;border-radius:999px;
+  background:var(--carbon);color:var(--marfil);font-weight:700;font-size:14px;
+  box-shadow:0 8px 22px rgba(23,23,20,.28);z-index:15}
+.volverFlot:active{transform:scale(.96)}
+html[data-tema="oscuro"] .volverFlot{background:var(--oro);color:#1A1509}
+
 .vacio{padding:var(--e10) var(--e6);text-align:center}
 .vacio .ico{width:64px;height:64px;border-radius:50%;background:var(--sup-2);color:var(--texto-2);
   display:flex;align-items:center;justify-content:center;margin:0 auto var(--e4)}
@@ -460,12 +478,7 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       <input type="text" id="qLista" placeholder="Buscar comercio, NF o detalle">
     </div>
-    <div class="chips" id="chipsEstado">
-      <button class="chip" data-f="todas" aria-pressed="true">Todas</button>
-      <button class="chip" data-f="pendiente" aria-pressed="false">Pendientes</button>
-      <button class="chip" data-f="exportada" aria-pressed="false">Exportadas</button>
-    </div>
-    <div class="lista" id="listaComprobantes"></div>
+    <div id="listaComprobantes"></div>
   </div>
 </section>
 
@@ -614,7 +627,7 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
       <div class="fila"><span class="k">Data</span><span class="v" id="dData">—</span></div>
       <div class="fila"><span class="k">Observação</span><span class="v" id="dObs" style="max-width:62%">—</span></div>
     </div>
-    <div style="padding:0 var(--e5) var(--e6)">
+    <div style="padding:0 var(--e5) calc(var(--e6) + 60px)">
       <div class="par" style="margin:0">
         <button class="btn btn-sec" id="btnEditarDet">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
@@ -627,6 +640,10 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
       </div>
     </div>
   </div>
+  <button class="volverFlot" id="volverFlotDetalle">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    Atrás
+  </button>
 </section>
 
 <section class="pantalla" id="pBuscar">
@@ -665,8 +682,12 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
       <button class="btn btn-oro" id="btnHacerBusq">Buscar</button>
     </div>
     <div class="sec-tit" id="tituloRes" style="display:none"><h2>Resultados</h2></div>
-    <div class="lista" id="listaBusq"></div>
+    <div class="lista" id="listaBusq" style="padding-bottom:60px"></div>
   </div>
+  <button class="volverFlot" id="volverFlotBuscar">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    Atrás
+  </button>
 </section>
 
 <nav class="nav" id="nav">
@@ -983,7 +1004,8 @@ function delPeriodo(){
 
 function tarjeta(f){
   const dup = f.tagDup ? '<span class="tagEdit">Posible duplicado</span>' : '';
-  return '<button class="card" data-id="'+f.id+'">'+
+  const claseEstado = f.exportado ? ' card-exp' : ' card-pend';
+  return '<button class="card'+claseEstado+'" data-id="'+f.id+'">'+
     '<div class="card-top"><span class="cat-ico">'+icoCat(f.despesa)+'</span>'+
       '<span class="head"><span class="cat">'+f.despesa+dup+'</span>'+
       '<div class="prov">'+(f.local||'—')+'</div>'+
@@ -1039,24 +1061,41 @@ function pintarInicio(){
   const bVacio = $('#btnNuevaVacio'); if (bVacio) bVacio.onclick = abrirFormularioNuevo;
 }
 
-let filtroLista = 'todas';
 function pintarComprobantes(){
   const q = norm(($('#qLista')?$('#qLista').value:'').trim());
   let arr = delPeriodo();
-  if (filtroLista==='pendiente') arr = arr.filter(f=>!f.exportado);
-  if (filtroLista==='exportada') arr = arr.filter(f=>f.exportado);
   if (q) arr = arr.filter(f => norm(f.local).includes(q) || (f.nf||'').includes(q) || norm(f.obs).includes(q));
-  $('#listaComprobantes').innerHTML = arr.length ? arr.map(tarjeta).join('') :
-    '<div class="vacio"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>'+
-    '<h3>Nada por acá</h3><p>Probá con otro texto o cambiá el filtro.</p></div>';
+
+  const pendientes = arr.filter(f => !f.exportado);
+  const exportadas = arr.filter(f => f.exportado);
+
+  if (!arr.length){
+    $('#listaComprobantes').innerHTML =
+      '<div class="vacio"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>'+
+      '<h3>Nada por acá</h3><p>Probá con otro texto, o cargá la primera factura del período.</p></div>';
+    return;
+  }
+
+  let html = '';
+  html += '<div class="secDosCol"><span class="punto" style="background:var(--oro)"></span>'+
+    '<h3>Pendientes</h3><span class="n">'+pendientes.length+'</span></div>';
+  html += pendientes.length
+    ? '<div class="lista">'+pendientes.map(tarjeta).join('')+'</div>'
+    : '<p class="vacioChico">Todo lo cargado ya se exportó ✓</p>';
+
+  if (exportadas.length){
+    html += '<div class="secDosCol"><span class="punto" style="background:var(--verde)"></span>'+
+      '<h3>Ya exportadas</h3><span class="n">'+exportadas.length+'</span></div>';
+    html += '<div class="avisoTodo">'+
+      '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'+
+      'Ya se mandaron a la PC — se vuelven a incluir solas la próxima vez que exportes</div>';
+    html += '<div class="lista">'+exportadas.map(tarjeta).join('')+'</div>';
+  }
+
+  $('#listaComprobantes').innerHTML = html;
   engancharTarjetas('#listaComprobantes');
 }
 $('#qLista').addEventListener('input', pintarComprobantes);
-$$('#chipsEstado .chip').forEach(c => c.onclick = () => {
-  filtroLista = c.dataset.f;
-  $$('#chipsEstado .chip').forEach(x => x.setAttribute('aria-pressed', String(x===c)));
-  pintarComprobantes();
-});
 $('#verTodos').onclick = () => ir('pComprobantes');
 $('#btnBuscar').onclick = function(){ ir('pBuscar','pComprobantes'); };
 $('#abrirBuscador').onclick = function(){ ir('pBuscar','pComprobantes'); };
@@ -1076,6 +1115,7 @@ function abrirDetalle(id){
   ir('pDetalle','pComprobantes');
 }
 $('#salirDetalle').onclick = () => ir('pComprobantes');
+$('#volverFlotDetalle').onclick = () => ir('pComprobantes');
 $('#btnEliminarDet').onclick = () => {
   preguntar('Eliminar factura', 'Esta acción no se puede deshacer.', () => {
     DB.items = DB.items.filter(x => x.id !== detalleId);
@@ -1457,6 +1497,7 @@ $('#bCats').innerHTML = ['todas'].concat(CATEGORIAS).map(function(c){
 $$('#bCats .chip').forEach(function(c){ c.onclick = function(){ filtroBusqCat=c.dataset.c; $$('#bCats .chip').forEach(function(x){x.setAttribute('aria-pressed',String(x===c));}); }; });
 $$('#bEstados .chip').forEach(function(c){ c.onclick = function(){ filtroBusqEstado=c.dataset.e; $$('#bEstados .chip').forEach(function(x){x.setAttribute('aria-pressed',String(x===c));}); }; });
 $('#salirBuscar').onclick = () => ir('pComprobantes');
+$('#volverFlotBuscar').onclick = () => ir('pComprobantes');
 $('#limpiarBusq').onclick = () => {
   $('#bTexto').value=''; $('#bMin').value=''; $('#bMax').value='';
   filtroBusqCat='todas'; filtroBusqEstado='todas';
@@ -1465,6 +1506,10 @@ $('#limpiarBusq').onclick = () => {
   $('#listaBusq').innerHTML=''; $('#tituloRes').style.display='none';
 };
 $('#btnHacerBusq').onclick = () => {
+  // El teclado se queda abierto y tapa los resultados si no le decimos
+  // explícitamente que ya terminamos de escribir.
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+
   const q=norm($('#bTexto').value.trim());
   const min=parseInt(($('#bMin').value||'').replace(/\D/g,''),10)||0;
   const max=parseInt(($('#bMax').value||'').replace(/\D/g,''),10)||Infinity;
@@ -1478,6 +1523,13 @@ $('#btnHacerBusq').onclick = () => {
   $('#tituloRes h2').textContent = arr.length+' resultado'+(arr.length===1?'':'s');
   $('#listaBusq').innerHTML = arr.length ? arr.map(tarjeta).join('') : '<div class="vacio"><h3>Sin coincidencias</h3><p>Probá aflojando algún filtro.</p></div>';
   engancharTarjetas('#listaBusq');
+
+  // Se espera a que el teclado termine de cerrarse antes de subir la
+  // pantalla, si no el salto se siente brusco.
+  setTimeout(() => {
+    const titulo = $('#tituloRes');
+    if (titulo) titulo.scrollIntoView({behavior:'smooth', block:'start'});
+  }, 260);
 };
 
 function pintarEstadisticas(){
