@@ -366,6 +366,7 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
   display:flex;align-items:center;justify-content:center;margin:0 auto var(--e5);
   animation:pop .45s cubic-bezier(.2,1.5,.4,1)}
 @keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes girar{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .exito h3{font-size:21px;margin-bottom:var(--e2)}
 .exito p{font-size:15px;color:var(--texto-2);margin:0 0 var(--e6);line-height:1.5}
 
@@ -519,8 +520,15 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
   <div class="barra"><h2>Más</h2></div>
   <div class="scroll">
 
-    <!-- ── SECCIÓN DRIVE (NUEVA) ── -->
-    <p class="etiq" style="padding:var(--e5) var(--e5) var(--e3)">Respaldo en la nube</p>
+    <!-- PERFIL -->
+    <div style="text-align:center;padding:var(--e6) var(--e5) var(--e4)">
+      <div style="width:72px;height:72px;border-radius:50%;background:rgba(201,149,50,.14);color:var(--oro);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;margin:0 auto var(--e3)">BR</div>
+      <div style="font-size:18px;font-weight:700;letter-spacing:-.01em">Bahia Rica S.A.</div>
+      <div style="font-size:13px;color:var(--texto-2);margin-top:4px" id="driveUserMail">bahiarica334@gmail.com</div>
+    </div>
+
+    <!-- DRIVE -->
+    <p class="etiq" style="padding:0 var(--e5) var(--e3)">Respaldo en la nube</p>
     <div class="drive-banner" id="driveBanner">
       <div class="ico">
         <svg width="20" height="18" viewBox="0 0 87 80" fill="none">
@@ -535,7 +543,7 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
       </div>
       <div class="punto" id="drivePunto"></div>
     </div>
-    <div class="grupo" style="margin-bottom:var(--e3)">
+    <div class="grupo" style="margin-bottom:var(--e5)">
       <button class="opcion" id="btnConectarDrive" style="display:flex">
         <span class="ico" style="background:rgba(30,120,220,.1);color:#1a78dc">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
@@ -559,11 +567,12 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
       </button>
       <button class="opcion" id="btnDesconectarDrive" style="display:none">
         <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
-        <span class="t" style="color:var(--rojo)">Desconectar cuenta<span class="d" id="driveUserMail">—</span></span>
+        <span class="t" style="color:var(--rojo)">Desconectar cuenta</span>
       </button>
     </div>
-    <!-- ── FIN SECCIÓN DRIVE ── -->
 
+    <!-- CONFIGURACIÓN -->
+    <p class="etiq" style="padding:0 var(--e5) var(--e3)">Cuenta</p>
     <div class="grupo">
       <button class="opcion" id="cambiarUsuario">
         <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
@@ -583,12 +592,15 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
         <span class="switch" id="switchTema" aria-pressed="false"></span>
       </button>
     </div>
-    <div class="grupo">
-      <button class="opcion">
-        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></span>
-        <span class="t">Información<span class="d">Grupo Piveta · demo funcional</span></span>
+
+    <!-- BOTÓN SALIR -->
+    <div style="padding:var(--e3) var(--e5) var(--e6)">
+      <button class="btn" id="btnSalirApp" style="background:var(--oro);color:#1A1509;font-weight:700;gap:var(--e2)">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Salir de la app
       </button>
     </div>
+
   </div>
 </section>
 
@@ -865,23 +877,53 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
 </div>
 
 <!-- AVISO CIERRE (NUEVO) -->
-<div class="velo" id="hojaAviso" style="z-index:80">
+<!-- PANEL SALIR DE LA APP -->
+<div class="velo" id="hojaSalir" style="z-index:80">
   <div class="hoja">
     <div class="hoja-tirador"></div>
-    <div style="text-align:center;margin-bottom:var(--e4)">
-      <div style="width:52px;height:52px;border-radius:16px;background:rgba(201,149,50,.14);color:var(--oro);display:flex;align-items:center;justify-content:center;margin:0 auto var(--e3)">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 019 9v1h-2a7 7 0 10-14 0H3v-1a9 9 0 019-9z"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>
+
+    <!-- Estado: hay cambios sin guardar -->
+    <div id="salirHayCambios">
+      <div style="text-align:center;margin-bottom:var(--e5)">
+        <div style="width:52px;height:52px;border-radius:16px;background:rgba(201,149,50,.14);color:var(--oro);display:flex;align-items:center;justify-content:center;margin:0 auto var(--e3)">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 019 9v1h-2a7 7 0 10-14 0H3v-1a9 9 0 019-9z"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>
+        </div>
+        <h3 style="margin:0 0 6px">¿Guardamos antes de salir?</h3>
+        <p class="sub" style="margin:0" id="salirSubtxt">Hay datos cargados hoy sin guardar en Drive.</p>
       </div>
-      <h3 style="margin:0 0 6px">Hay cambios sin respaldar</h3>
-      <p class="sub" style="margin:0">Desde el último respaldo cargaste datos nuevos.</p>
+      <button class="btn btn-oro" id="btnSalirSi" style="margin-bottom:var(--e2)">Sí, guardar todo</button>
+      <button class="btn btn-ter" id="btnSalirNo">No, salir sin guardar</button>
     </div>
-    <div class="cambios-lista" id="avisoCambiosLista"></div>
-    <div class="alcance-sel" id="alcanceAviso">
-      <button class="chip" data-av="activo" aria-pressed="true" style="flex:1;text-align:center" id="chipAvisoActivo">Solo <span id="avisoNombreActivo">—</span></button>
-      <button class="chip" data-av="todos" aria-pressed="false" style="flex:1;text-align:center">Los 3</button>
+
+    <!-- Estado: guardando -->
+    <div id="salirGuardando" style="display:none;text-align:center;padding:var(--e4) 0">
+      <div style="width:52px;height:52px;border-radius:16px;background:rgba(201,149,50,.14);color:var(--oro);display:flex;align-items:center;justify-content:center;margin:0 auto var(--e3)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:girar 1s linear infinite"><path d="M12 2a9 9 0 019 9"/></svg>
+      </div>
+      <h3 style="margin:0 0 6px">Guardando...</h3>
+      <p class="sub" style="margin:0" id="salirGuardandoTxt">Subiendo datos a Drive</p>
     </div>
-    <button class="btn btn-oro" id="btnAvisoRespaldar" style="margin-bottom:var(--e2)">Respaldar y salir</button>
-    <button class="btn btn-ter" id="btnAvisoSalir">Salir sin respaldar</button>
+
+    <!-- Estado: guardado OK -->
+    <div id="salirOk" style="display:none;text-align:center">
+      <div style="width:60px;height:60px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto var(--e4);animation:pop .4s cubic-bezier(.2,1.5,.4,1)">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h3 style="margin:0 0 var(--e2)" id="salirOkTit">¡Todo guardado!</h3>
+      <p class="sub" style="margin:0 0 var(--e5)" id="salirOkSub">Los datos están seguros en Drive.</p>
+      <button class="btn btn-oro" id="btnSalirCerrar">Cerrar sesión</button>
+    </div>
+
+    <!-- Estado: sin cambios -->
+    <div id="salirSinCambios" style="display:none;text-align:center">
+      <div style="width:52px;height:52px;border-radius:50%;background:rgba(63,138,97,.12);color:var(--verde);display:flex;align-items:center;justify-content:center;margin:0 auto var(--e3)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h3 style="margin:0 0 var(--e2)">Todo al día</h3>
+      <p class="sub" style="margin:0 0 var(--e5)">No hay cambios desde el último respaldo.</p>
+      <button class="btn btn-oro" id="btnSalirCerrarDirecto">Cerrar sesión</button>
+    </div>
+
   </div>
 </div>
 
@@ -1159,8 +1201,7 @@ async function subirOPisarArchivo(nombre, contenido, folderId){
 async function ejecutarRespaldo(cols){
   if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); return; }
   const btn = $('#btnEjecutarRespaldo');
-  const btnAviso = $('#btnAvisoRespaldar');
-  [btn, btnAviso].forEach(b=>{ if(b){ b.disabled=true; b.textContent='Respaldando...'; } });
+  if (btn){ btn.disabled=true; btn.textContent='Respaldando...'; }
   try {
     const folderId = await buscarOCrearCarpeta();
     const payload = buildPayload(cols);
@@ -1171,12 +1212,12 @@ async function ejecutarRespaldo(cols){
     guardarEstadoDrive();
     actualizarUIDrive();
     cerrarPanel('#hojaRespaldo');
-    cerrarPanel('#hojaAviso');
     aviso('Respaldo guardado en Drive ✓','ok');
   } catch(e){
     aviso('Error al respaldar: '+(e.message||'revisá la conexión'),'alerta',5000);
+    throw e;
   } finally {
-    [btn, btnAviso].forEach(b=>{ if(b){ b.disabled=false; b.textContent = b===btnAviso?'Respaldar y salir':'Respaldar ahora'; } });
+    if (btn){ btn.disabled=false; btn.textContent='Respaldar ahora'; }
   }
 }
 
@@ -1274,39 +1315,63 @@ $('#btnEjecutarRestaurar').onclick = () => {
   });
 };
 
-/* ── Aviso al cerrar ── */
-$$('#alcanceAviso .chip').forEach(b => b.onclick = () => {
-  alcanceAvisoActual = b.dataset.av;
-  $$('#alcanceAviso .chip').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
-});
-$('#btnAvisoRespaldar').onclick = () => {
-  if (!driveToken){ cerrarPanel('#hojaAviso'); return; }
-  const cols = alcanceAvisoActual==='todos' ? PERSONAS : [colaborador];
-  ejecutarRespaldo(cols);
-};
-$('#btnAvisoSalir').onclick = () => cerrarPanel('#hojaAviso');
 
-function mostrarAvisoCierre(){
-  if (!driveToken || !hayCambios()) return;
-  alcanceAvisoActual = 'activo';
-  $$('#alcanceAviso .chip').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.av==='activo')));
-  const span = $('#avisoNombreActivo');
-  if (span) span.textContent = colaborador ? colaborador.split(' ')[0] : '—';
-  const cols = PERSONAS;
-  let html = '';
-  cols.forEach(col => {
-    const items = DB.items.filter(i=>i.colaborador===col).length;
-    if (items) html += `<div class="cambio-item"><span class="cambio-punto"></span><b>${col.split(' ')[0]}</b>: ${items} comprobante${items>1?'s':''}</div>`;
+
+/* ── SALIR DE LA APP ── */
+function abrirPanelSalir(){
+  const conCambios = PERSONAS.filter(p => {
+    const items = DB.items.filter(i => i.colaborador === p);
+    const locales = (DB.locales[p]||[]);
+    const palabras = (DB.palabras[p]||[]);
+    return items.length > 0 || locales.length > 0 || palabras.length > 0;
   });
-  const locTot = PERSONAS.reduce((s,p)=>(s+(DB.locales[p]||[]).length),0);
-  if (locTot) html += `<div class="cambio-item"><span class="cambio-punto"></span>${locTot} comercios guardados</div>`;
-  $('#avisoCambiosLista').innerHTML = html || '<div class="cambio-item">Datos sin respaldar</div>';
-  abrirPanel('#hojaAviso');
+
+  $('#salirHayCambios').style.display = conCambios.length ? 'block' : 'none';
+  $('#salirSinCambios').style.display = conCambios.length ? 'none' : 'block';
+  $('#salirGuardando').style.display = 'none';
+  $('#salirOk').style.display = 'none';
+
+  if (conCambios.length) {
+    const noms = conCambios.map(p => p.split(' ')[0]).join(', ');
+    $('#salirSubtxt').textContent = conCambios.length === 1
+      ? 'Hay datos de ' + noms + ' sin guardar en Drive.'
+      : 'Hay datos de ' + noms + ' sin guardar en Drive.';
+  }
+
+  $('#btnSalirSi').disabled = false;
+  $('#btnSalirSi').textContent = 'Sí, guardar todo';
+  abrirPanel('#hojaSalir');
 }
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden') mostrarAvisoCierre();
-});
+$('#btnSalirApp').onclick = abrirPanelSalir;
+
+$('#btnSalirSi').onclick = async () => {
+  if (!driveToken) { aviso('Conectá tu cuenta de Google primero','alerta'); return; }
+  const conCambios = PERSONAS.filter(p => {
+    const items = DB.items.filter(i => i.colaborador === p);
+    return items.length > 0 || (DB.locales[p]||[]).length > 0 || (DB.palabras[p]||[]).length > 0;
+  });
+  $('#salirHayCambios').style.display = 'none';
+  $('#salirGuardando').style.display = 'block';
+  const noms = conCambios.map(p => p.split(' ')[0]).join(', ');
+  $('#salirGuardandoTxt').textContent = 'Guardando datos de ' + noms + '...';
+  try {
+    await ejecutarRespaldo(conCambios);
+    $('#salirGuardando').style.display = 'none';
+    $('#salirOk').style.display = 'block';
+    const cant = conCambios.length;
+    $('#salirOkTit').textContent = cant === 1 ? '¡Guardado!' : '¡' + cant + ' guardados!';
+    $('#salirOkSub').textContent = noms + ' — datos seguros en Drive.';
+  } catch(e) {
+    $('#salirGuardando').style.display = 'none';
+    $('#salirHayCambios').style.display = 'block';
+    aviso('Error al guardar — revisá la conexión','alerta');
+  }
+};
+
+$('#btnSalirNo').onclick = () => cerrarPanel('#hojaSalir');
+$('#btnSalirCerrar').onclick = () => { cerrarPanel('#hojaSalir'); ir('pElegir'); };
+$('#btnSalirCerrarDirecto').onclick = () => { cerrarPanel('#hojaSalir'); ir('pElegir'); };
 
 /* ── Resto del código original sin modificaciones ── */
 const DICC = {
