@@ -17,6 +17,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+<!-- Google Identity Services -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<!-- Google API client -->
+<script src="https://apis.google.com/js/api.js" async defer></script>
+
 <style>
 :root{
   --carbon:#171714; --superficie-oscura:#22211D; --marfil:#F7F6F2;
@@ -389,6 +395,26 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
   border:1.5px solid var(--linea);font-size:17px;font-weight:700;letter-spacing:.02em;
   color:var(--texto);transition:.15s}
 .elegirLista button:active{background:var(--oro);border-color:var(--oro);color:#1A1509;transform:scale(.98)}
+
+/* ── DRIVE ── */
+.drive-banner{margin:0 var(--e5) var(--e3);padding:var(--e4);border-radius:var(--r-m);
+  background:var(--sup);border:1px solid var(--linea);display:flex;align-items:center;gap:var(--e3)}
+.drive-banner .ico{width:38px;height:38px;border-radius:var(--r-s);background:#eef4ff;
+  display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.drive-banner .info{flex:1;min-width:0}
+.drive-banner .tit{font-size:14px;font-weight:600}
+.drive-banner .det{font-size:12px;color:var(--texto-2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drive-banner .punto{width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:var(--linea)}
+.drive-banner .punto.ok{background:var(--verde)}
+.drive-banner .punto.cargando{background:var(--oro);animation:pul 1.2s ease-in-out infinite}
+@keyframes pul{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* Panel respaldo */
+.cambios-lista{background:var(--sup-2);border-radius:var(--r-m);padding:var(--e3) var(--e4);margin-bottom:var(--e4)}
+.cambio-item{display:flex;align-items:center;gap:var(--e2);padding:4px 0;font-size:13px}
+.cambio-punto{width:6px;height:6px;border-radius:50%;background:var(--oro);flex:0 0 auto}
+.alcance-sel{display:flex;gap:var(--e2);margin-bottom:var(--e4)}
+.alcance-sel .chip{flex:1;text-align:center;padding:var(--e3) var(--e2)}
 </style>
 </head>
 <body>
@@ -420,10 +446,8 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
         </div>
       </div>
     </div>
-
     <p class="etiq" style="padding:0 var(--e5)">Usuario</p>
     <div class="usuarios" id="usuarios"></div>
-
     <div class="total">
       <p class="lbl">Total del período</p>
       <div class="cifra"><span class="m">G$</span><span class="num" id="totalNum">0</span></div>
@@ -433,7 +457,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
         <span id="totalEstadoTxt">Todo registrado</span>
       </div>
     </div>
-
     <div class="acciones">
       <button class="btn btn-oro" id="btnNueva">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -450,12 +473,10 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
         </button>
       </div>
     </div>
-
     <div class="banda" id="banda">
       <div class="ico" id="bandaIco"></div>
       <div><div class="t" id="bandaT">Pendientes · 0</div><div class="d" id="bandaD">Todo está al día</div></div>
     </div>
-
     <div class="sec-tit">
       <h2 id="tituloLista">Comprobantes</h2>
       <button class="ver" id="verTodos">Ver todos</button>
@@ -502,6 +523,52 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
 <section class="pantalla" id="pMas">
   <div class="barra"><h2>Más</h2></div>
   <div class="scroll">
+
+    <!-- ── SECCIÓN DRIVE (NUEVA) ── -->
+    <p class="etiq" style="padding:var(--e5) var(--e5) var(--e3)">Respaldo en la nube</p>
+    <div class="drive-banner" id="driveBanner">
+      <div class="ico">
+        <svg width="20" height="18" viewBox="0 0 87 80" fill="none">
+          <path d="M28 55L5 70H40L55 45L28 55Z" fill="#1FA463"/>
+          <path d="M55 45L40 70H75L87 50L55 45Z" fill="#FBBC04"/>
+          <path d="M28 55L43.5 5L59 30L28 55Z" fill="#4285F4"/>
+        </svg>
+      </div>
+      <div class="info">
+        <div class="tit">Google Drive</div>
+        <div class="det" id="driveDetTxt">Sin conectar</div>
+      </div>
+      <div class="punto" id="drivePunto"></div>
+    </div>
+    <div class="grupo" style="margin-bottom:var(--e3)">
+      <button class="opcion" id="btnConectarDrive" style="display:flex">
+        <span class="ico" style="background:rgba(30,120,220,.1);color:#1a78dc">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        </span>
+        <span class="t">Conectar con Google<span class="d">Necesario para respaldar</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--texto-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <button class="opcion" id="btnRespaldar" style="display:none">
+        <span class="ico" style="background:rgba(30,120,220,.1);color:#1a78dc">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 019 9v1h-2a7 7 0 10-14 0H3v-1a9 9 0 019-9z"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>
+        </span>
+        <span class="t">Respaldar a Drive<span class="d" id="driveUltimo">Nunca respaldado</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--texto-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <button class="opcion" id="btnRestaurar" style="display:none">
+        <span class="ico" style="background:rgba(63,138,97,.12);color:var(--verde)">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a9 9 0 01-9-9v-1h2a7 7 0 1014 0h2v1a9 9 0 01-9 9z"/><path d="M12 12V4M9 7l3-3 3 3"/></svg>
+        </span>
+        <span class="t">Restaurar desde Drive<span class="d">Recuperar datos guardados</span></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--texto-2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
+      <button class="opcion" id="btnDesconectarDrive" style="display:none">
+        <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>
+        <span class="t" style="color:var(--rojo)">Desconectar cuenta<span class="d" id="driveUserMail">—</span></span>
+      </button>
+    </div>
+    <!-- ── FIN SECCIÓN DRIVE ── -->
+
     <div class="grupo">
       <button class="opcion" id="cambiarUsuario">
         <span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
@@ -567,7 +634,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
       </div>
       <div class="errFecha" id="errFecha">Esa fecha no existe</div>
     </div>
-
     <div class="sub-paso" data-paso="2" style="display:none">
       <div class="campo">
         <label>Valor</label>
@@ -585,7 +651,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
         <span id="lblDictar">Dictar el detalle</span>
       </button>
     </div>
-
     <div class="sub-paso" data-paso="3" style="display:none">
       <div class="det-monto" style="padding-top:var(--e5)">
         <div class="m"><span>G$</span><span id="cfValor">0</span></div>
@@ -687,6 +752,7 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
 </nav>
 </div>
 
+<!-- PANELES EXISTENTES SIN CAMBIOS -->
 <div class="velo" id="velaMes">
   <div class="hoja"><div class="hoja-tirador"></div><h3>Elegir mes</h3>
     <div class="opt-lista" id="listaMeses"></div>
@@ -699,7 +765,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
     <button class="btn btn-ter" data-cerrar>Cancelar</button>
   </div>
 </div>
-
 <div class="hojaLocal" id="hojaLocal">
   <div class="cajaLocal" id="cajaLocal">
     <div class="barraLocal">
@@ -710,7 +775,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
     <div class="resLocal" id="resLocal"></div>
   </div>
 </div>
-
 <div class="confirm" id="accLocal">
   <div class="caja">
     <h3>Editar comercio</h3>
@@ -722,7 +786,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
     <button class="btn btn-ter" id="accCancelar" style="width:100%;margin-top:9px">Cancelar</button>
   </div>
 </div>
-
 <div class="confirm" id="confirm">
   <div class="caja">
     <h3 id="cTit">¿Seguro?</h3>
@@ -730,7 +793,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
     <div class="fila"><button class="btn btn-sec" id="cNo">Cancelar</button><button class="btn btn-oro" id="cSi" style="background:var(--rojo);color:#fff">Sí</button></div>
   </div>
 </div>
-
 <div class="velo" id="hojaPal">
   <div class="hoja">
     <div class="hoja-tirador"></div>
@@ -743,7 +805,6 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
     <button class="btn btn-ter" data-cerrar>Cerrar</button>
   </div>
 </div>
-
 <div class="velo" id="hojaExport">
   <div class="hoja">
     <div class="hoja-tirador"></div>
@@ -765,12 +826,80 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
   </div>
 </div>
 
+<!-- PANEL RESPALDO DRIVE (NUEVO) -->
+<div class="velo" id="hojaRespaldo">
+  <div class="hoja">
+    <div class="hoja-tirador"></div>
+    <h3 id="respTit">Respaldar a Drive</h3>
+    <p class="sub" id="respSub">Elegí qué colaboradores respaldar</p>
+    <div class="alcance-sel" id="alcanceRespaldo">
+      <button class="chip" data-r="activo" aria-pressed="true" style="flex:1;text-align:center" id="chipRespActivo">Solo <span id="respNombreActivo">—</span></button>
+      <button class="chip" data-r="todos" aria-pressed="false" style="flex:1;text-align:center">Los 3</button>
+    </div>
+    <div class="cambios-lista" id="respCambiosLista"></div>
+    <button class="btn btn-oro" id="btnEjecutarRespaldo" style="margin-bottom:var(--e2)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto"><path d="M12 2a9 9 0 019 9v1h-2a7 7 0 10-14 0H3v-1a9 9 0 019-9z"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>
+      Respaldar ahora
+    </button>
+    <button class="btn btn-ter" data-cerrar>Cancelar</button>
+  </div>
+</div>
+
+<!-- PANEL RESTAURAR DRIVE (NUEVO) -->
+<div class="velo" id="hojaRestaurar">
+  <div class="hoja">
+    <div class="hoja-tirador"></div>
+    <h3>Restaurar desde Drive</h3>
+    <p class="sub">Esto reemplaza los datos actuales del celular con el último respaldo guardado en Drive. No se puede deshacer.</p>
+    <div class="alcance-sel" id="alcanceRestaurar">
+      <button class="chip" data-rr="activo" aria-pressed="true" style="flex:1;text-align:center" id="chipRestActivo">Solo <span id="restNombreActivo">—</span></button>
+      <button class="chip" data-rr="todos" aria-pressed="false" style="flex:1;text-align:center">Los 3</button>
+    </div>
+    <div class="cambios-lista" style="margin-bottom:var(--e4)">
+      <div class="cambio-item" style="color:var(--texto-2);font-size:13px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex:0 0 auto"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Se restaurarán comprobantes, comercios y palabras del último respaldo en Drive.
+      </div>
+    </div>
+    <button class="btn btn-oro" id="btnEjecutarRestaurar" style="margin-bottom:var(--e2)">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:0 0 auto"><path d="M12 22a9 9 0 01-9-9v-1h2a7 7 0 1014 0h2v1a9 9 0 01-9 9z"/><path d="M12 12V4M9 7l3-3 3-3"/></svg>
+      Restaurar ahora
+    </button>
+    <button class="btn btn-ter" data-cerrar>Cancelar</button>
+  </div>
+</div>
+
+<!-- AVISO CIERRE (NUEVO) -->
+<div class="velo" id="hojaAviso" style="z-index:80">
+  <div class="hoja">
+    <div class="hoja-tirador"></div>
+    <div style="text-align:center;margin-bottom:var(--e4)">
+      <div style="width:52px;height:52px;border-radius:16px;background:rgba(201,149,50,.14);color:var(--oro);display:flex;align-items:center;justify-content:center;margin:0 auto var(--e3)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a9 9 0 019 9v1h-2a7 7 0 10-14 0H3v-1a9 9 0 019-9z"/><path d="M12 12v8M9 17l3 3 3-3"/></svg>
+      </div>
+      <h3 style="margin:0 0 6px">Hay cambios sin respaldar</h3>
+      <p class="sub" style="margin:0">Desde el último respaldo cargaste datos nuevos.</p>
+    </div>
+    <div class="cambios-lista" id="avisoCambiosLista"></div>
+    <div class="alcance-sel" id="alcanceAviso">
+      <button class="chip" data-av="activo" aria-pressed="true" style="flex:1;text-align:center" id="chipAvisoActivo">Solo <span id="avisoNombreActivo">—</span></button>
+      <button class="chip" data-av="todos" aria-pressed="false" style="flex:1;text-align:center">Los 3</button>
+    </div>
+    <button class="btn btn-oro" id="btnAvisoRespaldar" style="margin-bottom:var(--e2)">Respaldar y salir</button>
+    <button class="btn btn-ter" id="btnAvisoSalir">Salir sin respaldar</button>
+  </div>
+</div>
+
 <div class="aviso" id="aviso">
   <svg id="avisoIcono" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
   <span id="avisoTxt"></span>
 </div>
 
 <script>
+const GOOGLE_CLIENT_ID = '620543096799-2h3hshs2i3kkl2sse3k53uggf1jk82m2.apps.googleusercontent.com';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+const DRIVE_FOLDER = 'Prestação de Conta · Grupo Piveta';
+
 const PERSONAS = ['LAURO ZIMMER','RENATO MOURA','GUTTO BROETTO'];
 const CATEGORIAS = ['Combustível','Refeição','Manutenção','Hotel','Passagem','Outros'];
 const COLORES_CAT = {'Combustível':'#C99532','Refeição':'#3F8A61','Manutenção':'#E2B65A',
@@ -787,7 +916,9 @@ const Store = (() => {
     set(k,v){ try { ok ? localStorage.setItem(k,v) : (mem[k]=v); } catch(e){ mem[k]=v; } }
   };
 })();
+
 const KEY = 'piveta_pc_v1';
+const KEY_DRIVE = 'piveta_drive_v1';
 let DB = { items: [], locales: {}, palabras: {} };
 try { const raw = Store.get(KEY); if (raw) DB = JSON.parse(raw); } catch(e){}
 if (!Array.isArray(DB.items)) DB.items = [];
@@ -820,7 +951,11 @@ DB.items.forEach(it => {
   if (typeof it.tocadoTrasExport !== 'boolean') it.tocadoTrasExport = false;
 });
 
-const guardarDB = () => Store.set(KEY, JSON.stringify(DB));
+const guardarDB = () => {
+  Store.set(KEY, JSON.stringify(DB));
+  tomarSnapshot();
+};
+
 function localesDe(col){ if (!Array.isArray(DB.locales[col])) DB.locales[col] = []; return DB.locales[col]; }
 function palabrasDe(col){ if (!Array.isArray(DB.palabras[col])) DB.palabras[col] = []; return DB.palabras[col]; }
 function registrarLocal(col, nombre){
@@ -835,25 +970,350 @@ function iniciales(nombre){
   return p.slice(0,2).map(w=>w[0]).join('').toUpperCase();
 }
 
+/* ──────────────────────────────────────────
+   DRIVE — estado global
+────────────────────────────────────────── */
+let driveToken = null;
+let driveUser = null;
+let driveUltimoTs = null;
+let driveSnapshotHash = null;
+let alcanceRespActual = 'activo';
+let alcanceRestActual = 'activo';
+let alcanceAvisoActual = 'activo';
+
+function hashDB(){
+  return JSON.stringify({
+    items: DB.items.map(i=>({id:i.id,valor:i.valor,local:i.local,data:i.data,despesa:i.despesa,obs:i.obs,nf:i.nf,colaborador:i.colaborador})),
+    locales: DB.locales,
+    palabras: DB.palabras
+  });
+}
+function tomarSnapshot(){ driveSnapshotHash = hashDB(); }
+function hayCambios(){ return hashDB() !== driveSnapshotHash; }
+
+function cargarEstadoDrive(){
+  try {
+    const raw = Store.get(KEY_DRIVE);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    driveToken = d.token || null;
+    driveUser = d.user || null;
+    driveUltimoTs = d.ultimoTs || null;
+    driveSnapshotHash = d.snapshotHash || null;
+  } catch(e){}
+}
+function guardarEstadoDrive(){
+  Store.set(KEY_DRIVE, JSON.stringify({
+    token: driveToken,
+    user: driveUser,
+    ultimoTs: driveUltimoTs,
+    snapshotHash: driveSnapshotHash
+  }));
+}
+cargarEstadoDrive();
+if (!driveSnapshotHash) tomarSnapshot();
+
+function actualizarUIDrive(){
+  const conectado = !!driveToken;
+  $('#btnConectarDrive').style.display = conectado ? 'none' : 'flex';
+  $('#btnRespaldar').style.display = conectado ? 'flex' : 'none';
+  $('#btnRestaurar').style.display = conectado ? 'flex' : 'none';
+  $('#btnDesconectarDrive').style.display = conectado ? 'flex' : 'none';
+  if (conectado){
+    $('#drivePunto').className = 'punto ok';
+    $('#driveDetTxt').textContent = driveUser ? driveUser.email : 'Conectado';
+    $('#driveUserMail').textContent = driveUser ? driveUser.email : '';
+    const ts = driveUltimoTs ? new Date(driveUltimoTs).toLocaleString('es-PY',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : null;
+    $('#driveUltimo').textContent = ts ? 'Último: '+ts : 'Nunca respaldado';
+  } else {
+    $('#drivePunto').className = 'punto';
+    $('#driveDetTxt').textContent = 'Sin conectar';
+  }
+}
+actualizarUIDrive();
+
+/* Google Identity */
+function initGoogle(){
+  if (!window.google){ setTimeout(initGoogle, 600); return; }
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: onGoogleCredential,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+    scope: DRIVE_SCOPE
+  });
+}
+initGoogle();
+
+function onGoogleCredential(resp){
+  try {
+    const p = JSON.parse(atob(resp.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
+    driveUser = { name: p.name, email: p.email };
+  } catch(e){ driveUser = { name:'Usuario', email:'' }; }
+  solicitarTokenDrive(resp.credential);
+}
+
+function solicitarTokenDrive(idToken){
+  if (!window.google || !window.google.accounts || !window.google.accounts.oauth2){ aviso('Cargando Google...','alerta'); return; }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: DRIVE_SCOPE,
+    callback: (tokenResp) => {
+      if (tokenResp.error){ aviso('Error al conectar: '+tokenResp.error,'alerta'); return; }
+      driveToken = tokenResp.access_token;
+      guardarEstadoDrive();
+      actualizarUIDrive();
+      aviso('Cuenta conectada ✓','ok');
+    }
+  });
+  client.requestAccessToken({ prompt: '' });
+}
+
+$('#btnConectarDrive').onclick = () => {
+  if (!window.google){ aviso('Cargando Google, intentá en un momento','alerta'); return; }
+  google.accounts.id.prompt((notif) => {
+    if (notif.isNotDisplayed() || notif.isSkippedMoment()){
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: DRIVE_SCOPE,
+        callback: (tokenResp) => {
+          if (tokenResp.error){ aviso('No se pudo conectar','alerta'); return; }
+          driveToken = tokenResp.access_token;
+          guardarEstadoDrive();
+          actualizarUIDrive();
+          aviso('Cuenta conectada ✓','ok');
+        }
+      });
+      client.requestAccessToken({ prompt: 'consent' });
+    }
+  });
+};
+
+$('#btnDesconectarDrive').onclick = () => {
+  preguntar('Desconectar Google','Se eliminará la conexión. Los respaldos guardados en Drive quedan intactos.', () => {
+    if (window.google && driveToken) google.accounts.oauth2.revoke(driveToken, ()=>{});
+    driveToken = null; driveUser = null;
+    guardarEstadoDrive();
+    actualizarUIDrive();
+    aviso('Cuenta desconectada');
+  });
+};
+
+/* ── Construir payload de respaldo ── */
+function buildPayload(cols){
+  const ahora = new Date().toISOString();
+  return {
+    version: 2,
+    generado_en: ahora,
+    empresa: 'Grupo Piveta',
+    colaboradores: cols.reduce((acc, col) => {
+      acc[col] = {
+        items: DB.items.filter(i => i.colaborador === col),
+        locales: DB.locales[col] || [],
+        palabras: DB.palabras[col] || []
+      };
+      return acc;
+    }, {})
+  };
+}
+
+/* ── API Drive ── */
+async function buscarOCrearCarpeta(){
+  const q = `name='${DRIVE_FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)`,
+    { headers:{ Authorization:'Bearer '+driveToken } });
+  const d = await r.json();
+  if (d.files && d.files.length) return d.files[0].id;
+  const cr = await fetch('https://www.googleapis.com/drive/v3/files',{
+    method:'POST', headers:{ Authorization:'Bearer '+driveToken,'Content-Type':'application/json' },
+    body: JSON.stringify({ name: DRIVE_FOLDER, mimeType:'application/vnd.google-apps.folder' })
+  });
+  const cd = await cr.json();
+  return cd.id;
+}
+
+async function subirOPisarArchivo(nombre, contenido, folderId){
+  const q = `name='${nombre}' and '${folderId}' in parents and trashed=false`;
+  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`,
+    { headers:{ Authorization:'Bearer '+driveToken } });
+  const d = await r.json();
+  const body = new Blob([contenido], {type:'application/json'});
+  if (d.files && d.files.length){
+    const fileId = d.files[0].id;
+    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,{
+      method:'PATCH', headers:{ Authorization:'Bearer '+driveToken,'Content-Type':'application/json' }, body
+    });
+  } else {
+    const meta = JSON.stringify({ name: nombre, parents:[folderId] });
+    const form = new FormData();
+    form.append('metadata', new Blob([meta],{type:'application/json'}));
+    form.append('file', body);
+    await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+      method:'POST', headers:{ Authorization:'Bearer '+driveToken }, body: form
+    });
+  }
+}
+
+async function ejecutarRespaldo(cols){
+  if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); return; }
+  const btn = $('#btnEjecutarRespaldo');
+  const btnAviso = $('#btnAvisoRespaldar');
+  [btn, btnAviso].forEach(b=>{ if(b){ b.disabled=true; b.textContent='Respaldando...'; } });
+  try {
+    const folderId = await buscarOCrearCarpeta();
+    const payload = buildPayload(cols);
+    const nombre = 'backup_piveta_'+cols.map(c=>c.split(' ')[0]).join('_')+'.json';
+    await subirOPisarArchivo(nombre, JSON.stringify(payload, null, 2), folderId);
+    driveUltimoTs = new Date().toISOString();
+    tomarSnapshot();
+    guardarEstadoDrive();
+    actualizarUIDrive();
+    cerrarPanel('#hojaRespaldo');
+    cerrarPanel('#hojaAviso');
+    aviso('Respaldo guardado en Drive ✓','ok');
+  } catch(e){
+    aviso('Error al respaldar: '+(e.message||'revisá la conexión'),'alerta',5000);
+  } finally {
+    [btn, btnAviso].forEach(b=>{ if(b){ b.disabled=false; b.textContent = b===btnAviso?'Respaldar y salir':'Respaldar ahora'; } });
+  }
+}
+
+async function ejecutarRestaurar(cols){
+  if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); return; }
+  const btn = $('#btnEjecutarRestaurar');
+  btn.disabled = true; btn.textContent = 'Restaurando...';
+  try {
+    const folderId = await buscarOCrearCarpeta();
+    const nombre = 'backup_piveta_'+cols.map(c=>c.split(' ')[0]).join('_')+'.json';
+    const q = `name='${nombre}' and '${folderId}' in parents and trashed=false`;
+    const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`,
+      { headers:{ Authorization:'Bearer '+driveToken } });
+    const d = await r.json();
+    if (!d.files || !d.files.length){ aviso('No hay respaldo guardado para esos colaboradores','alerta'); return; }
+    const fileId = d.files[0].id;
+    const fr = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+      { headers:{ Authorization:'Bearer '+driveToken } });
+    const payload = await fr.json();
+    cols.forEach(col => {
+      if (payload.colaboradores && payload.colaboradores[col]){
+        const src = payload.colaboradores[col];
+        if (Array.isArray(src.items)) src.items.forEach(it => {
+          const idx = DB.items.findIndex(x=>x.id===it.id&&x.colaborador===col);
+          if (idx>=0) DB.items[idx]=it; else DB.items.push(it);
+        });
+        if (Array.isArray(src.locales)) DB.locales[col] = src.locales;
+        if (Array.isArray(src.palabras)) DB.palabras[col] = src.palabras;
+      }
+    });
+    guardarDB();
+    pintarTodo();
+    cerrarPanel('#hojaRestaurar');
+    aviso('Datos restaurados ✓','ok');
+  } catch(e){
+    aviso('Error al restaurar: '+(e.message||'revisá la conexión'),'alerta',5000);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Restaurar ahora';
+  }
+}
+
+/* ── Panel respaldo ── */
+function abrirPanelRespaldo(){
+  if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); return; }
+  alcanceRespActual = 'activo';
+  $('#chipRespActivo').textContent = 'Solo ';
+  const span = document.createElement('span'); span.id='respNombreActivo';
+  span.textContent = colaborador ? colaborador.split(' ')[0] : '—';
+  $('#chipRespActivo').appendChild(span);
+  $$('#alcanceRespaldo .chip').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.r==='activo')));
+  pintarCambiosRespaldo();
+  abrirPanel('#hojaRespaldo');
+}
+function pintarCambiosRespaldo(){
+  const cols = alcanceRespActual === 'todos' ? PERSONAS : [colaborador];
+  let html = '';
+  cols.forEach(col => {
+    const items = DB.items.filter(i=>i.colaborador===col).length;
+    const locales = (DB.locales[col]||[]).length;
+    const palabras = (DB.palabras[col]||[]).length;
+    html += `<div class="cambio-item"><span class="cambio-punto"></span><b>${col.split(' ')[0]}</b>: ${items} comprobantes · ${locales} comercios · ${palabras} palabras</div>`;
+  });
+  $('#respCambiosLista').innerHTML = html || '<div class="cambio-item">Sin datos para respaldar</div>';
+  $('#respTit').textContent = alcanceRespActual==='todos' ? 'Respaldar los 3' : 'Respaldar a Drive';
+}
+$$('#alcanceRespaldo .chip').forEach(b => b.onclick = () => {
+  alcanceRespActual = b.dataset.r;
+  $$('#alcanceRespaldo .chip').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  pintarCambiosRespaldo();
+});
+$('#btnRespaldar').onclick = abrirPanelRespaldo;
+$('#btnEjecutarRespaldo').onclick = () => {
+  const cols = alcanceRespActual==='todos' ? PERSONAS : [colaborador];
+  ejecutarRespaldo(cols);
+};
+
+/* ── Panel restaurar ── */
+function abrirPanelRestaurar(){
+  if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); return; }
+  alcanceRestActual = 'activo';
+  const span = $('#restNombreActivo');
+  if (span) span.textContent = colaborador ? colaborador.split(' ')[0] : '—';
+  $$('#alcanceRestaurar .chip').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.rr==='activo')));
+  abrirPanel('#hojaRestaurar');
+}
+$$('#alcanceRestaurar .chip').forEach(b => b.onclick = () => {
+  alcanceRestActual = b.dataset.rr;
+  $$('#alcanceRestaurar .chip').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+});
+$('#btnRestaurar').onclick = abrirPanelRestaurar;
+$('#btnEjecutarRestaurar').onclick = () => {
+  const cols = alcanceRestActual==='todos' ? PERSONAS : [colaborador];
+  preguntar('¿Restaurar datos?','Los datos actuales del celular serán reemplazados por el respaldo de Drive.', ()=>{
+    ejecutarRestaurar(cols);
+  });
+};
+
+/* ── Aviso al cerrar ── */
+$$('#alcanceAviso .chip').forEach(b => b.onclick = () => {
+  alcanceAvisoActual = b.dataset.av;
+  $$('#alcanceAviso .chip').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+});
+$('#btnAvisoRespaldar').onclick = () => {
+  if (!driveToken){ cerrarPanel('#hojaAviso'); return; }
+  const cols = alcanceAvisoActual==='todos' ? PERSONAS : [colaborador];
+  ejecutarRespaldo(cols);
+};
+$('#btnAvisoSalir').onclick = () => cerrarPanel('#hojaAviso');
+
+function mostrarAvisoCierre(){
+  if (!driveToken || !hayCambios()) return;
+  alcanceAvisoActual = 'activo';
+  $$('#alcanceAviso .chip').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.av==='activo')));
+  const span = $('#avisoNombreActivo');
+  if (span) span.textContent = colaborador ? colaborador.split(' ')[0] : '—';
+  const cols = PERSONAS;
+  let html = '';
+  cols.forEach(col => {
+    const items = DB.items.filter(i=>i.colaborador===col).length;
+    if (items) html += `<div class="cambio-item"><span class="cambio-punto"></span><b>${col.split(' ')[0]}</b>: ${items} comprobante${items>1?'s':''}</div>`;
+  });
+  const locTot = PERSONAS.reduce((s,p)=>(s+(DB.locales[p]||[]).length),0);
+  if (locTot) html += `<div class="cambio-item"><span class="cambio-punto"></span>${locTot} comercios guardados</div>`;
+  $('#avisoCambiosLista').innerHTML = html || '<div class="cambio-item">Datos sin respaldar</div>';
+  abrirPanel('#hojaAviso');
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') mostrarAvisoCierre();
+});
+
+/* ── Resto del código original sin modificaciones ── */
 const DICC = {
-  'Combustível':['gasoil','gas oil','gasoíl','diesel','diésel','nafta','gasolina','combustible',
-    'surtidor','estacion','estación','copetrol','puma','petrobras','petropar','shell','ypf','querosene'],
-  'Refeição':['comida','almuerzo','almorzar','cena','cenar','desayuno','merienda','restaurante',
-    'consumicion','consumición','consumo','asado','parrilla','cafe','café','comedor','empanada',
-    'hamburguesa','pizza','viveres','víveres','provista','mercaderia','mercadería','alimentos',
-    'comestibles','bebida','gaseosa','yerba','agua'],
-  'Manutenção':['mantenimiento','manutencion','repuesto','repuestos','taller','mecanico','mecánico',
-    'service','cubierta','cubiertas','neumatico','neumático','goma','gomas','gomeria','gomería',
-    'aceite','filtro','filtros','bateria','batería','reparacion','reparación','arreglo','lavado',
-    'lavadero','chaperia','chapería','pintura','soldadura','herramienta','herramientas','ferreteria',
-    'ferretería','tornillo','correa','bujia','bujía','engrase','carburador','rodamiento','embrague',
-    'radiador','alternador','amortiguador','escape','llanta','manguera','sensor','bomba'],
-  'Hotel':['hotel','hospedaje','alojamiento','posada','hostal','pernocte','habitacion','habitación',
-    'motel','cabaña','estadia','estadía','dormida'],
-  'Passagem':['pasaje','pasajes','boleto','vuelo','avion','avión','aereo','aéreo','colectivo',
-    'omnibus','ómnibus','micro','taxi','remis','flete','encomienda','traslado','peaje','balsa','lancha'],
-  'Outros':['farmacia','remedio','medicamento','papeleria','papelería','oficina','limpieza',
-    'celular','recarga','internet']
+  'Combustível':['gasoil','gas oil','gasoíl','diesel','diésel','nafta','gasolina','combustible','surtidor','estacion','estación','copetrol','puma','petrobras','petropar','shell','ypf','querosene'],
+  'Refeição':['comida','almuerzo','almorzar','cena','cenar','desayuno','merienda','restaurante','consumicion','consumición','consumo','asado','parrilla','cafe','café','comedor','empanada','hamburguesa','pizza','viveres','víveres','provista','mercaderia','mercadería','alimentos','comestibles','bebida','gaseosa','yerba','agua'],
+  'Manutenção':['mantenimiento','manutencion','repuesto','repuestos','taller','mecanico','mecánico','service','cubierta','cubiertas','neumatico','neumático','goma','gomas','gomeria','gomería','aceite','filtro','filtros','bateria','batería','reparacion','reparación','arreglo','lavado','lavadero','chaperia','chapería','pintura','soldadura','herramienta','herramientas','ferreteria','ferretería','tornillo','correa','bujia','bujía','engrase','carburador','rodamiento','embrague','radiador','alternador','amortiguador','escape','llanta','manguera','sensor','bomba'],
+  'Hotel':['hotel','hospedaje','alojamiento','posada','hostal','pernocte','habitacion','habitación','motel','cabaña','estadia','estadía','dormida'],
+  'Passagem':['pasaje','pasajes','boleto','vuelo','avion','avión','aereo','aéreo','colectivo','omnibus','ómnibus','micro','taxi','remis','flete','encomienda','traslado','peaje','balsa','lancha'],
+  'Outros':['farmacia','remedio','medicamento','papeleria','papelería','oficina','limpieza','celular','recarga','internet']
 };
 const norm = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim();
 function sugerirCategoria(txt){
@@ -882,10 +1342,7 @@ const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n||0));
 
 let colaborador = null;
 let mesActual = 8, anoActual = 2026;
-{
-  const hoy = new Date();
-  mesActual = hoy.getMonth()+1; anoActual = hoy.getFullYear();
-}
+{ const hoy = new Date(); mesActual = hoy.getMonth()+1; anoActual = hoy.getFullYear(); }
 
 function fechaCorta(iso){
   if (!iso) return '—';
@@ -1025,11 +1482,9 @@ function pintarInicio(){
   animarNumero($('#totalNum'), totalPrevio, total); totalPrevio = total;
   $('#totalSub').textContent = arr.length+' comprobante'+(arr.length===1?'':'s');
   pintarSelPeriodo();
-
   const est = $('#totalEstado');
   est.classList.toggle('amb', pend>0);
   $('#totalEstadoTxt').textContent = pend>0 ? (pend+' sin exportar') : (arr.length?'Todo registrado':'Sin movimientos');
-
   const banda = $('#banda'); banda.classList.remove('amb');
   if (pend>0){
     banda.classList.add('amb');
@@ -1039,7 +1494,6 @@ function pintarInicio(){
     $('#bandaIco').innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
     $('#bandaT').textContent = 'Pendientes · 0'; $('#bandaD').textContent = arr.length?'Todo está al día':'Todavía no cargaste nada';
   }
-
   $('#tituloLista').textContent = pend>0 ? 'Últimos comprobantes' : 'Comprobantes exportados';
   $('#listaInicio').innerHTML = arr.length ? arr.slice(0,4).map(tarjeta).join('') :
     '<div class="vacio"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h9l5 5v15H6z"/><path d="M15 2v5h5"/><path d="M9 13h7M9 17h5"/></svg></div>'+
@@ -1054,24 +1508,20 @@ function pintarComprobantes(){
   const q = norm(($('#qLista')?$('#qLista').value:'').trim());
   let arr = delPeriodo();
   if (q) arr = arr.filter(f => norm(f.local).includes(q) || (f.nf||'').includes(q) || norm(f.obs).includes(q));
-
   const pendientes = arr.filter(f => !f.exportado);
   const exportadas = arr.filter(f => f.exportado);
-
   if (!arr.length){
     $('#listaComprobantes').innerHTML =
       '<div class="vacio"><div class="ico"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></div>'+
       '<h3>Nada por acá</h3><p>Probá con otro texto, o cargá la primera factura del período.</p></div>';
     return;
   }
-
   let html = '';
   html += '<div class="secDosCol"><span class="punto" style="background:var(--oro)"></span>'+
     '<h3>Pendientes</h3><span class="n">'+pendientes.length+'</span></div>';
   html += pendientes.length
     ? '<div class="lista">'+pendientes.map(tarjeta).join('')+'</div>'
     : '<p class="vacioChico">Todo lo cargado ya se exportó ✓</p>';
-
   if (exportadas.length){
     html += '<div class="secDosCol"><span class="punto" style="background:var(--verde)"></span>'+
       '<h3>Ya exportadas</h3><span class="n">'+exportadas.length+'</span></div>';
@@ -1080,7 +1530,6 @@ function pintarComprobantes(){
       'Ya se mandaron a la PC — se vuelven a incluir solas la próxima vez que exportes</div>';
     html += '<div class="lista">'+exportadas.map(tarjeta).join('')+'</div>';
   }
-
   $('#listaComprobantes').innerHTML = html;
   engancharTarjetas('#listaComprobantes');
 }
@@ -1262,7 +1711,6 @@ $('#btnPasoSig').onclick = () => {
     data: fechaISO(), valor: borrador.valor, obs: borrador.obs.trim()
   };
   const duplicada = buscarPosibleDuplicada(datos, editandoId);
-
   if (editandoId){
     const i = DB.items.findIndex(function(x){return x.id===editandoId;});
     if (i>=0){
@@ -1279,7 +1727,6 @@ $('#btnPasoSig').onclick = () => {
   registrarLocal(colaborador, datos.local);
   guardarDB(); pintarTodo();
   ir(editandoId ? 'pComprobantes':'pInicio');
-
   if (duplicada){
     const fechaTxt = (duplicada.data||'').split('-').reverse().join('/');
     setTimeout(function(){ aviso(
@@ -1494,10 +1941,7 @@ $('#limpiarBusq').onclick = () => {
   $('#listaBusq').innerHTML=''; $('#tituloRes').style.display='none';
 };
 $('#btnHacerBusq').onclick = () => {
-  // El teclado se queda abierto y tapa los resultados si no le decimos
-  // explícitamente que ya terminamos de escribir.
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-
   const q=norm($('#bTexto').value.trim());
   const min=parseInt(($('#bMin').value||'').replace(/\D/g,''),10)||0;
   const max=parseInt(($('#bMax').value||'').replace(/\D/g,''),10)||Infinity;
@@ -1511,9 +1955,6 @@ $('#btnHacerBusq').onclick = () => {
   $('#tituloRes h2').textContent = arr.length+' resultado'+(arr.length===1?'':'s');
   $('#listaBusq').innerHTML = arr.length ? arr.map(tarjeta).join('') : '<div class="vacio"><h3>Sin coincidencias</h3><p>Probá aflojando algún filtro.</p></div>';
   engancharTarjetas('#listaBusq');
-
-  // Se espera a que el teclado termine de cerrarse antes de subir la
-  // pantalla, si no el salto se siente brusco.
   setTimeout(() => {
     const titulo = $('#tituloRes');
     if (titulo) titulo.scrollIntoView({behavior:'smooth', block:'start'});
@@ -1526,7 +1967,6 @@ function pintarEstadisticas(){
   $('#statPeriodo').textContent = periodoTxt();
   $('#statTotal').textContent = fmt(total);
   $('#statCant').textContent = arr.length+' comprobante'+(arr.length===1?'':'s');
-
   const porCat = {}; arr.forEach(function(f){ porCat[f.despesa]=(porCat[f.despesa]||0)+f.valor; });
   const cats = Object.entries(porCat).sort(function(a,b){return b[1]-a[1];});
   const R=54, C=2*Math.PI*R; let offset=0;
@@ -1549,7 +1989,6 @@ function pintarEstadisticas(){
     '<span class="n">'+c+'</span><span class="v">'+fmt(v)+'</span>'+
     '<span class="p">'+(total?Math.round(v/total*100):0)+'%</span></div>';
   }).join('');
-
   const serie = [];
   for (let i=5;i>=0;i--){
     let m=mesActual-i, a=anoActual; while (m<1){ m+=12; a--; }
@@ -1579,7 +2018,7 @@ function construirPaquete(col){
   return { arr:arr, nombre:col.split(' ')[0]+'_'+MESNOM[mesActual-1]+'_'+anoActual+'.json',
     texto:JSON.stringify(paquete,null,2), editadas:arr.filter(function(i){return i.tocadoTrasExport;}).length };
 }
-function marcarExportados(paquetes){ paquetes.forEach(function(p){p.arr.forEach(function(i){i.exportado=true;i.tocadoTrasExport=false;});}); guardarDB(); pintarTodo(); }
+function marcarExportados(paquetes){ paquetes.forEach(function(p){p.arr.forEach(function(i){i.exportado=true;i.tocadoTrasExport=false;})}); guardarDB(); pintarTodo(); }
 function resumenSalida(paquetes){
   const ed = paquetes.reduce(function(s,p){return s+p.editadas;},0);
   const base = paquetes.length===1 ? paquetes[0].nombre : paquetes.length+' archivos';
