@@ -18,11 +18,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 
-<!-- Google Identity Services -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<!-- Google API client -->
-<script src="https://apis.google.com/js/api.js" async defer></script>
-
 <style>
 :root{
   --carbon:#171714; --superficie-oscura:#22211D; --marfil:#F7F6F2;
@@ -1037,60 +1032,63 @@ function actualizarUIDrive(){
 actualizarUIDrive();
 
 /* Google Identity */
+let googleListo = false;
 function initGoogle(){
-  if (!window.google){ setTimeout(initGoogle, 600); return; }
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: onGoogleCredential,
-    auto_select: false,
-    cancel_on_tap_outside: true,
-    scope: DRIVE_SCOPE
-  });
+  if (!window.google || !window.google.accounts) return;
+  try {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: onGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    googleListo = true;
+  } catch(e){ googleListo = false; }
 }
-initGoogle();
+window.addEventListener('load', () => { setTimeout(initGoogle, 800); });
 
 function onGoogleCredential(resp){
   try {
     const p = JSON.parse(atob(resp.credential.split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));
     driveUser = { name: p.name, email: p.email };
   } catch(e){ driveUser = { name:'Usuario', email:'' }; }
-  solicitarTokenDrive(resp.credential);
+  solicitarTokenDrive();
 }
 
-function solicitarTokenDrive(idToken){
-  if (!window.google || !window.google.accounts || !window.google.accounts.oauth2){ aviso('Cargando Google...','alerta'); return; }
-  const client = google.accounts.oauth2.initTokenClient({
-    client_id: GOOGLE_CLIENT_ID,
-    scope: DRIVE_SCOPE,
-    callback: (tokenResp) => {
-      if (tokenResp.error){ aviso('Error al conectar: '+tokenResp.error,'alerta'); return; }
-      driveToken = tokenResp.access_token;
-      guardarEstadoDrive();
-      actualizarUIDrive();
-      aviso('Cuenta conectada ✓','ok');
-    }
-  });
-  client.requestAccessToken({ prompt: '' });
+function solicitarTokenDrive(){
+  if (!window.google || !window.google.accounts || !window.google.accounts.oauth2){ aviso('Google no disponible, intentá de nuevo','alerta'); return; }
+  try {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: (tokenResp) => {
+        if (tokenResp.error){ aviso('Error al conectar: '+tokenResp.error,'alerta'); return; }
+        driveToken = tokenResp.access_token;
+        guardarEstadoDrive();
+        actualizarUIDrive();
+        aviso('Cuenta conectada ✓','ok');
+      }
+    });
+    client.requestAccessToken({ prompt: '' });
+  } catch(e){ aviso('Error al conectar con Google','alerta'); }
 }
 
 $('#btnConectarDrive').onclick = () => {
-  if (!window.google){ aviso('Cargando Google, intentá en un momento','alerta'); return; }
-  google.accounts.id.prompt((notif) => {
-    if (notif.isNotDisplayed() || notif.isSkippedMoment()){
-      const client = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: DRIVE_SCOPE,
-        callback: (tokenResp) => {
-          if (tokenResp.error){ aviso('No se pudo conectar','alerta'); return; }
-          driveToken = tokenResp.access_token;
-          guardarEstadoDrive();
-          actualizarUIDrive();
-          aviso('Cuenta conectada ✓','ok');
-        }
-      });
-      client.requestAccessToken({ prompt: 'consent' });
-    }
-  });
+  if (!window.google || !window.google.accounts){ aviso('Cargando Google, intentá en un momento','alerta'); setTimeout(initGoogle,500); return; }
+  try {
+    const client = google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_CLIENT_ID,
+      scope: DRIVE_SCOPE,
+      callback: (tokenResp) => {
+        if (tokenResp.error){ aviso('No se pudo conectar: '+tokenResp.error,'alerta'); return; }
+        driveToken = tokenResp.access_token;
+        guardarEstadoDrive();
+        actualizarUIDrive();
+        aviso('Cuenta conectada ✓','ok');
+      }
+    });
+    client.requestAccessToken({ prompt: 'consent' });
+  } catch(e){ aviso('Error al conectar con Google','alerta'); }
 };
 
 $('#btnDesconectarDrive').onclick = () => {
@@ -2087,5 +2085,9 @@ $('#swTema').onclick = () => {
 function pintarTodo(){ pintarUsuarios(); pintarInicio(); pintarComprobantes(); pintarEstadisticas(); }
 pintarSelPeriodo();
 </script>
+
+<!-- Google scripts al final para no bloquear render -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://apis.google.com/js/api.js" async defer></script>
 </body>
 </html>
