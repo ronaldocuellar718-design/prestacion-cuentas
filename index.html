@@ -436,9 +436,15 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
     <div class="cab">
       <div class="cab-fila">
         <div><p class="eyebrow">Cartão Coorporativo</p><h1>Prestação<br>de Conta</h1></div>
-        <div class="selPeriodo" id="selPeriodo">
-          <button id="btnMes"></button>
-          <button id="btnAno"></button>
+        <div style="display:flex;align-items:flex-start;gap:var(--e2)">
+          <div class="selPeriodo" id="selPeriodo">
+            <button id="btnMes"></button>
+            <button id="btnAno"></button>
+          </div>
+          <button class="campana" id="btnIrMas" aria-label="Perfil y salir" style="position:relative">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span id="badgeSalir" style="display:none;position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--oro);border:2px solid var(--sup)"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -995,6 +1001,7 @@ DB.items.forEach(it => {
 const guardarDB = () => {
   Store.set(KEY, JSON.stringify(DB));
   tomarSnapshot();
+  actualizarBadgeSalir();
 };
 
 function localesDe(col){ if (!Array.isArray(DB.locales[col])) DB.locales[col] = []; return DB.locales[col]; }
@@ -1055,6 +1062,7 @@ cargarEstadoDrive();
 if (!driveSnapshotHash) tomarSnapshot();
 
 function actualizarUIDrive(){
+  actualizarBadgeSalir();
   const conectado = !!driveToken;
   $('#btnConectarDrive').style.display = conectado ? 'none' : 'flex';
   $('#btnRespaldar').style.display = conectado ? 'flex' : 'none';
@@ -2139,6 +2147,19 @@ $('#expCompartir').onclick = async () => {
     cerrarPanel('#hojaExport'); descargarPaquetes(paquetes, 'No se pudo compartir ('+(e&&e.name?e.name:'error')+'). Se descargó en su lugar.');
   }
 };
+
+$('#btnIrMas').onclick = () => ir('pMas');
+
+function actualizarBadgeSalir(){
+  const badge = $('#badgeSalir');
+  if (!badge) return;
+  const tieneCambios = PERSONAS.some(p =>
+    DB.items.filter(i=>i.colaborador===p).length > 0 ||
+    (DB.locales[p]||[]).length > 0 ||
+    (DB.palabras[p]||[]).length > 0
+  );
+  badge.style.display = (driveToken && tieneCambios) ? 'block' : 'none';
+}
 
 $('#swTema').onclick = () => {
   const oscuro = document.documentElement.dataset.tema==='oscuro';
