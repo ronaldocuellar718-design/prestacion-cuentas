@@ -896,6 +896,10 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
 </div>
 
 <script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n||0));
+
 const GOOGLE_CLIENT_ID = '620543096799-2h3hshs2i3kkl2sse3k53uggf1jk82m2.apps.googleusercontent.com';
 const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const DRIVE_FOLDER = 'Prestação de Conta · Grupo Piveta';
@@ -1335,10 +1339,6 @@ function icoCat(cat){
   };
   return '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'+(p[cat]||p['Outros'])+'</svg>';
 }
-
-const $ = s => document.querySelector(s);
-const $$ = s => [...document.querySelectorAll(s)];
-const fmt = n => new Intl.NumberFormat('es-PY').format(Math.round(n||0));
 
 let colaborador = null;
 let mesActual = 8, anoActual = 2026;
