@@ -1353,7 +1353,8 @@ function abrirPanelSalir(){
 
 $('#btnSalirApp').onclick = abrirPanelSalir;
 
-$('#btnSalirSi').onclick = async () => {
+$('#btnSalirSi').onclick = async (e) => {
+  e.stopPropagation();
   if (!driveToken) { aviso('Conectá tu cuenta de Google primero','alerta'); return; }
   const conCambios = PERSONAS.filter(p => {
     const items = DB.items.filter(i => i.colaborador === p);
@@ -1377,9 +1378,9 @@ $('#btnSalirSi').onclick = async () => {
   }
 };
 
-$('#btnSalirNo').onclick = () => cerrarPanel('#hojaSalir');
-$('#btnSalirCerrar').onclick = () => { cerrarPanel('#hojaSalir'); ir('pElegir'); };
-$('#btnSalirCerrarDirecto').onclick = () => { cerrarPanel('#hojaSalir'); ir('pElegir'); };
+$('#btnSalirNo').onclick = (e) => { e.stopPropagation(); cerrarPanel('#hojaSalir'); ir('pInicio'); };
+$('#btnSalirCerrar').onclick = (e) => { e.stopPropagation(); cerrarPanel('#hojaSalir'); colaborador = null; ir('pElegir'); };
+$('#btnSalirCerrarDirecto').onclick = (e) => { e.stopPropagation(); cerrarPanel('#hojaSalir'); colaborador = null; ir('pElegir'); };
 
 /* ── Resto del código original sin modificaciones ── */
 const DICC = {
