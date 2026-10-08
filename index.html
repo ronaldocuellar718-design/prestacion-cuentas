@@ -873,7 +873,7 @@ html[data-tema="oscuro"] .dictar{background:var(--sup-2);border:1px solid var(--
   <div class="hoja">
     <div class="hoja-tirador"></div>
     <h3>Restaurar desde Drive</h3>
-    <p class="sub">Esto reemplaza los datos actuales del celular con el último respaldo guardado en Drive. No se puede deshacer.</p>
+    <p class="sub">Trae del respaldo de Drive los comprobantes, comercios y palabras. Si un comprobante está en los dos lados, queda la versión del respaldo. Los que solo están en este celular no se borran.</p>
     <div class="alcance-sel" id="alcanceRestaurar">
       <button class="chip" data-rr="activo" aria-pressed="true" style="flex:1;text-align:center" id="chipRestActivo">Solo <span id="restNombreActivo">—</span></button>
       <button class="chip" data-rr="todos" aria-pressed="false" style="flex:1;text-align:center">Los 3</button>
@@ -1010,7 +1010,6 @@ DB.items.forEach(it => {
 
 const guardarDB = () => {
   Store.set(KEY, JSON.stringify(DB));
-  tomarSnapshot();
   actualizarBadgeSalir();
 };
 
@@ -1034,20 +1033,25 @@ function iniciales(nombre){
 let driveToken = null;
 let driveUser = null;
 let driveUltimoTs = null;
-let driveSnapshotHash = null;
+let driveTokenExp = 0;      // momento (ms) en que vence el permiso de Google
+let driveHashes = {};       // huella de lo último respaldado, por colaborador
 let alcanceRespActual = 'activo';
 let alcanceRestActual = 'activo';
 let alcanceAvisoActual = 'activo';
 
-function hashDB(){
-  return JSON.stringify({
-    items: DB.items.map(i=>({id:i.id,valor:i.valor,local:i.local,data:i.data,despesa:i.despesa,obs:i.obs,nf:i.nf,colaborador:i.colaborador})),
-    locales: DB.locales,
-    palabras: DB.palabras
-  });
+/* Huella corta de los datos de UN colaborador (para saber si cambió desde el último respaldo) */
+function h32(t){ let h = 5381; for (let i=0;i<t.length;i++){ h = ((h<<5)+h+t.charCodeAt(i))|0; } return h+':'+t.length; }
+function hashCol(col){
+  return h32(JSON.stringify({
+    items: DB.items.filter(i=>i.colaborador===col),
+    locales: DB.locales[col] || [],
+    palabras: DB.palabras[col] || []
+  }));
 }
-function tomarSnapshot(){ driveSnapshotHash = hashDB(); }
-function hayCambios(){ return hashDB() !== driveSnapshotHash; }
+function tieneDatos(col){
+  return DB.items.some(i=>i.colaborador===col) || (DB.locales[col]||[]).length>0 || (DB.palabras[col]||[]).length>0;
+}
+function colConCambios(col){ return tieneDatos(col) && driveHashes[col] !== hashCol(col); }
 
 function cargarEstadoDrive(){
   try {
@@ -1057,7 +1061,8 @@ function cargarEstadoDrive(){
     driveToken = d.token || null;
     driveUser = d.user || null;
     driveUltimoTs = d.ultimoTs || null;
-    driveSnapshotHash = d.snapshotHash || null;
+    driveTokenExp = d.tokenExp || 0;
+    driveHashes = d.hashes || {};
   } catch(e){}
 }
 function guardarEstadoDrive(){
@@ -1065,11 +1070,11 @@ function guardarEstadoDrive(){
     token: driveToken,
     user: driveUser,
     ultimoTs: driveUltimoTs,
-    snapshotHash: driveSnapshotHash
+    tokenExp: driveTokenExp,
+    hashes: driveHashes
   }));
 }
 cargarEstadoDrive();
-if (!driveSnapshotHash) tomarSnapshot();
 
 function actualizarUIDrive(){
   actualizarBadgeSalir();
@@ -1124,6 +1129,7 @@ function solicitarTokenDrive(){
       callback: (tokenResp) => {
         if (tokenResp.error){ aviso('Error al conectar: '+tokenResp.error,'alerta'); return; }
         driveToken = tokenResp.access_token;
+        driveTokenExp = Date.now() + ((+tokenResp.expires_in || 3600) - 60) * 1000;
         guardarEstadoDrive();
         actualizarUIDrive();
         aviso('Cuenta conectada ✓','ok');
@@ -1142,6 +1148,7 @@ $('#btnConectarDrive').onclick = () => {
       callback: (tokenResp) => {
         if (tokenResp.error){ aviso('No se pudo conectar: '+tokenResp.error,'alerta'); return; }
         driveToken = tokenResp.access_token;
+        driveTokenExp = Date.now() + ((+tokenResp.expires_in || 3600) - 60) * 1000;
         guardarEstadoDrive();
         actualizarUIDrive();
         aviso('Cuenta conectada ✓','ok');
@@ -1154,7 +1161,7 @@ $('#btnConectarDrive').onclick = () => {
 $('#btnDesconectarDrive').onclick = () => {
   preguntar('Desconectar Google','Se eliminará la conexión. Los respaldos guardados en Drive quedan intactos.', () => {
     if (window.google && driveToken) google.accounts.oauth2.revoke(driveToken, ()=>{});
-    driveToken = null; driveUser = null;
+    driveToken = null; driveUser = null; driveTokenExp = 0;
     guardarEstadoDrive();
     actualizarUIDrive();
     aviso('Cuenta desconectada');
@@ -1170,6 +1177,7 @@ function buildPayload(cols){
     empresa: 'Grupo Piveta',
     colaboradores: cols.reduce((acc, col) => {
       acc[col] = {
+        respaldado_en: ahora,
         items: DB.items.filter(i => i.colaborador === col),
         locales: DB.locales[col] || [],
         palabras: DB.palabras[col] || []
@@ -1180,100 +1188,206 @@ function buildPayload(cols){
 }
 
 /* ── API Drive ── */
+const BACKUP_PRINCIPAL = 'backup_piveta.json';
+const BACKUP_ANTERIOR  = 'backup_piveta_anterior.json';
+
+/* Renueva el permiso de Google si venció (hay que llamarlo desde un toque del usuario) */
+function asegurarToken(){
+  return new Promise(function(resolve, reject){
+    if (driveToken && driveTokenExp && Date.now() < driveTokenExp){ resolve(); return; }
+    if (!window.google || !window.google.accounts || !window.google.accounts.oauth2){
+      reject(new Error('Google no está disponible. Revisá la conexión a internet')); return;
+    }
+    let hecho = false, t = null;
+    const fin = function(fn, v){ if (hecho) return; hecho = true; clearTimeout(t); fn(v); };
+    const soltar = function(){ driveToken = null; driveTokenExp = 0; guardarEstadoDrive(); actualizarUIDrive(); };
+    t = setTimeout(function(){ soltar(); fin(reject, new Error('Google no respondió. Volvé a conectar la cuenta')); }, 60000);
+    try {
+      const client = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: DRIVE_SCOPE,
+        callback: function(tr){
+          if (tr.error){ soltar(); fin(reject, new Error('La sesión de Google venció. Volvé a conectar la cuenta')); return; }
+          driveToken = tr.access_token;
+          driveTokenExp = Date.now() + ((+tr.expires_in || 3600) - 60) * 1000;
+          guardarEstadoDrive(); actualizarUIDrive();
+          fin(resolve);
+        },
+        error_callback: function(){ soltar(); fin(reject, new Error('No se pudo renovar la sesión de Google. Volvé a conectar la cuenta')); }
+      });
+      client.requestAccessToken({ prompt: '' });
+    } catch(e){ soltar(); fin(reject, new Error('Error al conectar con Google')); }
+  });
+}
+
+/* fetch a Drive que NUNCA da por bueno un error */
+async function driveFetch(url, opts){
+  opts = opts || {};
+  opts.headers = Object.assign({}, opts.headers, { Authorization: 'Bearer ' + driveToken });
+  let r;
+  try { r = await fetch(url, opts); }
+  catch(e){ throw new Error('Sin conexión con Google Drive'); }
+  if (r.status === 401){
+    driveTokenExp = 0; guardarEstadoDrive();
+    throw new Error('La sesión de Google venció. Tocá de nuevo para renovarla');
+  }
+  if (!r.ok){
+    let det = '';
+    try { const j = await r.clone().json(); if (j && j.error && j.error.message) det = ': ' + String(j.error.message).slice(0,140); } catch(e){}
+    throw new Error('Drive respondió ' + r.status + det);
+  }
+  return r;
+}
+
 async function buscarOCrearCarpeta(){
   const q = `name='${DRIVE_FOLDER}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
-  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name)`,
-    { headers:{ Authorization:'Bearer '+driveToken } });
+  const r = await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&orderBy=createdTime&fields=files(id,name)`);
   const d = await r.json();
   if (d.files && d.files.length) return d.files[0].id;
-  const cr = await fetch('https://www.googleapis.com/drive/v3/files',{
-    method:'POST', headers:{ Authorization:'Bearer '+driveToken,'Content-Type':'application/json' },
+  const cr = await driveFetch('https://www.googleapis.com/drive/v3/files',{
+    method:'POST', headers:{ 'Content-Type':'application/json' },
     body: JSON.stringify({ name: DRIVE_FOLDER, mimeType:'application/vnd.google-apps.folder' })
   });
   const cd = await cr.json();
+  if (!cd.id) throw new Error('No se pudo crear la carpeta en Drive');
   return cd.id;
 }
 
+/* Sube o pisa un archivo y devuelve su id (si Drive no lo confirma, falla) */
 async function subirOPisarArchivo(nombre, contenido, folderId){
   const q = `name='${nombre}' and '${folderId}' in parents and trashed=false`;
-  const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`,
-    { headers:{ Authorization:'Bearer '+driveToken } });
+  const r = await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&orderBy=${encodeURIComponent('modifiedTime desc')}&fields=files(id)`);
   const d = await r.json();
   const body = new Blob([contenido], {type:'application/json'});
+  let resp;
   if (d.files && d.files.length){
     const fileId = d.files[0].id;
-    await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,{
-      method:'PATCH', headers:{ Authorization:'Bearer '+driveToken,'Content-Type':'application/json' }, body
+    resp = await driveFetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,{
+      method:'PATCH', headers:{ 'Content-Type':'application/json' }, body
     });
   } else {
     const meta = JSON.stringify({ name: nombre, parents:[folderId] });
     const form = new FormData();
     form.append('metadata', new Blob([meta],{type:'application/json'}));
     form.append('file', body);
-    await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
-      method:'POST', headers:{ Authorization:'Bearer '+driveToken }, body: form
+    resp = await driveFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',{
+      method:'POST', body: form
     });
   }
+  const j = await resp.json();
+  if (!j || !j.id) throw new Error('Drive no confirmó el archivo guardado');
+  return j.id;
+}
+
+/* Lee TODOS los respaldos de la carpeta (el actual y los de versiones viejas de la app)
+   y se queda, por colaborador, con el más reciente. Cualquier error de lectura corta todo. */
+async function leerRespaldos(folderId){
+  const q = `'${folderId}' in parents and trashed=false`;
+  const r = await driveFetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,modifiedTime)&pageSize=200`);
+  const d = await r.json();
+  const archivos = (d.files || []).filter(f => /^backup_piveta.*\.json$/i.test(f.name || ''));
+  const porCol = {}; let principal = null;
+  for (const f of archivos){
+    const fr = await driveFetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`);
+    const texto = await fr.text();
+    if (f.name === BACKUP_PRINCIPAL) principal = { id:f.id, texto };
+    let payload = null;
+    try { payload = JSON.parse(texto); } catch(e){ continue; }
+    if (!payload || !payload.colaboradores) continue;
+    PERSONAS.forEach(col => {
+      const datos = payload.colaboradores[col];
+      if (!datos) return;
+      const ts = datos.respaldado_en || payload.generado_en || f.modifiedTime || '';
+      if (!porCol[col] || ts > porCol[col].ts) porCol[col] = { datos, ts, archivo: f.name };
+    });
+  }
+  return { porCol, principal };
+}
+
+/* Vuelve a leer lo subido y comprueba que coincide con lo que se mandó */
+async function verificarRespaldo(fileId, payload, cols){
+  const fr = await driveFetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`);
+  let leido;
+  try { leido = await fr.json(); } catch(e){ throw new Error('El respaldo subido no se pudo leer de vuelta'); }
+  cols.forEach(col => {
+    const a = payload.colaboradores[col], b = leido && leido.colaboradores && leido.colaboradores[col];
+    if (!b || !Array.isArray(b.items) || b.items.length !== a.items.length ||
+        (b.locales||[]).length !== (a.locales||[]).length || (b.palabras||[]).length !== (a.palabras||[]).length){
+      throw new Error('El respaldo no coincidió al verificarlo ('+col.split(' ')[0]+')');
+    }
+  });
 }
 
 async function ejecutarRespaldo(cols){
-  if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); return; }
+  if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); throw new Error('SIN_CONEXION'); }
   const btn = $('#btnEjecutarRespaldo');
+  const btnHTML = btn ? btn.innerHTML : '';
   if (btn){ btn.disabled=true; btn.textContent='Respaldando...'; }
   try {
+    await asegurarToken();                       // renueva el permiso si ya venció
+    const conDatos = cols.filter(tieneDatos);    // nunca se respalda un colaborador vacío
+    if (!conDatos.length){ const e = new Error('No hay datos para respaldar'); e.sinDatos = true; throw e; }
     const folderId = await buscarOCrearCarpeta();
-    const payload = buildPayload(cols);
-    const nombre = 'backup_piveta_'+cols.map(c=>c.split(' ')[0]).join('_')+'.json';
-    await subirOPisarArchivo(nombre, JSON.stringify(payload, null, 2), folderId);
+    const previo = await leerRespaldos(folderId);
+    const payload = buildPayload(conDatos);
+    PERSONAS.forEach(col => {                    // conserva lo ya respaldado de los demás
+      if (conDatos.indexOf(col) < 0 && previo.porCol[col]){
+        payload.colaboradores[col] = Object.assign({ respaldado_en: previo.porCol[col].ts }, previo.porCol[col].datos);
+      }
+    });
+    if (previo.principal) await subirOPisarArchivo(BACKUP_ANTERIOR, previo.principal.texto, folderId);
+    const fileId = await subirOPisarArchivo(BACKUP_PRINCIPAL, JSON.stringify(payload, null, 2), folderId);
+    await verificarRespaldo(fileId, payload, conDatos);
     driveUltimoTs = new Date().toISOString();
-    tomarSnapshot();
+    conDatos.forEach(col => { driveHashes[col] = hashCol(col); });
     guardarEstadoDrive();
     actualizarUIDrive();
-    cerrarPanel('#hojaRespaldo');
-    aviso('Respaldo guardado en Drive ✓','ok');
+    if ($('#hojaRespaldo').classList.contains('on')) cerrarPanel('#hojaRespaldo');
+    const sin = cols.filter(c => conDatos.indexOf(c) < 0);
+    aviso(sin.length ? 'Guardado y verificado. Sin datos de '+sin.map(c=>c.split(' ')[0]).join(', ')+' (su respaldo anterior no se tocó)'
+                     : 'Respaldo guardado y verificado en Drive ✓', 'ok', sin.length ? 5000 : undefined);
   } catch(e){
-    aviso('Error al respaldar: '+(e.message||'revisá la conexión'),'alerta',5000);
+    if (e.sinDatos) aviso('No hay datos para respaldar','alerta');
+    else aviso('NO se guardó el respaldo: '+(e.message||'revisá la conexión'),'alerta',6000);
     throw e;
   } finally {
-    if (btn){ btn.disabled=false; btn.textContent='Respaldar ahora'; }
+    if (btn){ btn.disabled=false; btn.innerHTML = btnHTML || 'Respaldar ahora'; }
   }
 }
 
 async function ejecutarRestaurar(cols){
   if (!driveToken){ aviso('Conectá tu cuenta de Google primero','alerta'); return; }
   const btn = $('#btnEjecutarRestaurar');
+  const btnHTML = btn.innerHTML;
   btn.disabled = true; btn.textContent = 'Restaurando...';
   try {
+    await asegurarToken();
     const folderId = await buscarOCrearCarpeta();
-    const nombre = 'backup_piveta_'+cols.map(c=>c.split(' ')[0]).join('_')+'.json';
-    const q = `name='${nombre}' and '${folderId}' in parents and trashed=false`;
-    const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id)`,
-      { headers:{ Authorization:'Bearer '+driveToken } });
-    const d = await r.json();
-    if (!d.files || !d.files.length){ aviso('No hay respaldo guardado para esos colaboradores','alerta'); return; }
-    const fileId = d.files[0].id;
-    const fr = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-      { headers:{ Authorization:'Bearer '+driveToken } });
-    const payload = await fr.json();
-    cols.forEach(col => {
-      if (payload.colaboradores && payload.colaboradores[col]){
-        const src = payload.colaboradores[col];
-        if (Array.isArray(src.items)) src.items.forEach(it => {
-          const idx = DB.items.findIndex(x=>x.id===it.id&&x.colaborador===col);
-          if (idx>=0) DB.items[idx]=it; else DB.items.push(it);
-        });
-        if (Array.isArray(src.locales)) DB.locales[col] = src.locales;
-        if (Array.isArray(src.palabras)) DB.palabras[col] = src.palabras;
-      }
+    const previo = await leerRespaldos(folderId);
+    const hallados = cols.filter(c => previo.porCol[c]);
+    if (!hallados.length){ aviso('No hay respaldo guardado en Drive para '+cols.map(c=>c.split(' ')[0]).join(', '),'alerta'); return; }
+    try { Store.set('piveta_pc_antes_de_restaurar', JSON.stringify(DB)); } catch(e){}   // red de seguridad local
+    hallados.forEach(col => {
+      const src = previo.porCol[col].datos;
+      if (Array.isArray(src.items)) src.items.forEach(it => {
+        if (typeof it.exportado !== 'boolean') it.exportado = false;
+        if (typeof it.tocadoTrasExport !== 'boolean') it.tocadoTrasExport = false;
+        const idx = DB.items.findIndex(x=>x.id===it.id&&x.colaborador===col);
+        if (idx>=0) DB.items[idx]=it; else DB.items.push(it);
+      });
+      if (Array.isArray(src.locales) && src.locales.length) DB.locales[col] = src.locales;
+      if (Array.isArray(src.palabras) && src.palabras.length) DB.palabras[col] = src.palabras;
     });
     guardarDB();
     pintarTodo();
-    cerrarPanel('#hojaRestaurar');
-    aviso('Datos restaurados ✓','ok');
+    if ($('#hojaRestaurar').classList.contains('on')) cerrarPanel('#hojaRestaurar');
+    const faltan = cols.filter(c => !previo.porCol[c]);
+    aviso(faltan.length ? 'Restaurado. No había respaldo de: '+faltan.map(c=>c.split(' ')[0]).join(', ') : 'Datos restaurados ✓',
+          faltan.length ? 'alerta' : 'ok', faltan.length ? 5000 : undefined);
   } catch(e){
-    aviso('Error al restaurar: '+(e.message||'revisá la conexión'),'alerta',5000);
+    aviso('NO se restauró: '+(e.message||'revisá la conexión'),'alerta',6000);
   } finally {
-    btn.disabled = false; btn.textContent = 'Restaurar ahora';
+    btn.disabled = false; btn.innerHTML = btnHTML;
   }
 }
 
@@ -1309,7 +1423,7 @@ $$('#alcanceRespaldo .chip').forEach(b => b.onclick = () => {
 $('#btnRespaldar').onclick = abrirPanelRespaldo;
 $('#btnEjecutarRespaldo').onclick = () => {
   const cols = alcanceRespActual==='todos' ? PERSONAS : [colaborador];
-  ejecutarRespaldo(cols);
+  ejecutarRespaldo(cols).catch(function(){});
 };
 
 /* ── Panel restaurar ── */
@@ -1328,7 +1442,7 @@ $$('#alcanceRestaurar .chip').forEach(b => b.onclick = () => {
 $('#btnRestaurar').onclick = abrirPanelRestaurar;
 $('#btnEjecutarRestaurar').onclick = () => {
   const cols = alcanceRestActual==='todos' ? PERSONAS : [colaborador];
-  preguntar('¿Restaurar datos?','Los datos actuales del celular serán reemplazados por el respaldo de Drive.', ()=>{
+  preguntar('¿Restaurar datos?','Se traerán los datos del respaldo de Drive. Si un comprobante está en ambos lados, queda la versión del respaldo; los que solo están en este celular se conservan.', ()=>{
     ejecutarRestaurar(cols);
   });
 };
@@ -1337,12 +1451,7 @@ $('#btnEjecutarRestaurar').onclick = () => {
 
 /* ── SALIR DE LA APP ── */
 function abrirPanelSalir(){
-  const conCambios = PERSONAS.filter(p => {
-    const items = DB.items.filter(i => i.colaborador === p);
-    const locales = (DB.locales[p]||[]);
-    const palabras = (DB.palabras[p]||[]);
-    return items.length > 0 || locales.length > 0 || palabras.length > 0;
-  });
+  const conCambios = PERSONAS.filter(colConCambios);
 
   $('#salirHayCambios').style.display = conCambios.length ? 'block' : 'none';
   $('#salirSinCambios').style.display = conCambios.length ? 'none' : 'block';
@@ -1366,10 +1475,7 @@ $('#btnSalirApp').onclick = abrirPanelSalir;
 $('#btnSalirSi').onclick = async (e) => {
   e.stopPropagation();
   if (!driveToken) { aviso('Conectá tu cuenta de Google primero','alerta'); return; }
-  const conCambios = PERSONAS.filter(p => {
-    const items = DB.items.filter(i => i.colaborador === p);
-    return items.length > 0 || (DB.locales[p]||[]).length > 0 || (DB.palabras[p]||[]).length > 0;
-  });
+  const conCambios = PERSONAS.filter(colConCambios);
   $('#salirHayCambios').style.display = 'none';
   $('#salirGuardando').style.display = 'block';
   const noms = conCambios.map(p => p.split(' ')[0]).join(', ');
@@ -1384,7 +1490,7 @@ $('#btnSalirSi').onclick = async (e) => {
   } catch(e) {
     $('#salirGuardando').style.display = 'none';
     $('#salirHayCambios').style.display = 'block';
-    aviso('Error al guardar — revisá la conexión','alerta');
+    aviso('NO se guardó — '+((e && e.message) ? e.message : 'revisá la conexión'),'alerta',6000);
   }
 };
 
@@ -2182,11 +2288,7 @@ $('#btnIrMas').onclick = () => ir('pMas');
 function actualizarBadgeSalir(){
   const badge = $('#badgeSalir');
   if (!badge) return;
-  const tieneCambios = PERSONAS.some(p =>
-    DB.items.filter(i=>i.colaborador===p).length > 0 ||
-    (DB.locales[p]||[]).length > 0 ||
-    (DB.palabras[p]||[]).length > 0
-  );
+  const tieneCambios = PERSONAS.some(colConCambios);
   badge.style.display = (driveToken && tieneCambios) ? 'block' : 'none';
 }
 
